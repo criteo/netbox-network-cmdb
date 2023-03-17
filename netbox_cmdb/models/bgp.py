@@ -18,6 +18,7 @@ class BGPGlobal(ChangeLoggedModel):
     One device can have multiple configuration, as there are possibily VRF.
     Note: VRF are not implemented yet.
     """
+
     # TODO: once VRF will be implemented, attach to the VRF instead of directly to the device
     device = models.OneToOneField(
         Device,
@@ -42,7 +43,9 @@ class BGPGlobal(ChangeLoggedModel):
     graceful_restart_time = models.PositiveIntegerField(blank=True, null=True)
 
     ecmp = models.BooleanField(default=True, help_text="field ignored for JunOS")
-    ecmp_maximum_paths = models.PositiveIntegerField(default=32, validators=[MinValueValidator(1)], help_text="field ignored for JunOS")
+    ecmp_maximum_paths = models.PositiveIntegerField(
+        default=32, validators=[MinValueValidator(1)], help_text="field ignored for JunOS"
+    )
 
     def __str__(self):
         return str(self.device)
@@ -52,7 +55,6 @@ class BGPGlobal(ChangeLoggedModel):
 
 
 class BGPSessionStatusChoices(ChoiceSet):
-
     STATUS_ACTIVE = "active"
     STATUS_PLANNED = "planned"
     STATUS_MAINTENANCE = "maintenance"
@@ -74,7 +76,6 @@ class BGPSessionStatusChoices(ChoiceSet):
 
 
 class SendCommunity(ChoiceSet):
-
     NONE = "NONE"
     STANDARD = "STANDARD"
     EXTENDED = "EXTENDED"
@@ -89,7 +90,6 @@ class SendCommunity(ChoiceSet):
 
 
 class AfiSafiChoices(ChoiceSet):
-
     IPV4_UNICAST = "ipv4-unicast"
     IPV6_UNICAST = "ipv6-unicast"
     L2VPN_EVPN = "l2vpn-evpn"

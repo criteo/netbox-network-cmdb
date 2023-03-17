@@ -40,6 +40,7 @@ class BaseTestCase(TestCase):
         self.ip_address2 = IPAddress.objects.create(address="10.0.0.2/32")
         self.tenant = Tenant.objects.create(name="tenant1", slug="tenant1")
 
+
 class BGPGlobalSerializerCreate(BaseTestCase):
     def test_create(self):
         data = {
@@ -68,6 +69,7 @@ class BGPGlobalSerializerCreate(BaseTestCase):
         assert global_conf.ecmp == True
         assert global_conf.ecmp_maximum_paths == 128
 
+
 class BGPGlobalSerializerUpdate(BaseTestCase):
     def setUp(self):
         super().setUp()
@@ -82,7 +84,6 @@ class BGPGlobalSerializerUpdate(BaseTestCase):
             ecmp=True,
             ecmp_maximum_paths=128,
         )
-
 
     def test_already_existing(self):
         data = {
@@ -99,7 +100,6 @@ class BGPGlobalSerializerUpdate(BaseTestCase):
         bgp_global_serializer = BGPGlobalSerializer(data=data)
         assert bgp_global_serializer.is_valid() == True
         self.assertRaises(IntegrityError, bgp_global_serializer.save)
-
 
     def test_update(self):
         data = {

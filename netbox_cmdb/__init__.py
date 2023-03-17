@@ -2,7 +2,6 @@
 from extras.plugins import PluginConfig
 
 
-
 class CMDB(PluginConfig):
     name = "netbox_cmdb"
     verbose_name = "Netbox CMDB"
