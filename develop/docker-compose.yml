@@ -17,7 +17,7 @@ services:
       - ./dev.env
     volumes: &volumes
       - ./configuration.py:/opt/netbox/netbox/netbox/configuration.py
-      - ../netbox_cmdb:/source/netbox_cmdb/netbox_cmdb
+      - ../netbox_cmdb:/source/netbox_cmdb
     tty: true
   worker:
     build:
