@@ -1,0 +1,43 @@
+{% extends 'generic/object.html' %}
+
+{% block content %}
+<div class="row">
+  <div class="col col-md-6">
+    <div class="card">
+      <h5 class="card-header">Peer Group</h5>
+      <div class="card-body">
+        <table class="table table-hover attr-table">
+          <tr>
+            <td>Name</td>
+            <td>{{ object.name }}</td>
+          </tr>
+          <tr>
+            <td>Device</td>
+            <td>{{ object.device }}</td>
+          </tr>
+          <tr>
+            <td>Local ASN</td>
+            <td>{{ object.local_asn }}</td>
+          </tr>
+          <tr>
+            <td>Remote ASN</td>
+            <td>{{ object.remote_asn }}</td>
+          </tr>
+          <tr>
+            <td>Route-policy in</td>
+            <td>{{ object.route_policy_in }}</td>
+          </tr>
+          <tr>
+            <td>Route-policy out</td>
+            <td>{{ object.route_policy_out }}</td>
+          </tr>
+          <tr>
+            <td>Maximum prefixes</td>
+            <td>{{ object.maximum_prefixes }}</td>
+          </tr>
+        </table>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

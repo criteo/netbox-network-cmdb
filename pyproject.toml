@@ -1,0 +1,23 @@
+[tool.black]
+line-length = 100
+exclude = '''
+(
+  /(
+      \.eggs
+    | \.git
+    | \.tox
+    | \.venv
+    | venv
+    | env
+    | \.env
+    | migrations
+    | develop
+  )/
+)
+'''
+
+[tool.isort]
+profile = "black"
+multi_line_output = 3
+skip_gitignore = true
+skip = ".bzr,.direnv,.eggs,.git,.hg,.mypy_cache,.nox,.pants.d,.svn,.tox,.venv,_build,buck-out,build,dist,node_modules,venv,migrations,urls.py"
