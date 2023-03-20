@@ -75,20 +75,6 @@ class BGPSessionStatusChoices(ChoiceSet):
     }
 
 
-class SendCommunity(ChoiceSet):
-    NONE = "NONE"
-    STANDARD = "STANDARD"
-    EXTENDED = "EXTENDED"
-    BOTH = "BOTH"
-
-    CHOICES = (
-        (NONE, "None"),
-        (STANDARD, "Standard"),
-        (EXTENDED, "Extended"),
-        (BOTH, "Both"),
-    )
-
-
 class AfiSafiChoices(ChoiceSet):
     IPV4_UNICAST = "ipv4-unicast"
     IPV6_UNICAST = "ipv6-unicast"
@@ -257,12 +243,6 @@ class DeviceBGPSession(BGPSessionCommon):
         help_text="warning: changing this field will cause the reset of the BGP session",
     )
     maximum_prefixes = models.PositiveIntegerField(null=True, blank=True)
-
-    send_community = models.CharField(
-        max_length=10,
-        choices=SendCommunity,
-        default=SendCommunity.BOTH,
-    )
 
     objects = RestrictedQuerySet.as_manager()
 
