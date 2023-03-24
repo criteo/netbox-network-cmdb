@@ -349,6 +349,39 @@ class BGPSessionSerializerUpdate(BaseTestCase):
         assert bgp_session_got.peer_a.enforce_first_as == False
         assert bgp_session_got.peer_b.description == "peer_b"
 
+    def test_bgp_session_update__patch_peer_a_route_policy(self):
+        """Peer setting of a peer (DeviceBGPSession)."""
+        # Set route_policy_out
+        data = {
+            "peer_a": {
+                "local_address": self.ip_address1.pk,
+                "device": self.device1.pk,
+                "local_asn": self.asn1.pk,
+                "route_policy_out": self.route_policy1.pk,
+            },
+            "peer_b": {
+                "local_address": self.ip_address2.pk,
+                "device": self.device2.pk,
+                "local_asn": self.asn2.pk,
+            },
+        }
+        bgp_session_serializer = BGPSessionSerializer(instance=self.bgp_session, data=data)
+        assert bgp_session_serializer.is_valid() == True
+        bgp_session_serializer.save()
+
+        bgp_session_got = BGPSession.objects.get(id=self.bgp_session.pk)
+        assert bgp_session_got.peer_a.route_policy_out == self.route_policy1
+
+        # Remove route_policy_out
+        data["peer_a"]["route_policy_out"] = None
+
+        bgp_session_serializer = BGPSessionSerializer(instance=self.bgp_session, data=data)
+        assert bgp_session_serializer.is_valid() == True
+        bgp_session_serializer.save()
+
+        bgp_session_got = BGPSession.objects.get(id=self.bgp_session.pk)
+        assert bgp_session_got.peer_a.route_policy_out == None
+
     def test_bgp_session_update__add_afisafi(self):
         """Adding ipv4-unicast afisafi to an existing session"""
         data = {

@@ -57,8 +57,8 @@ class RoutePolicySerializer(WritableNestedSerializer):
 
 
 class NestedAfiSafiSerializer(ModelSerializer):
-    route_policy_in = RoutePolicySerializer(required=False, many=False)
-    route_policy_out = RoutePolicySerializer(required=False, many=False)
+    route_policy_in = RoutePolicySerializer(required=False, many=False, allow_null=True)
+    route_policy_out = RoutePolicySerializer(required=False, many=False, allow_null=True)
 
     class Meta:
         model = AfiSafi
@@ -66,9 +66,7 @@ class NestedAfiSafiSerializer(ModelSerializer):
 
 
 class BGPPeerGroupSerializer(BGPSessionCommonSerializer):
-    local_asn = AsnSerializer(
-        required=False,
-    )
+    local_asn = AsnSerializer(required=False, allow_null=True)
     remote_asn = AsnSerializer(
         required=False,
     )
@@ -76,10 +74,12 @@ class BGPPeerGroupSerializer(BGPSessionCommonSerializer):
     route_policy_in = RoutePolicySerializer(
         required=False,
         many=False,
+        allow_null=True,
     )
     route_policy_out = RoutePolicySerializer(
         required=False,
         many=False,
+        allow_null=True,
     )
 
     class Meta:
@@ -117,11 +117,11 @@ class BGPASNSerializer(ModelSerializer):
 class DeviceBGPSessionSerializer(ModelSerializer):
     local_address = NestedIPAddressSerializer(many=False)
     device = CommonDeviceSerializer()
-    peer_group = LiteBGPPeerGroupSerializer(required=False, many=False)
-    local_asn = AsnSerializer(many=False)
-    afi_safis = NestedAfiSafiSerializer(required=False, many=True)
-    route_policy_in = RoutePolicySerializer(required=False, many=False)
-    route_policy_out = RoutePolicySerializer(required=False, many=False)
+    peer_group = LiteBGPPeerGroupSerializer(required=False, many=False, allow_null=True)
+    local_asn = AsnSerializer(many=False, allow_null=True)
+    afi_safis = NestedAfiSafiSerializer(required=False, many=True, allow_null=True)
+    route_policy_in = RoutePolicySerializer(required=False, many=False, allow_null=True)
+    route_policy_out = RoutePolicySerializer(required=False, many=False, allow_null=True)
 
     class Meta:
         model = DeviceBGPSession
