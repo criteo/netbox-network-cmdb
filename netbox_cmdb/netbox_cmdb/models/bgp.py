@@ -288,14 +288,16 @@ class DeviceBGPSession(BGPSessionCommon):
             errors.append(error)
 
         if route_policy_in and route_policy_in.device_id != device.id:
-            error = ValidationError("%(field)s is not on the same device",
+            error = ValidationError(
+                "%(field)s is not on the same device",
                 code="device_mismatch",
                 params={"field": "route_policy_in"},
             )
             errors.append(error)
 
         if route_policy_out and route_policy_out.device_id != device.id:
-            error = ValidationError("%(field)s is not on the same device",
+            error = ValidationError(
+                "%(field)s is not on the same device",
                 code="device_mismatch",
                 params={"field": "route_policy_out"},
             )

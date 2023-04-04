@@ -277,7 +277,9 @@ class BGPSessionSerializer(ModelSerializer):
             for safi in attrs[peer].get("afi_safis", []):
                 try:
                     AfiSafi.validate_device_consistency(
-                        attrs[peer]["device"], safi.get("route_policy_in"), safi.get("route_policy_out")
+                        attrs[peer]["device"],
+                        safi.get("route_policy_in"),
+                        safi.get("route_policy_out"),
                     )
                 except ValidationError as error:
                     errors.append(error)
