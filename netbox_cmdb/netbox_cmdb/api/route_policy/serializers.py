@@ -1,6 +1,8 @@
 """Route Policy serializers."""
+from django.core.exceptions import ValidationError
 from netbox.api.serializers import WritableNestedSerializer
-from rest_framework.serializers import ModelSerializer, ValidationError
+from rest_framework import serializers
+from rest_framework.serializers import ModelSerializer
 
 from netbox_cmdb.api.common_serializers import CommonDeviceSerializer
 from netbox_cmdb.models.bgp_community_list import BGPCommunityList
@@ -71,7 +73,7 @@ class WritableRoutePolicySerializer(ModelSerializer):
 
     def _validate_terms(self, terms_data):
         if len(terms_data) < 1:
-            raise ValidationError(
+            raise serializers.ValidationError(
                 {
                     "detail": "input is not valid, you must have at least one term in your route policy."
                 }
@@ -142,3 +144,20 @@ class WritableRoutePolicySerializer(ModelSerializer):
                 term.delete()
 
         return instance
+
+    def validate(self, attrs):
+        errors = []
+        for term in attrs.get("route_policy_term", []):
+            try:
+                RoutePolicyTerm.validate_device_consistency(
+                    attrs["device"],
+                    term.get("from_bgp_community_list"),
+                    term.get("from_prefix_list"),
+                )
+            except ValidationError as error:
+                errors.append(error)
+
+        if errors:
+            raise serializers.ValidationError({"errors": ValidationError(errors).messages})
+
+        return super().validate(attrs)
