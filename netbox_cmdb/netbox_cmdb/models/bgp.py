@@ -231,7 +231,7 @@ class DeviceBGPSession(BGPSessionCommon):
         to="dcim.Device", on_delete=models.CASCADE, related_name="%(class)sdevice"
     )
     local_address = models.ForeignKey(
-        to="ipam.IPAddress", on_delete=models.CASCADE, related_name="local_address"
+        to="ipam.IPAddress", on_delete=models.PROTECT, related_name="local_address"
     )
     # instance = models.ForeignKey(...)
 
