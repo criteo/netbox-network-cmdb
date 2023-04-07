@@ -29,7 +29,6 @@ class ValidPrefixListTestCase(BaseTestCase):
         PrefixListTerm.objects.create(
             prefix_list=prefix_list,
             sequence=10,
-            decision="permit",
             prefix=IPNetwork("10.0.0.0/8"),
             ge=24,
             le=32,
@@ -42,7 +41,6 @@ class ValidPrefixListTestCase(BaseTestCase):
         PrefixListTerm.objects.create(
             prefix_list=prefix_list,
             sequence=10,
-            decision="permit",
             prefix=IPNetwork("2001:DB8::/32"),
             ge=48,
             le=128,
@@ -58,7 +56,6 @@ class InvalidPrefixListTestCase(BaseTestCase):
             PrefixListTerm.objects.create(
                 prefix_list=prefix_list,
                 sequence=10,
-                decision="permit",
                 prefix=IPNetwork("2001:DB8::/32"),
             )
 
@@ -70,7 +67,6 @@ class InvalidPrefixListTestCase(BaseTestCase):
             PrefixListTerm.objects.create(
                 prefix_list=prefix_list,
                 sequence=10,
-                decision="permit",
                 prefix=IPNetwork("10.0.0.0/8"),
             )
 
@@ -82,7 +78,6 @@ class InvalidPrefixListTestCase(BaseTestCase):
             PrefixListTerm.objects.create(
                 prefix_list=prefix_list,
                 sequence=10,
-                decision="permit",
                 prefix=IPNetwork("10.0.0.0/8"),
                 le=48,
             )
@@ -95,7 +90,6 @@ class InvalidPrefixListTestCase(BaseTestCase):
             PrefixListTerm.objects.create(
                 prefix_list=prefix_list,
                 sequence=10,
-                decision="permit",
                 prefix=IPNetwork("2001:DB8::/32"),
                 ge=200,
             )
@@ -108,7 +102,6 @@ class InvalidPrefixListTestCase(BaseTestCase):
             PrefixListTerm.objects.create(
                 prefix_list=prefix_list,
                 sequence=10,
-                decision="permit",
                 prefix=IPNetwork("10.0.0.0/8"),
                 le=6,
             )
@@ -124,7 +117,6 @@ class InvalidPrefixListTestCase(BaseTestCase):
             PrefixListTerm.objects.create(
                 prefix_list=prefix_list,
                 sequence=10,
-                decision="permit",
                 prefix=IPNetwork("10.0.0.0/8"),
                 le=10,
                 ge=24,

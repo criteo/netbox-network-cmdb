@@ -6,8 +6,6 @@ from ipam.fields import IPNetworkField
 from netbox.models import ChangeLoggedModel
 from utilities.choices import ChoiceSet
 
-from netbox_cmdb.choices import DecisionChoice
-
 
 class PrefixListIPVersionChoices(ChoiceSet):
     """Prefix list IP versions choices."""
@@ -53,17 +51,12 @@ class PrefixListTerm(ChangeLoggedModel):
         to="PrefixList", on_delete=models.CASCADE, related_name="prefix_list_term"
     )
     sequence = models.PositiveIntegerField()
-    decision = models.CharField(
-        max_length=32,
-        choices=DecisionChoice,
-        default=DecisionChoice.PERMIT,
-    )
     prefix = IPNetworkField()
     le = models.PositiveSmallIntegerField(null=True, blank=True)
     ge = models.PositiveSmallIntegerField(null=True, blank=True)
 
     def __str__(self):
-        return str(f"{self.prefix_list} seq:{self.sequence} decision:{self.decision}")
+        return str(f"{self.prefix_list} seq:{self.sequence}")
 
     @staticmethod
     def _is_mask_len_operator_valid(mask_len, prefix_mask_len, max_prefix_len):

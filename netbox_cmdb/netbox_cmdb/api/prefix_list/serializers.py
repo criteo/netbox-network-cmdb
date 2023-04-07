@@ -10,7 +10,7 @@ class PrefixListTermSerializer(ModelSerializer):
 
     class Meta:  # pylint: disable=missing-docstring
         model = PrefixListTerm
-        fields = ["sequence", "decision", "prefix", "le", "ge"]
+        fields = ["sequence", "prefix", "le", "ge"]
 
 
 class PrefixListSerializer(ModelSerializer):
@@ -61,7 +61,6 @@ class PrefixListSerializer(ModelSerializer):
                 prefix_list=instance, sequence=term_data["sequence"], defaults=term_data
             )
             if not created:
-                term.decision = term_data.get("decision", term.decision)
                 term.prefix = term_data.get("prefix", term.prefix)
                 term.le = term_data.get("le", term.le)
                 term.ge = term_data.get("ge", term.ge)

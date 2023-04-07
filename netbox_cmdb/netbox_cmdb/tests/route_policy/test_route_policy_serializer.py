@@ -75,7 +75,6 @@ class BaseTestCase(TestCase):
         self.prefix_list_term = PrefixListTerm.objects.create(
             prefix_list=self.prefix_list,
             sequence=5,
-            decision="permit",
             prefix=IPNetwork("10.0.0.0/8"),
         )
         self.bgp_community_list = BGPCommunityList.objects.create(
@@ -99,7 +98,6 @@ class BaseTestCase(TestCase):
         self.prefix_list_term2 = PrefixListTerm.objects.create(
             prefix_list=self.prefix_list2,
             sequence=5,
-            decision="permit",
             prefix=IPNetwork("10.0.0.0/8"),
         )
         self.bgp_community_list2 = BGPCommunityList.objects.create(
