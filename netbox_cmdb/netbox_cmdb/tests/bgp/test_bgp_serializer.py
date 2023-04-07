@@ -193,7 +193,6 @@ class BGPSessionSerializerUpdate(BaseTestCase):
         self.bgp_community_list_term1 = BGPCommunityListTerm.objects.create(
             bgp_community_list=self.bgp_community_list1,
             sequence=5,
-            decision="permit",
             community="64666:123",
         )
         self.bgp_community_list2 = BGPCommunityList.objects.create(
@@ -202,7 +201,6 @@ class BGPSessionSerializerUpdate(BaseTestCase):
         self.bgp_community_list_term2 = BGPCommunityListTerm.objects.create(
             bgp_community_list=self.bgp_community_list2,
             sequence=5,
-            decision="permit",
             community="64666:123",
         )
 
@@ -212,7 +210,6 @@ class BGPSessionSerializerUpdate(BaseTestCase):
         data_terms1 = [
             {
                 "sequence": 5,
-                "decision": "permit",
                 "from_bgp_community_list": self.bgp_community_list1,
                 "set_local_pref": 100,
             },
@@ -234,7 +231,6 @@ class BGPSessionSerializerUpdate(BaseTestCase):
         data_terms2 = [
             {
                 "sequence": 5,
-                "decision": "permit",
                 "from_bgp_community_list": self.bgp_community_list2,
                 "set_local_pref": 100,
             },
