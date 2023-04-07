@@ -7,7 +7,7 @@ from rest_framework.serializers import ModelSerializer, ValidationError
 class BGPCommunityListTermSerializer(ModelSerializer):
     class Meta:
         model = BGPCommunityListTerm
-        fields = ["sequence", "decision", "community"]
+        fields = ["sequence", "community"]
 
 
 class BGPCommunityListSerializer(ModelSerializer):
@@ -58,7 +58,6 @@ class BGPCommunityListSerializer(ModelSerializer):
                 defaults=term_data,
             )
             if not created:
-                term.decision = term_data.get("decision", term.decision)
                 term.community = term_data.get("community", term.community)
                 term.save()
 

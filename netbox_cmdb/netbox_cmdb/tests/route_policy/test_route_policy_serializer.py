@@ -84,7 +84,6 @@ class BaseTestCase(TestCase):
         self.bgp_community_list_term = BGPCommunityListTerm.objects.create(
             bgp_community_list=self.bgp_community_list,
             sequence=5,
-            decision="permit",
             community="64666:123",
         )
 
@@ -109,7 +108,6 @@ class BaseTestCase(TestCase):
         self.bgp_community_list_term2 = BGPCommunityListTerm.objects.create(
             bgp_community_list=self.bgp_community_list2,
             sequence=5,
-            decision="permit",
             community="64666:123",
         )
 
