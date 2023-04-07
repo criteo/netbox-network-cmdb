@@ -28,7 +28,6 @@ def validate(device, data):
 
     for cl_term_got, cl_term_expected in zip(cl_terms_got, cl_terms_expected):
         assert cl_term_got.sequence == cl_term_expected.sequence
-        assert cl_term_got.decision == cl_term_expected.decision
         assert cl_term_got.community == cl_term_expected.community
 
 
@@ -56,12 +55,10 @@ class BGPCommunityListSerializerCreate(BaseTestCase):
             "terms": [
                 {
                     "sequence": 5,
-                    "decision": "permit",
                     "community": "64512:1000",
                 },
                 {
                     "sequence": 10,
-                    "decision": "deny",
                     "community": "64512:2000",
                 },
             ],
@@ -103,12 +100,10 @@ class BGPCommunityListSerializerUpdate(BaseTestCase):
         data_terms = [
             {
                 "sequence": 5,
-                "decision": "permit",
                 "community": "64512:1000",
             },
             {
                 "sequence": 10,
-                "decision": "deny",
                 "community": "64512:2000",
             },
         ]
@@ -127,17 +122,14 @@ class BGPCommunityListSerializerUpdate(BaseTestCase):
             "terms": [
                 {
                     "sequence": 5,
-                    "decision": "permit",
                     "community": "64512:1000",
                 },
                 {
                     "sequence": 10,
-                    "decision": "deny",
                     "community": "64512:2000",
                 },
                 {
                     "sequence": 15,
-                    "decision": "permit",
                     "community": "64512:666",
                 },
             ],
@@ -154,7 +146,6 @@ class BGPCommunityListSerializerUpdate(BaseTestCase):
             "terms": [
                 {
                     "sequence": 5,
-                    "decision": "permit",
                     "community": "64512:1000",
                 }
             ],
@@ -171,12 +162,10 @@ class BGPCommunityListSerializerUpdate(BaseTestCase):
             "terms": [
                 {
                     "sequence": 5,
-                    "decision": "permit",
                     "community": "64512:1000",
                 },
                 {
                     "sequence": 10,
-                    "decision": "deny",
                     "community": "64512:2000",
                 },
             ],
@@ -194,12 +183,10 @@ class BGPCommunityListSerializerUpdate(BaseTestCase):
             "terms": [
                 {
                     "sequence": 5,
-                    "decision": "deny",  # changing it to deny
                     "community": "64512:1000",
                 },
                 {
                     "sequence": 10,
-                    "decision": "deny",
                     "community": "64512:3000",  # changing value
                 },
             ],

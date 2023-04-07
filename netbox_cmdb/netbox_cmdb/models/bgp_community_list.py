@@ -1,8 +1,6 @@
 from django.db import models
 from netbox.models import ChangeLoggedModel
 
-from netbox_cmdb.choices import DecisionChoice
-
 
 class BGPCommunityList(ChangeLoggedModel):
     """An object used in RoutePolicy object to filter on a list of BGP communities."""
@@ -31,15 +29,10 @@ class BGPCommunityListTerm(ChangeLoggedModel):
         related_name="bgp_community_list_term",
     )
     sequence = models.PositiveIntegerField()
-    decision = models.CharField(
-        max_length=32,
-        choices=DecisionChoice,
-        default=DecisionChoice.PERMIT,
-    )
     community = models.CharField(max_length=100)
 
     def __str__(self):
-        return str(f"{self.bgp_community_list} seq:{self.sequence} decision:{self.decision}")
+        return str(f"{self.bgp_community_list} seq:{self.sequence}")
 
     class Meta:
         unique_together = ("bgp_community_list", "sequence")
