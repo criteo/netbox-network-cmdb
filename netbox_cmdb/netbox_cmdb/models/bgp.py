@@ -1,9 +1,9 @@
+from dcim.models.devices import Device
+from django.core.exceptions import ValidationError
 from django.core.validators import MaxValueValidator, MinValueValidator
 from django.db import models
 from django.db.models import Q
-from django.forms import ValidationError
 from django.urls import reverse
-from dcim.models.devices import Device
 from netbox.models import ChangeLoggedModel
 from utilities.choices import ChoiceSet
 from utilities.querysets import RestrictedQuerySet
@@ -122,6 +122,33 @@ class AfiSafi(ChangeLoggedModel):
     def __str__(self):
         return str(self.afi_safi_name)
 
+    @staticmethod
+    def validate_device_consistency(device, route_policy_in, route_policy_out):
+        errors = []
+        if route_policy_in and route_policy_in.device_id != device.id:
+            error = ValidationError(
+                "%(field)s is not on the same device",
+                code="device_mismatch",
+                params={"field": "route_policy_in"},
+            )
+            errors.append(error)
+
+        if route_policy_out and route_policy_out.device_id != device.id:
+            error = ValidationError(
+                "%(field)s is not on the same device",
+                code="device_mismatch",
+                params={"field": "route_policy_out"},
+            )
+            errors.append(error)
+
+        if errors:
+            raise ValidationError(errors)
+
+    def clean(self):
+        self.validate_device_consistency(
+            self.device_bgp_session.device, self.route_policy_in, self.route_policy_out
+        )
+
     class Meta:
         unique_together = ("device_bgp_session", "afi_safi_name")
 
@@ -231,7 +258,7 @@ class DeviceBGPSession(BGPSessionCommon):
         to="dcim.Device", on_delete=models.CASCADE, related_name="%(class)sdevice"
     )
     local_address = models.ForeignKey(
-        to="ipam.IPAddress", on_delete=models.CASCADE, related_name="local_address"
+        to="ipam.IPAddress", on_delete=models.PROTECT, related_name="local_address"
     )
     # instance = models.ForeignKey(...)
 
@@ -248,6 +275,41 @@ class DeviceBGPSession(BGPSessionCommon):
 
     def __str__(self):
         return str(f"{self.device}--{self.local_asn}--{self.local_address}")
+
+    @staticmethod
+    def validate_device_consistency(device, peer_group, route_policy_in, route_policy_out):
+        errors = []
+        if peer_group and peer_group.device_id != device.id:
+            error = ValidationError(
+                "%(field)s is not on the same device",
+                code="device_mismatch",
+                params={"field": "peer_group"},
+            )
+            errors.append(error)
+
+        if route_policy_in and route_policy_in.device_id != device.id:
+            error = ValidationError(
+                "%(field)s is not on the same device",
+                code="device_mismatch",
+                params={"field": "route_policy_in"},
+            )
+            errors.append(error)
+
+        if route_policy_out and route_policy_out.device_id != device.id:
+            error = ValidationError(
+                "%(field)s is not on the same device",
+                code="device_mismatch",
+                params={"field": "route_policy_out"},
+            )
+            errors.append(error)
+
+        if errors:
+            raise ValidationError(errors)
+
+    def clean(self):
+        self.validate_device_consistency(
+            self.device, self.peer_group, self.route_policy_in, self.route_policy_out
+        )
 
     class Meta:
         verbose_name_plural = "Device BGP Sessions"

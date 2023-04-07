@@ -1,3 +1,4 @@
+from django.core.exceptions import ValidationError
 from django.db import models
 from netbox.models import ChangeLoggedModel
 from utilities.querysets import RestrictedQuerySet
@@ -91,6 +92,33 @@ class RoutePolicyTerm(ChangeLoggedModel):
 
     def __str__(self):
         return str(f"{self.route_policy} seq:{self.sequence} decision:{self.decision}")
+
+    @staticmethod
+    def validate_device_consistency(device, from_bgp_community_list, from_prefix_list):
+        errors = []
+        if from_bgp_community_list and from_bgp_community_list.device_id != device.id:
+            error = ValidationError(
+                "%(field)s is not on the same device",
+                code="device_mismatch",
+                params={"field": "from_bgp_community_list"},
+            )
+            errors.append(error)
+
+        if from_prefix_list and from_prefix_list.device_id != device.id:
+            error = ValidationError(
+                "%(field)s is not on the same device",
+                code="device_mismatch",
+                params={"field": "from_prefix_list"},
+            )
+            errors.append(error)
+
+        if errors:
+            raise ValidationError(errors)
+
+    def clean(self):
+        self.validate_device_consistency(
+            self.route_policy.device, self.from_bgp_community_list, self.from_prefix_list
+        )
 
     class Meta:
         unique_together = ("route_policy", "sequence")

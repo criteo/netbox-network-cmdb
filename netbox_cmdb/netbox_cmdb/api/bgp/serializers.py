@@ -1,7 +1,9 @@
 from django.db.models import Q
+from django.core.exceptions import ValidationError
 from ipam.api.nested_serializers import NestedIPAddressSerializer
 from netbox.api.serializers import WritableNestedSerializer
-from rest_framework.serializers import IntegerField, ModelSerializer, ValidationError
+from rest_framework import serializers
+from rest_framework.serializers import IntegerField, ModelSerializer
 from tenancy.api.nested_serializers import NestedTenantSerializer
 
 from netbox_cmdb.api.common_serializers import CommonDeviceSerializer
@@ -57,8 +59,8 @@ class RoutePolicySerializer(WritableNestedSerializer):
 
 
 class NestedAfiSafiSerializer(ModelSerializer):
-    route_policy_in = RoutePolicySerializer(required=False, many=False)
-    route_policy_out = RoutePolicySerializer(required=False, many=False)
+    route_policy_in = RoutePolicySerializer(required=False, many=False, allow_null=True)
+    route_policy_out = RoutePolicySerializer(required=False, many=False, allow_null=True)
 
     class Meta:
         model = AfiSafi
@@ -66,9 +68,7 @@ class NestedAfiSafiSerializer(ModelSerializer):
 
 
 class BGPPeerGroupSerializer(BGPSessionCommonSerializer):
-    local_asn = AsnSerializer(
-        required=False,
-    )
+    local_asn = AsnSerializer(required=False, allow_null=True)
     remote_asn = AsnSerializer(
         required=False,
     )
@@ -76,10 +76,12 @@ class BGPPeerGroupSerializer(BGPSessionCommonSerializer):
     route_policy_in = RoutePolicySerializer(
         required=False,
         many=False,
+        allow_null=True,
     )
     route_policy_out = RoutePolicySerializer(
         required=False,
         many=False,
+        allow_null=True,
     )
 
     class Meta:
@@ -104,7 +106,7 @@ class BGPASNSerializer(ModelSerializer):
         if ASN.objects.filter(
             number=attrs["number"], organization_name=attrs.get("organization_name")
         ).exists():
-            raise ValidationError(
+            raise serializers.ValidationError(
                 {"error": "ASN with this Number and Organization Name already exists."}
             )
         return attrs
@@ -117,11 +119,11 @@ class BGPASNSerializer(ModelSerializer):
 class DeviceBGPSessionSerializer(ModelSerializer):
     local_address = NestedIPAddressSerializer(many=False)
     device = CommonDeviceSerializer()
-    peer_group = LiteBGPPeerGroupSerializer(required=False, many=False)
-    local_asn = AsnSerializer(many=False)
-    afi_safis = NestedAfiSafiSerializer(required=False, many=True)
-    route_policy_in = RoutePolicySerializer(required=False, many=False)
-    route_policy_out = RoutePolicySerializer(required=False, many=False)
+    peer_group = LiteBGPPeerGroupSerializer(required=False, many=False, allow_null=True)
+    local_asn = AsnSerializer(many=False, allow_null=True)
+    afi_safis = NestedAfiSafiSerializer(required=False, many=True, allow_null=True)
+    route_policy_in = RoutePolicySerializer(required=False, many=False, allow_null=True)
+    route_policy_out = RoutePolicySerializer(required=False, many=False, allow_null=True)
 
     class Meta:
         model = DeviceBGPSession
@@ -240,6 +242,7 @@ class BGPSessionSerializer(ModelSerializer):
 
     def validate(self, attrs):
         # Check for a duplicate BGP session (same devices / ips).
+        errors = []
         if BGPSession.objects.exclude(pk=getattr(self.instance, "id", None)).filter(
             Q(
                 peer_a__device=attrs["peer_a"]["device"],
@@ -254,9 +257,36 @@ class BGPSessionSerializer(ModelSerializer):
                 peer_b__local_address=attrs["peer_a"]["local_address"],
             )
         ):
-            raise ValidationError(
+            error = serializers.ValidationError(
                 "A BGP session already exists between these 2 devices and IP addresses."
             )
+            errors.append(error)
+
+        # Check if all dependencies are on the same device
+        for peer in ["peer_a", "peer_b"]:
+            try:
+                DeviceBGPSession.validate_device_consistency(
+                    attrs[peer]["device"],
+                    attrs[peer].get("peer_group"),
+                    attrs[peer].get("route_policy_in"),
+                    attrs[peer].get("route_policy_out"),
+                )
+            except ValidationError as error:
+                errors.append(error)
+
+            for safi in attrs[peer].get("afi_safis", []):
+                try:
+                    AfiSafi.validate_device_consistency(
+                        attrs[peer]["device"],
+                        safi.get("route_policy_in"),
+                        safi.get("route_policy_out"),
+                    )
+                except ValidationError as error:
+                    errors.append(error)
+
+        if errors:
+            raise serializers.ValidationError({"errors": ValidationError(errors).messages})
+
         return super().validate(attrs)
 
     class Meta:

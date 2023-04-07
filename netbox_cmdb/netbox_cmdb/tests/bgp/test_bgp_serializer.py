@@ -280,8 +280,8 @@ class BGPSessionSerializerUpdate(BaseTestCase):
         }
         bgp_session_serializer = BGPSessionSerializer(data=data)
         assert bgp_session_serializer.is_valid() == False
-        assert bgp_session_serializer._errors["non_field_errors"][0] == ErrorDetail(
-            string="A BGP session already exists between these 2 devices and IP addresses.",
+        assert bgp_session_serializer.errors["errors"][0] == ErrorDetail(
+            string="[ErrorDetail(string='A BGP session already exists between these 2 devices and IP addresses.', code='invalid')]",
             code="invalid",
         )
 
@@ -348,6 +348,39 @@ class BGPSessionSerializerUpdate(BaseTestCase):
         assert bgp_session_got.peer_a.maximum_prefixes == 50000
         assert bgp_session_got.peer_a.enforce_first_as == False
         assert bgp_session_got.peer_b.description == "peer_b"
+
+    def test_bgp_session_update__patch_peer_a_route_policy(self):
+        """Peer setting of a peer (DeviceBGPSession)."""
+        # Set route_policy_out
+        data = {
+            "peer_a": {
+                "local_address": self.ip_address1.pk,
+                "device": self.device1.pk,
+                "local_asn": self.asn1.pk,
+                "route_policy_out": self.route_policy1.pk,
+            },
+            "peer_b": {
+                "local_address": self.ip_address2.pk,
+                "device": self.device2.pk,
+                "local_asn": self.asn2.pk,
+            },
+        }
+        bgp_session_serializer = BGPSessionSerializer(instance=self.bgp_session, data=data)
+        assert bgp_session_serializer.is_valid() == True
+        bgp_session_serializer.save()
+
+        bgp_session_got = BGPSession.objects.get(id=self.bgp_session.pk)
+        assert bgp_session_got.peer_a.route_policy_out == self.route_policy1
+
+        # Remove route_policy_out
+        data["peer_a"]["route_policy_out"] = None
+
+        bgp_session_serializer = BGPSessionSerializer(instance=self.bgp_session, data=data)
+        assert bgp_session_serializer.is_valid() == True
+        bgp_session_serializer.save()
+
+        bgp_session_got = BGPSession.objects.get(id=self.bgp_session.pk)
+        assert bgp_session_got.peer_a.route_policy_out == None
 
     def test_bgp_session_update__add_afisafi(self):
         """Adding ipv4-unicast afisafi to an existing session"""
@@ -482,3 +515,51 @@ class BGPSessionSerializerUpdate(BaseTestCase):
             assert afi_safi[0].afi_safi_name == "ipv4-unicast"
             assert afi_safi[0].route_policy_in == route_policy
             assert afi_safi[0].route_policy_out == route_policy
+
+    def test_bgp_session_update__set_bad_route_policy_afisafi(self):
+        """Set route policies from another device on an existing afisafi."""
+        # we add first an ipv4 unicast safi
+        for device_bgp_session in [self.device_bgp_session1, self.device_bgp_session2]:
+            AfiSafi.objects.create(
+                device_bgp_session=device_bgp_session,
+                afi_safi_name="ipv4-unicast",
+            )
+
+        data = {
+            "peer_a": {
+                "local_address": self.ip_address1.pk,
+                "device": self.device1.pk,
+                "local_asn": self.asn1.pk,
+                "description": "",
+                "afi_safis": [
+                    {
+                        "afi_safi_name": "ipv4-unicast",
+                        "route_policy_in": self.route_policy2.pk,
+                        "route_policy_out": self.route_policy2.pk,
+                    }
+                ],
+                "maximum_prefixes": 1000,
+                "enforce_first_as": False,
+            },
+            "peer_b": {
+                "local_address": self.ip_address2.pk,
+                "device": self.device2.pk,
+                "local_asn": self.asn2.pk,
+                "description": "",
+                "afi_safis": [
+                    {
+                        "afi_safi_name": "ipv4-unicast",
+                    }
+                ],
+                "maximum_prefixes": 1000,
+                "enforce_first_as": False,
+            },
+            "status": "active",
+            "password": "1234",
+        }
+
+        bgp_session_serializer = BGPSessionSerializer(instance=self.bgp_session, data=data)
+        assert not bgp_session_serializer.is_valid()
+        assert bgp_session_serializer.errors["errors"][0] == ErrorDetail(
+            string="route_policy_in is not on the same device", code="invalid"
+        )

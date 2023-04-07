@@ -2,11 +2,13 @@ from dcim.models.devices import Device, DeviceRole, DeviceType, Manufacturer
 from dcim.models.sites import Site
 from django.test import TestCase
 from netaddr import IPNetwork
+from rest_framework.exceptions import ErrorDetail
+from rest_framework.serializers import ValidationError
+
 from netbox_cmdb.api.route_policy.serializers import WritableRoutePolicySerializer
 from netbox_cmdb.models.bgp_community_list import BGPCommunityList, BGPCommunityListTerm
 from netbox_cmdb.models.prefix_list import PrefixList, PrefixListTerm
 from netbox_cmdb.models.route_policy import RoutePolicy, RoutePolicyTerm
-from rest_framework.serializers import ValidationError
 
 
 def validate(device, data):
@@ -81,6 +83,31 @@ class BaseTestCase(TestCase):
         )
         self.bgp_community_list_term = BGPCommunityListTerm.objects.create(
             bgp_community_list=self.bgp_community_list,
+            sequence=5,
+            decision="permit",
+            community="64666:123",
+        )
+
+        self.device2 = Device.objects.create(
+            name="router-test-bis",
+            device_role=device_role,
+            device_type=device_type,
+            site=site,
+        )
+        self.prefix_list2 = PrefixList.objects.create(
+            name="PF-TEST", device=self.device2, ip_version="ipv4"
+        )
+        self.prefix_list_term2 = PrefixListTerm.objects.create(
+            prefix_list=self.prefix_list2,
+            sequence=5,
+            decision="permit",
+            prefix=IPNetwork("10.0.0.0/8"),
+        )
+        self.bgp_community_list2 = BGPCommunityList.objects.create(
+            name="CL-TEST", device=self.device2
+        )
+        self.bgp_community_list_term2 = BGPCommunityListTerm.objects.create(
+            bgp_community_list=self.bgp_community_list2,
             sequence=5,
             decision="permit",
             community="64666:123",
@@ -290,6 +317,38 @@ class WritableRoutePolicySerializerUpdate(BaseTestCase):
         assert route_policy_serializer.is_valid() == True
         route_policy_serializer.save()
         validate(self.device, data)
+
+    def test_route_policy_update_set_bad_lists_attr_term(self):
+        data = {
+            "name": "RM-TEST",
+            "device": {"name": "router-test"},
+            "ip_version": "ipv4",
+            "terms": [
+                {
+                    "sequence": 5,
+                    "decision": "deny",
+                    "from_bgp_community_list": self.bgp_community_list2.pk,
+                    "set_local_pref": 100,
+                },
+                {
+                    "sequence": 10,
+                    "decision": "permit",
+                    "from_prefix_list": self.prefix_list2.pk,
+                },
+            ],
+        }
+        route_policy_serializer = WritableRoutePolicySerializer(
+            instance=self.route_policy, data=data
+        )
+        assert not route_policy_serializer.is_valid()
+        assert route_policy_serializer.errors["errors"][0] == ErrorDetail(
+            string="from_bgp_community_list is not on the same device",
+            code="invalid",
+        )
+        assert route_policy_serializer.errors["errors"][1] == ErrorDetail(
+            string="from_prefix_list is not on the same device",
+            code="invalid",
+        )
 
     def test_route_policy_update_no_terms(self):
         data = {
