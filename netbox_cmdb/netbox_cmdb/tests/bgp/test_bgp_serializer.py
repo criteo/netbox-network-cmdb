@@ -177,13 +177,11 @@ class BGPSessionSerializerUpdate(BaseTestCase):
         self.prefix_list_term1 = PrefixListTerm.objects.create(
             prefix_list=self.prefix_list1,
             sequence=5,
-            decision="permit",
             prefix=IPNetwork("10.0.0.0/8"),
         )
         self.prefix_list_term2 = PrefixListTerm.objects.create(
             prefix_list=self.prefix_list2,
             sequence=5,
-            decision="permit",
             prefix=IPNetwork("10.0.0.0/8"),
         )
 
@@ -215,7 +213,6 @@ class BGPSessionSerializerUpdate(BaseTestCase):
             },
             {
                 "sequence": 10,
-                "decision": "permit",
                 "from_prefix_list": self.prefix_list1,
                 "set_local_pref": 200,
             },
@@ -236,7 +233,6 @@ class BGPSessionSerializerUpdate(BaseTestCase):
             },
             {
                 "sequence": 10,
-                "decision": "permit",
                 "from_prefix_list": self.prefix_list2,
                 "set_local_pref": 200,
             },

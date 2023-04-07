@@ -27,7 +27,6 @@ def validate(device, data):
 
     for pf_term_got, pf_term_expected in zip(pf_terms_got, pf_terms_expected):
         assert pf_term_got.sequence == pf_term_expected.sequence
-        assert pf_term_got.decision == pf_term_expected.decision
         assert str(pf_term_got.prefix) == str(pf_term_expected.prefix)
         assert pf_term_got.le == pf_term_expected.le
         assert pf_term_got.ge == pf_term_expected.ge
@@ -58,13 +57,11 @@ class PrefixListSerializerCreate(BaseTestCase):
             "terms": [
                 {
                     "sequence": 5,
-                    "decision": "permit",
                     "prefix": "10.0.0.0/24",
                     "le": 32,
                 },
                 {
                     "sequence": 10,
-                    "decision": "deny",
                     "prefix": "192.168.1.0/24",
                 },
             ],
@@ -110,13 +107,11 @@ class PrefixListSerializerUpdate(BaseTestCase):
         data_terms = [
             {
                 "sequence": 5,
-                "decision": "permit",
                 "prefix": "10.0.0.0/24",
                 "le": 32,
             },
             {
                 "sequence": 10,
-                "decision": "deny",
                 "prefix": "192.168.1.0/24",
             },
         ]
@@ -133,18 +128,15 @@ class PrefixListSerializerUpdate(BaseTestCase):
             "terms": [
                 {
                     "sequence": 5,
-                    "decision": "permit",
                     "prefix": "10.0.0.0/24",
                     "le": 32,
                 },
                 {
                     "sequence": 10,
-                    "decision": "deny",
                     "prefix": "192.168.1.0/24",
                 },
                 {
                     "sequence": 15,
-                    "decision": "deny",
                     "prefix": "192.168.2.0/24",
                 },
             ],
@@ -162,7 +154,6 @@ class PrefixListSerializerUpdate(BaseTestCase):
             "terms": [
                 {
                     "sequence": 5,
-                    "decision": "permit",
                     "prefix": "10.0.0.0/24",
                     "le": 32,
                 }
@@ -181,13 +172,11 @@ class PrefixListSerializerUpdate(BaseTestCase):
             "terms": [
                 {
                     "sequence": 6,
-                    "decision": "permit",
                     "prefix": "10.0.0.0/24",
                     "le": 32,
                 },
                 {
                     "sequence": 15,
-                    "decision": "deny",
                     "prefix": "10.1.1.0/24",
                     "le": 32,
                 },
@@ -206,13 +195,11 @@ class PrefixListSerializerUpdate(BaseTestCase):
             "terms": [
                 {
                     "sequence": 5,
-                    "decision": "deny",  # changing it to deny
                     "prefix": "10.0.0.0/24",
                     "le": 32,
                 },
                 {
                     "sequence": 10,
-                    "decision": "deny",
                     "prefix": "192.168.2.0/24",  # changing the prefix
                 },
             ],
