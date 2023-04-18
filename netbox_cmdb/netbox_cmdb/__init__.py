@@ -14,6 +14,7 @@ class CMDB(PluginConfig):
     default_settings = {}
 
     def ready(self):
+        super().ready()
         import netbox_cmdb.signals
 
 
