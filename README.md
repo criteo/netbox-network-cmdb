@@ -1,11 +1,15 @@
-# Netbox Network CMDB plugin
+# NetBox Network CMDB plugin
+
+> This repository is part of [AFK](https://criteo.github.io/AFK).
 
 ## Context
 
-This repo will contain our Network CMDB plugin for Netbox. The goal is to bring Network CMDB to Netbox while using Netbox as source of truth for DCIM and IPAM.
+This plugin brings Network CMDB plugin to NetBox.
 
-Two important notices:
-- it is in active development, but it is already being deployed at scale in production
-- the models are opiniated, the reason for all choices will be documented in a public FAQ
+The full documentation can be found here: [AFK documentation](https://criteo.github.io/AFK/CMDB/installation/)
 
-More details to come...
+## Contribute
+
+Please do the following:
+- Create an issue prior investing time to write a PR. We might already work on want you want to add.
+- Respect [Conventional Commits](https://www.conventionalcommits.org/en/v1.0.0/#summary).
