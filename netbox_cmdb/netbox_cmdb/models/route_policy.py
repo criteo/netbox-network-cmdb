@@ -87,7 +87,14 @@ class RoutePolicyTerm(ChangeLoggedModel):
     set_origin = models.CharField(max_length=32, choices=ORIGIN, blank=True)
     set_metric = models.PositiveBigIntegerField(blank=True, null=True)
     set_large_community = models.CharField(max_length=100, blank=True)
-    set_as_path_prepend = models.CharField(max_length=100, blank=True)
+    set_as_path_prepend_asn = models.ForeignKey(
+        to="ASN",
+        on_delete=models.PROTECT,
+        blank=True,
+        null=True,
+        related_name="%(class)slocal_asn",
+    )
+    set_as_path_prepend_repeat = models.PositiveSmallIntegerField(blank=True, null=True)
     set_next_hop = CustomIPAddressField(null=True, blank=True)
 
     def __str__(self):
