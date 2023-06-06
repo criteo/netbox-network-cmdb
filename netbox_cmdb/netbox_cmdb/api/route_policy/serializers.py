@@ -57,7 +57,8 @@ class RoutePolicyTermSerializer(ModelSerializer):
             "set_origin",
             "set_metric",
             "set_large_community",
-            "set_as_path_prepend",
+            "set_as_path_prepend_repeat",
+            "set_as_path_prepend_asn",
             "set_next_hop",
         ]
 
@@ -132,8 +133,11 @@ class WritableRoutePolicySerializer(ModelSerializer):
                 term.set_large_community = term_data.get(
                     "set_large_community", term.set_large_community
                 )
-                term.set_as_path_prepend = term_data.get(
-                    "set_as_path_prepend", term.set_as_path_prepend
+                term.set_as_path_prepend_repeat = term_data.get(
+                    "set_as_path_prepend_repeat", term.set_as_path_prepend_repeat
+                )
+                term.set_as_path_prepend_asn = term_data.get(
+                    "set_as_path_prepend_asn", term.set_as_path_prepend_asn
                 )
                 term.set_next_hop = term_data.get("set_next_hop", term.set_next_hop)
                 term.save()
