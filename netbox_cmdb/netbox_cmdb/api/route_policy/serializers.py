@@ -4,6 +4,7 @@ from netbox.api.serializers import WritableNestedSerializer
 from rest_framework import serializers
 from rest_framework.serializers import ModelSerializer
 
+from netbox_cmdb.api.bgp.serializers import AsnSerializer
 from netbox_cmdb.api.common_serializers import CommonDeviceSerializer
 from netbox_cmdb.models.bgp_community_list import BGPCommunityList
 from netbox_cmdb.models.prefix_list import PrefixList
@@ -39,6 +40,7 @@ class RoutePolicyTermSerializer(ModelSerializer):
         required=False, many=False, allow_null=True
     )
     from_prefix_list = NestedPrefixListSerializer(required=False, many=False, allow_null=True)
+    set_as_path_prepend_asn = AsnSerializer(required=False, allow_null=True)
 
     class Meta:
         model = RoutePolicyTerm
