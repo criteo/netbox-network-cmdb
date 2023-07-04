@@ -51,7 +51,8 @@ def validate(device, data):
         assert rp_term_got.set_origin == rp_term_expected.set_origin
         assert rp_term_got.set_metric == rp_term_expected.set_metric
         assert rp_term_got.set_large_community == rp_term_expected.set_large_community
-        assert rp_term_got.set_as_path_prepend == rp_term_expected.set_as_path_prepend
+        assert rp_term_got.set_as_path_prepend_repeat == rp_term_expected.set_as_path_prepend_repeat
+        assert rp_term_got.set_as_path_prepend_asn == rp_term_expected.set_as_path_prepend_asn
         assert str(rp_term_got.set_next_hop) == str(rp_term_expected.set_next_hop)
 
 
