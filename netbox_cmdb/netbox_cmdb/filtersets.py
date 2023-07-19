@@ -7,6 +7,14 @@ from utilities.filters import MultiValueCharFilter
 
 from netbox_cmdb.models.bgp import ASN, BGPPeerGroup, BGPSession
 
+device_location_filterset = [
+    "device__location__name",
+    "device__site__name",
+    "device__site__group__name",
+    "device__site__region__name",
+    "device__rack__name",
+]
+
 
 class ASNFilterSet(ChangeLoggedModelFilterSet):
     """AS number filterset."""
@@ -38,7 +46,32 @@ class BGPSessionFilterSet(ChangeLoggedModelFilterSet, TenancyFilterSet):
 
     device = MultiValueCharFilter(
         method="filter_peer_device",
-        label="device",
+        label="device*",
+    )
+
+    device__rack__name = MultiValueCharFilter(
+        method="filter_device_location",
+        label="device__rack__name",
+    )
+
+    device__location__name = MultiValueCharFilter(
+        method="filter_device_location",
+        label="device__location__name",
+    )
+
+    device__site__name = MultiValueCharFilter(
+        method="filter_device_location",
+        label="device__site__name",
+    )
+
+    device__site__group__name = MultiValueCharFilter(
+        method="filter_device_location",
+        label="device__site__group__name",
+    )
+
+    device__site__region__name = MultiValueCharFilter(
+        method="filter_device_location",
+        label="device__site__region__name",
     )
 
     local_address = MultiValueCharFilter(
@@ -49,7 +82,7 @@ class BGPSessionFilterSet(ChangeLoggedModelFilterSet, TenancyFilterSet):
     class Meta:
         model = BGPSession
         exclude = ["__all__"]
-        fields = ["id", "device", "local_address"]
+        fields = ["id", "device", "local_address"] + device_location_filterset
 
     def filter_peer_address(self, queryset, name, value):
         if len(value) > 2:
@@ -74,6 +107,19 @@ class BGPSessionFilterSet(ChangeLoggedModelFilterSet, TenancyFilterSet):
             queryset = queryset.filter(Q(peer_a__device__name=val) | Q(peer_b__device__name=val))
         return queryset
 
+    def filter_device_location(self, queryset, name, value):
+        if len(value) > 2:
+            # a BGP session can't have more than 2 devices
+            return queryset.none()
+
+        for val in value:
+            # we chain the querysets to get a single BGP session when 2 values are passed
+            peer_a_lookup = {f"peer_a__{name}": val}
+            peer_b_lookup = {f"peer_b__{name}": val}
+
+            queryset = queryset.filter(Q(**peer_a_lookup) | Q(**peer_b_lookup))
+        return queryset
+
     def search(self, queryset, name, value):
         if not value.strip():
             return queryset
@@ -92,7 +138,7 @@ class BGPPeerGroupFilterSet(ChangeLoggedModelFilterSet):
 
     class Meta:
         model = BGPPeerGroup
-        fields = ["id", "local_asn", "remote_asn", "device", "name"]
+        fields = ["id", "local_asn", "remote_asn", "device", "name"] + device_location_filterset
 
     def search(self, queryset, name, value):
         if not value.strip():
