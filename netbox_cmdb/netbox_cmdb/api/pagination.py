@@ -8,7 +8,7 @@ from rest_framework.pagination import CursorPagination, _reverse_ordering
 class CustomCursorPagination(CursorPagination):
     # PAGE_SIZE is not set globally by NetBox, hence we fetch it from its config
     default_page_size = get_config().PAGINATE_COUNT
-    page_size_query_param = 'limit'
+    page_size_query_param = "limit"
     ordering = "-created"
 
     def paginate_queryset(self, queryset, request, view=None):
@@ -35,14 +35,14 @@ class CustomCursorPagination(CursorPagination):
         # If we have a cursor with a fixed position then filter by that.
         if current_position is not None:
             order = self.ordering[0]
-            is_reversed = order.startswith('-')
-            order_attr = order.lstrip('-')
+            is_reversed = order.startswith("-")
+            order_attr = order.lstrip("-")
 
             # Test for: (cursor reversed) XOR (queryset reversed)
             if self.cursor.reverse != is_reversed:
-                kwargs = {order_attr + '__lt': current_position}
+                kwargs = {order_attr + "__lt": current_position}
             else:
-                kwargs = {order_attr + '__gt': current_position}
+                kwargs = {order_attr + "__gt": current_position}
 
             queryset = queryset.filter(**kwargs)
 
@@ -50,8 +50,8 @@ class CustomCursorPagination(CursorPagination):
             # If we have an offset cursor then offset the entire page by that amount.
             # We also always fetch an extra item in order to determine if there is a
             # page following on from this one.
-            results = list(queryset[offset:offset + self.page_size + 1])
-            self.page = list(results[:self.page_size])
+            results = list(queryset[offset : offset + self.page_size + 1])
+            self.page = list(results[: self.page_size])
         else:
             self.page = results = list(queryset[offset:])
 
@@ -109,6 +109,6 @@ class CustomCursorPagination(CursorPagination):
 
 
 PAGINATORS = {
-    'limit_offset': OptionalLimitOffsetPagination,  # Default per settings.DEFAULT_PAGINATION_CLASS
-    'cursor': CustomCursorPagination,
+    "limit_offset": OptionalLimitOffsetPagination,  # Default per settings.DEFAULT_PAGINATION_CLASS
+    "cursor": CustomCursorPagination,
 }

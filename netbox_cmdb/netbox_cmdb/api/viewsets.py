@@ -15,10 +15,10 @@ class CustomNetBoxModelViewSet(NetBoxModelViewSet):
         """
         Allow the request to designate the paginator class per the pagination_mode parameter.
         """
-        if not hasattr(self, '_paginator'):
+        if not hasattr(self, "_paginator"):
             if self.pagination_class is None:
                 self._paginator = None
-            elif mode := self.request.query_params.get('pagination_mode'):
+            elif mode := self.request.query_params.get("pagination_mode"):
                 self._paginator = PAGINATORS.get(mode, self.pagination_class)()
             else:
                 self._paginator = self.pagination_class()
