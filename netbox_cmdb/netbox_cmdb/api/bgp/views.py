@@ -2,7 +2,6 @@ from django.core.exceptions import ObjectDoesNotExist, PermissionDenied
 from django.db import transaction
 from django_pglocks import advisory_lock
 from drf_yasg.utils import swagger_auto_schema
-from netbox.api.viewsets import NetBoxModelViewSet
 from netbox.api.viewsets.mixins import ObjectValidationMixin
 from rest_framework import status
 from rest_framework.exceptions import ValidationError
@@ -16,11 +15,12 @@ from netbox_cmdb.api.bgp.serializers import (
     BGPPeerGroupSerializer,
     BGPSessionSerializer,
 )
+from netbox_cmdb.api.viewsets import CustomNetBoxModelViewSet
 from netbox_cmdb.filtersets import ASNFilterSet, BGPSessionFilterSet
 from netbox_cmdb.models.bgp import ASN, BGPGlobal, BGPPeerGroup, BGPSession
 
 
-class ASNViewSet(NetBoxModelViewSet):
+class ASNViewSet(CustomNetBoxModelViewSet):
     queryset = ASN.objects.all()
     serializer_class = BGPASNSerializer
     filterset_class = ASNFilterSet
@@ -83,7 +83,7 @@ class AvailableASNsView(ObjectValidationMixin, APIView):
         return serializer.data
 
 
-class BGPGlobalViewSet(NetBoxModelViewSet):
+class BGPGlobalViewSet(CustomNetBoxModelViewSet):
     queryset = BGPGlobal.objects.all()
     serializer_class = BGPGlobalSerializer
     filterset_fields = [
@@ -91,13 +91,13 @@ class BGPGlobalViewSet(NetBoxModelViewSet):
     ]
 
 
-class BGPSessionsViewSet(NetBoxModelViewSet):
+class BGPSessionsViewSet(CustomNetBoxModelViewSet):
     queryset = BGPSession.objects.all()
     serializer_class = BGPSessionSerializer
     filterset_class = BGPSessionFilterSet
 
 
-class BGPPeerGroupViewSet(NetBoxModelViewSet):
+class BGPPeerGroupViewSet(CustomNetBoxModelViewSet):
     queryset = BGPPeerGroup.objects.all()
     serializer_class = BGPPeerGroupSerializer
     filterset_fields = [

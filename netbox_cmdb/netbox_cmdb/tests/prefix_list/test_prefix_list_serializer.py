@@ -1,9 +1,10 @@
 from dcim.models.devices import Device, DeviceRole, DeviceType, Manufacturer
 from dcim.models.sites import Site
 from django.test import TestCase
+from rest_framework.serializers import ValidationError
+
 from netbox_cmdb.api.prefix_list.serializers import PrefixListSerializer
 from netbox_cmdb.models.prefix_list import PrefixList, PrefixListTerm
-from rest_framework.serializers import ValidationError
 
 
 def validate(device, data):
