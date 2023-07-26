@@ -4,6 +4,7 @@ from netbox.api.serializers import WritableNestedSerializer
 from rest_framework import serializers
 from rest_framework.serializers import ModelSerializer
 
+from netbox_cmdb.api.bgp.serializers import AsnSerializer
 from netbox_cmdb.api.common_serializers import CommonDeviceSerializer
 from netbox_cmdb.models.bgp_community_list import BGPCommunityList
 from netbox_cmdb.models.prefix_list import PrefixList
@@ -39,6 +40,7 @@ class RoutePolicyTermSerializer(ModelSerializer):
         required=False, many=False, allow_null=True
     )
     from_prefix_list = NestedPrefixListSerializer(required=False, many=False, allow_null=True)
+    set_as_path_prepend_asn = AsnSerializer(required=False, allow_null=True)
 
     class Meta:
         model = RoutePolicyTerm
@@ -57,7 +59,8 @@ class RoutePolicyTermSerializer(ModelSerializer):
             "set_origin",
             "set_metric",
             "set_large_community",
-            "set_as_path_prepend",
+            "set_as_path_prepend_repeat",
+            "set_as_path_prepend_asn",
             "set_next_hop",
         ]
 
@@ -132,8 +135,11 @@ class WritableRoutePolicySerializer(ModelSerializer):
                 term.set_large_community = term_data.get(
                     "set_large_community", term.set_large_community
                 )
-                term.set_as_path_prepend = term_data.get(
-                    "set_as_path_prepend", term.set_as_path_prepend
+                term.set_as_path_prepend_repeat = term_data.get(
+                    "set_as_path_prepend_repeat", term.set_as_path_prepend_repeat
+                )
+                term.set_as_path_prepend_asn = term_data.get(
+                    "set_as_path_prepend_asn", term.set_as_path_prepend_asn
                 )
                 term.set_next_hop = term_data.get("set_next_hop", term.set_next_hop)
                 term.save()
