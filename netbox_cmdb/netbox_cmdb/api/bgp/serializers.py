@@ -157,7 +157,7 @@ class BGPSessionSerializer(ModelSerializer):
         bgp_session = BGPSession.objects.create(
             peer_a=device_bgp_session["peer_a"],
             peer_b=device_bgp_session["peer_b"],
-            status=validated_data.get("status"),
+            state=validated_data.get("state"),
             password=validated_data.get("password"),
             circuit=validated_data.get("circuit"),
             tenant=validated_data.get("tenant"),
@@ -171,7 +171,7 @@ class BGPSessionSerializer(ModelSerializer):
         for peer in ["a", "b"]:
             peers_data[f"peer_{peer}"] = validated_data.pop(f"peer_{peer}")
 
-        instance.status = validated_data.get("status", instance.status)
+        instance.state = validated_data.get("state", instance.state)
         instance.password = validated_data.get("password", instance.password)
         instance.circuit = validated_data.get("circuit", instance.circuit)
         instance.tenant = validated_data.get("tenant", instance.tenant)
@@ -186,6 +186,7 @@ class BGPSessionSerializer(ModelSerializer):
 
             # update peer instance with provided data
             peer_instance.device = peers_data[peer].get("device", peer_instance.device)
+            peer_instance.enabled = peers_data[peer].get("enabled", peer_instance.enabled)
             peer_instance.local_address = peers_data[peer].get(
                 "local_address", peer_instance.local_address
             )

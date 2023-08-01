@@ -63,31 +63,31 @@ class BGPSessionTestCase(TestCase, NetBoxModelFilterSet):
 
         bgp_sessions = [
             BGPSession(
-                status="active",
+                state="production",
                 peer_a=device_bgp_sessions[0],
                 peer_b=device_bgp_sessions[1],
                 tenant=tenants[0],
             ),
             BGPSession(
-                status="active",
+                state="production",
                 peer_a=device_bgp_sessions[0],
                 peer_b=device_bgp_sessions[2],
                 tenant=tenants[1],
             ),
             BGPSession(
-                status="active",
+                state="production",
                 peer_a=device_bgp_sessions[0],
                 peer_b=device_bgp_sessions[3],
                 tenant=tenants[2],
             ),
             BGPSession(
-                status="active",
+                state="production",
                 peer_a=device_bgp_sessions[1],
                 peer_b=device_bgp_sessions[2],
                 tenant=tenants[3],
             ),
             BGPSession(
-                status="active",
+                state="production",
                 peer_a=device_bgp_sessions[1],
                 peer_b=device_bgp_sessions[3],
                 tenant=tenants[0],

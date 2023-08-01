@@ -9,6 +9,7 @@ from utilities.choices import ChoiceSet
 from utilities.querysets import RestrictedQuerySet
 
 from netbox_cmdb.constants import BGP_MAX_ASN, BGP_MIN_ASN
+from netbox_cmdb.choices import AssetStateChoices
 from netbox_cmdb.models.circuit import Circuit
 
 
@@ -52,27 +53,6 @@ class BGPGlobal(ChangeLoggedModel):
 
     class Meta:
         verbose_name = "BGP global configuration"
-
-
-class BGPSessionStatusChoices(ChoiceSet):
-    STATUS_ACTIVE = "active"
-    STATUS_PLANNED = "planned"
-    STATUS_MAINTENANCE = "maintenance"
-    STATUS_OFFLINE = "offline"
-
-    CHOICES = (
-        (STATUS_ACTIVE, "Active"),
-        (STATUS_PLANNED, "Planned"),
-        (STATUS_MAINTENANCE, "Maintenance"),
-        (STATUS_OFFLINE, "Offline"),
-    )
-
-    CSS_CLASSES = {
-        STATUS_ACTIVE: "success",
-        STATUS_PLANNED: "info",
-        STATUS_MAINTENANCE: "warning",
-        STATUS_OFFLINE: "warning",
-    }
 
 
 class AfiSafiChoices(ChoiceSet):
@@ -261,6 +241,7 @@ class DeviceBGPSession(BGPSessionCommon):
         to="ipam.IPAddress", on_delete=models.PROTECT, related_name="local_address"
     )
     # instance = models.ForeignKey(...)
+    enabled = models.BooleanField(default=True)
 
     peer_group = models.ForeignKey(
         to="BGPPeerGroup",
@@ -322,11 +303,11 @@ class BGPSession(ChangeLoggedModel):
     def __str__(self):
         return str(f"{self.peer_a} <--> {self.peer_b}")
 
-    status = models.CharField(
+    state = models.CharField(
         max_length=50,
-        choices=BGPSessionStatusChoices,
-        default=BGPSessionStatusChoices.STATUS_ACTIVE,
-        help_text="Status of this BGP session",
+        choices=AssetStateChoices,
+        default=AssetStateChoices.STATE_STAGING,
+        help_text="State of this BGP session",
     )
     peer_a = models.ForeignKey(
         to="DeviceBGPSession", on_delete=models.CASCADE, related_name="peer_a"
