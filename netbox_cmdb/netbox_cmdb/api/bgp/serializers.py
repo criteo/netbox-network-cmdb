@@ -1,10 +1,11 @@
-from django.db.models import Q
 from django.core.exceptions import ValidationError
+from django.db.models import Q
 from ipam.api.nested_serializers import NestedIPAddressSerializer
 from netbox.api.serializers import WritableNestedSerializer
 from rest_framework import serializers
 from rest_framework.serializers import IntegerField, ModelSerializer
 from tenancy.api.nested_serializers import NestedTenantSerializer
+from netbox_cmdb.choices import AssetMonitoringStateChoices
 
 from netbox_cmdb.api.common_serializers import CommonDeviceSerializer
 from netbox_cmdb.constants import BGP_MAX_ASN, BGP_MIN_ASN
@@ -158,6 +159,7 @@ class BGPSessionSerializer(ModelSerializer):
             peer_a=device_bgp_session["peer_a"],
             peer_b=device_bgp_session["peer_b"],
             state=validated_data.get("state"),
+            monitoring_state=validated_data.get("monitoring_state", AssetMonitoringStateChoices.DISABLED),
             password=validated_data.get("password"),
             circuit=validated_data.get("circuit"),
             tenant=validated_data.get("tenant"),
@@ -172,6 +174,7 @@ class BGPSessionSerializer(ModelSerializer):
             peers_data[f"peer_{peer}"] = validated_data.pop(f"peer_{peer}")
 
         instance.state = validated_data.get("state", instance.state)
+        instance.monitoring_state = validated_data.get("monitoring_state", instance.monitoring_state)
         instance.password = validated_data.get("password", instance.password)
         instance.circuit = validated_data.get("circuit", instance.circuit)
         instance.tenant = validated_data.get("tenant", instance.tenant)

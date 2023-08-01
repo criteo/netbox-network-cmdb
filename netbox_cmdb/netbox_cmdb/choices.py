@@ -17,6 +17,20 @@ class AssetStateChoices(ChoiceSet):
     ]
 
 
+class AssetMonitoringStateChoices(ChoiceSet):
+    """A ChoiceSet to define the monitoring state of an asset independently of its state."""
+
+    CRITICAL = "critical"
+    WARNING = "warning"
+    DISABLED = "disabled"
+
+    CHOICES = (
+        (CRITICAL, "Critical"),
+        (WARNING, "Warning"),
+        (DISABLED, "Disabled"),
+    )
+
+
 class DecisionChoice(ChoiceSet):
     """A ChoiceSet that could be used in many network related objects:
     ACLs, route policies, BGP community lists, etc..."""

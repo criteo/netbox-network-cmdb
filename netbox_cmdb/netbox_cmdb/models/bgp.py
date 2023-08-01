@@ -9,7 +9,7 @@ from utilities.choices import ChoiceSet
 from utilities.querysets import RestrictedQuerySet
 
 from netbox_cmdb.constants import BGP_MAX_ASN, BGP_MIN_ASN
-from netbox_cmdb.choices import AssetStateChoices
+from netbox_cmdb.choices import AssetStateChoices, AssetMonitoringStateChoices
 from netbox_cmdb.models.circuit import Circuit
 
 
@@ -308,6 +308,12 @@ class BGPSession(ChangeLoggedModel):
         choices=AssetStateChoices,
         default=AssetStateChoices.STATE_STAGING,
         help_text="State of this BGP session",
+    )
+    monitoring_state = models.CharField(
+        max_length=50,
+        choices=AssetMonitoringStateChoices,
+        default=AssetMonitoringStateChoices.DISABLED,
+        help_text="Monitoring state of this BGP session",
     )
     peer_a = models.ForeignKey(
         to="DeviceBGPSession", on_delete=models.CASCADE, related_name="peer_a"

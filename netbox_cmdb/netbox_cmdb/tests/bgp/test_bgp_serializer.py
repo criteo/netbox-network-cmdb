@@ -151,6 +151,14 @@ class BGPSessionSerializerCreate(BaseTestCase):
         assert bgp_session_serializer.is_valid() == True
         bgp_session_serializer.save()
 
+        bgp_session_got = BGPSession.objects.get(
+            peer_a__device=self.device1,
+            peer_a__local_address=self.ip_address1,
+            peer_b__device=self.device2,
+            peer_b__local_address=self.ip_address2,
+        )
+        assert bgp_session_got.monitoring_state == "disabled"
+
 
 class BGPSessionSerializerUpdate(BaseTestCase):
     def setUp(self):
@@ -268,6 +276,7 @@ class BGPSessionSerializerUpdate(BaseTestCase):
                 "enforce_first_as": False,
             },
             "state": "production",
+            "monitoring_state": "critical",
             "password": "1234",
         }
         bgp_session_serializer = BGPSessionSerializer(data=data)
@@ -297,6 +306,7 @@ class BGPSessionSerializerUpdate(BaseTestCase):
                 "enforce_first_as": False,
             },
             "state": "maintenance",  # production to maintenance
+            "monitoring_state": "warning",
             "password": "5678",  # 1234 to 5678
         }
 
@@ -306,6 +316,7 @@ class BGPSessionSerializerUpdate(BaseTestCase):
 
         bgp_session_got = BGPSession.objects.get(id=self.bgp_session.pk)
         assert bgp_session_got.state == "maintenance"
+        assert bgp_session_got.monitoring_state == "warning"
         assert bgp_session_got.password == "5678"
         assert bgp_session_got.tenant.name == "tenant1"
 
