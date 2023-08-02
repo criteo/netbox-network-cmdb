@@ -8,6 +8,7 @@ from rest_framework.exceptions import ValidationError
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
+from netbox_cmdb import filtersets
 from netbox_cmdb.api.bgp.serializers import (
     AvailableAsnSerializer,
     BGPASNSerializer,
@@ -86,9 +87,7 @@ class AvailableASNsView(ObjectValidationMixin, APIView):
 class BGPGlobalViewSet(CustomNetBoxModelViewSet):
     queryset = BGPGlobal.objects.all()
     serializer_class = BGPGlobalSerializer
-    filterset_fields = [
-        "device__name",
-    ]
+    filterset_fields = ["device__name"] + filtersets.device_location_filterset
 
 
 class BGPSessionsViewSet(CustomNetBoxModelViewSet):
@@ -105,4 +104,4 @@ class BGPPeerGroupViewSet(CustomNetBoxModelViewSet):
         "name",
         "device__id",
         "device__name",
-    ]
+    ] + filtersets.device_location_filterset
