@@ -34,7 +34,7 @@ services:
     image: postgres:13
     env_file: dev.env
     volumes:
-      - pgdata_netbox_plugins:/var/lib/postgresql/data
+      - pgdata_netbox_cmdb:/var/lib/postgresql/data
   redis:
     image: redis:5-alpine
     command:
@@ -43,4 +43,4 @@ services:
       - redis-server --appendonly yes --requirepass $$REDIS_PASSWORD ## $$ because of docker-compose
     env_file: ./dev.env
 volumes:
-  pgdata_netbox_plugins:
+  pgdata_netbox_cmdb:

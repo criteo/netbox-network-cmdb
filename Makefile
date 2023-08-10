@@ -1,5 +1,5 @@
 COMPOSE_FILE=./develop/docker-compose.yml
-BUILD_NAME=netbox-plugins
+BUILD_NAME=netbox-cmdb
 PLUGINS_LIST=netbox_cmdb
 
 
