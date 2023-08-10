@@ -142,7 +142,7 @@ class BGPSessionSerializerCreate(BaseTestCase):
                 "maximum_prefixes": 1000,
                 "enforce_first_as": False,
             },
-            "status": "active",
+            "state": "production",
             "password": "1234",
             "tenant": self.tenant.pk,
         }
@@ -150,6 +150,14 @@ class BGPSessionSerializerCreate(BaseTestCase):
         bgp_session_serializer = BGPSessionSerializer(data=data)
         assert bgp_session_serializer.is_valid() == True
         bgp_session_serializer.save()
+
+        bgp_session_got = BGPSession.objects.get(
+            peer_a__device=self.device1,
+            peer_a__local_address=self.ip_address1,
+            peer_b__device=self.device2,
+            peer_b__local_address=self.ip_address2,
+        )
+        assert bgp_session_got.monitoring_state == "disabled"
 
 
 class BGPSessionSerializerUpdate(BaseTestCase):
@@ -164,7 +172,7 @@ class BGPSessionSerializerUpdate(BaseTestCase):
         self.bgp_session = BGPSession.objects.create(
             peer_a=self.device_bgp_session1,
             peer_b=self.device_bgp_session2,
-            status="active",
+            state="production",
             password="test",
             tenant=self.tenant,
         )
@@ -267,7 +275,8 @@ class BGPSessionSerializerUpdate(BaseTestCase):
                 "maximum_prefixes": 1000,
                 "enforce_first_as": False,
             },
-            "status": "active",
+            "state": "production",
+            "monitoring_state": "critical",
             "password": "1234",
         }
         bgp_session_serializer = BGPSessionSerializer(data=data)
@@ -277,7 +286,7 @@ class BGPSessionSerializerUpdate(BaseTestCase):
             code="invalid",
         )
 
-    def test_bgp_session_update__status_and_password(self):
+    def test_bgp_session_update__state_and_password(self):
         """Adding ipv4-unicast afisafi to an existing session."""
         data = {
             "peer_a": {
@@ -296,7 +305,8 @@ class BGPSessionSerializerUpdate(BaseTestCase):
                 "maximum_prefixes": 1000,
                 "enforce_first_as": False,
             },
-            "status": "maintenance",  # active to maintenance
+            "state": "maintenance",  # production to maintenance
+            "monitoring_state": "warning",
             "password": "5678",  # 1234 to 5678
         }
 
@@ -305,7 +315,8 @@ class BGPSessionSerializerUpdate(BaseTestCase):
         bgp_session_serializer.save()
 
         bgp_session_got = BGPSession.objects.get(id=self.bgp_session.pk)
-        assert bgp_session_got.status == "maintenance"
+        assert bgp_session_got.state == "maintenance"
+        assert bgp_session_got.monitoring_state == "warning"
         assert bgp_session_got.password == "5678"
         assert bgp_session_got.tenant.name == "tenant1"
 
@@ -319,6 +330,7 @@ class BGPSessionSerializerUpdate(BaseTestCase):
                 "description": "peer_a",
                 "maximum_prefixes": 50000,
                 "enforce_first_as": False,
+                "enabled": False,
             },
             "peer_b": {
                 "local_address": self.ip_address2.pk,
@@ -327,8 +339,9 @@ class BGPSessionSerializerUpdate(BaseTestCase):
                 "description": "peer_b",
                 "maximum_prefixes": 1000,
                 "enforce_first_as": False,
+                "enabled": True,
             },
-            "status": "active",
+            "state": "production",
             "password": "1234",
         }
         bgp_session_serializer = BGPSessionSerializer(instance=self.bgp_session, data=data)
@@ -338,8 +351,10 @@ class BGPSessionSerializerUpdate(BaseTestCase):
         bgp_session_got = BGPSession.objects.get(id=self.bgp_session.pk)
         assert bgp_session_got.peer_a.description == "peer_a"
         assert bgp_session_got.peer_a.maximum_prefixes == 50000
+        assert bgp_session_got.peer_a.enabled is False
         assert bgp_session_got.peer_a.enforce_first_as == False
         assert bgp_session_got.peer_b.description == "peer_b"
+        assert bgp_session_got.peer_b.enabled is True
 
     def test_bgp_session_update__patch_peer_a_route_policy(self):
         """Peer setting of a peer (DeviceBGPSession)."""
@@ -395,7 +410,7 @@ class BGPSessionSerializerUpdate(BaseTestCase):
                 "maximum_prefixes": 1000,
                 "enforce_first_as": False,
             },
-            "status": "active",
+            "state": "production",
             "password": "1234",
         }
 
@@ -431,7 +446,7 @@ class BGPSessionSerializerUpdate(BaseTestCase):
                 "maximum_prefixes": 1000,
                 "enforce_first_as": False,
             },
-            "status": "active",
+            "state": "production",
             "password": "1234",
         }
 
@@ -487,7 +502,7 @@ class BGPSessionSerializerUpdate(BaseTestCase):
                 "maximum_prefixes": 1000,
                 "enforce_first_as": False,
             },
-            "status": "active",
+            "state": "production",
             "password": "1234",
         }
 
@@ -546,7 +561,7 @@ class BGPSessionSerializerUpdate(BaseTestCase):
                 "maximum_prefixes": 1000,
                 "enforce_first_as": False,
             },
-            "status": "active",
+            "state": "production",
             "password": "1234",
         }
 
