@@ -1,7 +1,7 @@
 ARG python_ver=3.9
 FROM python:${python_ver}
 
-ARG netbox_ver=v3.3.10
+ARG netbox_ver=v3.5.7
 ENV PYTHONUNBUFFERED 1
 
 RUN pip install --upgrade pip
@@ -19,6 +19,10 @@ RUN git clone --single-branch --branch ${netbox_ver} https://github.com/netbox-c
 
 # Work around https://github.com/rq/django-rq/issues/421
 RUN pip install django-rq==2.3.2
+
+# Workaround for https://github.com/netbox-community/netbox/issues/12415 (our current version is also impacte
+# to remove once django-rq is bumped to >= 2.8.0d)
+RUN pip install rq==1.13.0
 
 # -------------------------------------------------------------------------------------
 # Install Netbox Plugins
