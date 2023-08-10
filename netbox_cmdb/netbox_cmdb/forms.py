@@ -3,8 +3,7 @@ from dcim.models import Device
 from django import forms
 from extras.models import Tag
 from netbox.forms import NetBoxModelForm
-from utilities.forms import DynamicModelMultipleChoiceField
-from utilities.forms.fields import DynamicModelChoiceField
+from utilities.forms.fields import DynamicModelChoiceField, DynamicModelMultipleChoiceField
 
 from netbox_cmdb.models.bgp import ASN, BGPPeerGroup, BGPSession
 

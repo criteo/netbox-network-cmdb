@@ -1,7 +1,7 @@
 from django.core.exceptions import ObjectDoesNotExist, PermissionDenied
 from django.db import transaction
 from django_pglocks import advisory_lock
-from drf_yasg.utils import swagger_auto_schema
+from drf_spectacular.utils import extend_schema
 from netbox.api.viewsets.mixins import ObjectValidationMixin
 from rest_framework import status
 from rest_framework.exceptions import ValidationError
@@ -30,8 +30,8 @@ class ASNViewSet(CustomNetBoxModelViewSet):
 class AvailableASNsView(ObjectValidationMixin, APIView):
     queryset = ASN.objects.all()
 
-    @swagger_auto_schema(
-        request_body=AvailableAsnSerializer,
+    @extend_schema(
+        request=AvailableAsnSerializer,
         responses={201: BGPASNSerializer},
     )
     def post(self, request):
