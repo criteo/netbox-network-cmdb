@@ -46,7 +46,7 @@ collectstatic:
 migrations:
 	docker compose -f ${COMPOSE_FILE} -p ${BUILD_NAME} up -d postgres
 	docker compose -f ${COMPOSE_FILE} -p ${BUILD_NAME} \
-	run netbox python manage.py makemigrations
+	run netbox python manage.py makemigrations --no-header
 	docker compose -f ${COMPOSE_FILE} -p ${BUILD_NAME} down
 
 test:
