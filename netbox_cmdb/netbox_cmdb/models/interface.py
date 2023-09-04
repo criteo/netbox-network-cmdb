@@ -121,3 +121,20 @@ class LogicalInterface(ChangeLoggedModel):
 
     class Meta:
         unique_together = ("index", "parent_interface")
+
+
+class PortLayout(ChangeLoggedModel):
+    """A port layout configuration on a Network device."""
+
+    device_type = models.ForeignKey(
+        to="dcim.DeviceType", related_name="%(class)s_device_type", on_delete=models.CASCADE
+    )
+    network_role = models.ForeignKey(
+        to="dcim.DeviceRole", related_name="%(class)s_network_role", on_delete=models.CASCADE
+    )
+    name = models.CharField(max_length=64)
+    label_name = models.CharField(max_length=64)
+    logical_name = models.CharField(max_length=64)
+    vendor_name = models.CharField(max_length=64)
+    vendor_short_name = models.CharField(max_length=64)
+    vendor_long_name = models.CharField(max_length=64)
