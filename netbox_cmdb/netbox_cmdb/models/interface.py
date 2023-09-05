@@ -2,6 +2,8 @@ from django.core.validators import MaxValueValidator, MinValueValidator
 from django.db import models
 from netbox.models import ChangeLoggedModel
 
+from netbox_cmdb.choices import AssetMonitoringStateChoices, AssetStateChoices
+
 FEC_CHOICES = [
     (None, "None"),
     ("rs", "Reed Solomon"),
@@ -121,6 +123,36 @@ class LogicalInterface(ChangeLoggedModel):
 
     class Meta:
         unique_together = ("index", "parent_interface")
+
+
+class Link(ChangeLoggedModel):
+    """A link between two DeviceInterface."""
+
+    interface_a = models.ForeignKey(
+        to="DeviceInterface",
+        related_name="%(class)s_interface_a",
+        on_delete=models.CASCADE,
+    )
+    interface_b = models.ForeignKey(
+        to="DeviceInterface",
+        related_name="%(class)s_interface_b",
+        on_delete=models.CASCADE,
+    )
+    state = models.CharField(
+        max_length=50,
+        choices=AssetStateChoices,
+        default=AssetStateChoices.STATE_STAGING,
+        help_text="State of this Link",
+    )
+    monitoring_state = models.CharField(
+        max_length=50,
+        choices=AssetMonitoringStateChoices,
+        default=AssetMonitoringStateChoices.DISABLED,
+        help_text="Monitoring state of this Link",
+    )
+
+    def __str__(self):
+        return str(f"{self.interface_a} <--> {self.interface_b}")
 
 
 class PortLayout(ChangeLoggedModel):
