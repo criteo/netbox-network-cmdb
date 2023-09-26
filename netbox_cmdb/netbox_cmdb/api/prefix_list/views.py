@@ -13,4 +13,5 @@ class PrefixListViewSet(CustomNetBoxModelViewSet):
         "name",
         "ip_version",
         "device__id",
+        "device__name",
     ] + filtersets.device_location_filterset
