@@ -17,13 +17,6 @@ class VLAN(ChangeLoggedModel):
         validators=(MinValueValidator(VLAN_VID_MIN), MaxValueValidator(VLAN_VID_MAX)),
     )
     name = models.CharField(max_length=64)
-    device = models.ForeignKey(
-        to="dcim.Device",
-        on_delete=models.CASCADE,
-        related_name="%(class)sdevice",
-        null=False,
-        blank=False,
-    )
     description = models.CharField(max_length=100, blank=True)
     tenant = models.ForeignKey(
         to="tenancy.Tenant",
@@ -34,10 +27,10 @@ class VLAN(ChangeLoggedModel):
     )
 
     def __str__(self):
-        return f"{self.device.name}--{self.name}"
+        return f"{self.vid}--{self.name}"
 
     class Meta:
         ordering = ["vid"]
-        unique_together = ("device", "name")
+        unique_together = ("vid", "name")
         verbose_name = "VLAN"
         verbose_name_plural = "VLANs"
