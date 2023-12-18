@@ -11,13 +11,6 @@ class VRF(ChangeLoggedModel):
     """
 
     name = models.CharField(max_length=100)
-    device = models.ForeignKey(
-        to="dcim.Device",
-        on_delete=models.CASCADE,
-        related_name="%(class)sdevice",
-        null=False,
-        blank=False,
-    )
     tenant = models.ForeignKey(
         to="tenancy.Tenant",
         on_delete=models.PROTECT,
@@ -27,10 +20,10 @@ class VRF(ChangeLoggedModel):
     )
 
     def __str__(self):
-        return f"{self.device}--{self.name}"
+        return f"{self.tenant}--{self.name}"
 
     class Meta:
         ordering = ["name"]
-        unique_together = ("device", "name")
+        unique_together = ("tenant", "name")
         verbose_name = "VRF"
         verbose_name_plural = "VRFs"
