@@ -1,0 +1,228 @@
+{% extends 'generic/object.html' %} {% load helpers %}
+{% block title %}{{ object.peer_a.device }} <> {{ object.peer_b.device }}{% endblock %}
+{% block content %}
+<div class="row">
+  <div class="col col-12 col-xl-5">
+    <div class="card">
+      <h5 class="card-header">Peer A</h5>
+      <div class="card-body">
+        <table class="table table-hover attr-table">
+          <tr>
+            <th>Device</td>
+            <td>{{ object.peer_a.device|linkify}}</td>
+          </tr>
+          <tr>
+            <th>Description</td>
+            <td>{{ object.peer_a.description }}</td>
+          </tr>
+          <tr>
+            <th>Local address</td>
+            <td>{{ object.peer_a.local_address|linkify}}</td>
+          </tr>
+          <tr>
+            <th>Local ASN</td>
+            <td>{{ object.peer_a.local_asn|linkify}}</td>
+          </tr>
+          <tr>
+            <th>Route Policy in</td>
+            <td>{{ object.peer_a.route_policy_in|placeholder}}</td>
+          </tr>
+          <tr>
+            <th>Route Policy out</td>
+            <td>{{ object.peer_a.route_policy_out|placeholder}}</td>
+          </tr>
+          <tr>
+            <th>Maximum prefixes</td>
+            <td>{{ object.peer_a.maximum_prefixes }}</td>
+          </tr>
+        </table>
+        <h5 class="card-text">AFI/SAFI</h5>
+        <table class="table">
+          <thead>
+            <tr>
+              <th scope="col">Name</th>
+              <th scope="col">Route Policy in</th>
+              <th scope="col">Route Policy out</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for afisafi in object.peer_b.afi_safis.all %}
+            <tr>
+              <td>{{ afisafi.afi_safi_name }}</td>
+              <td>{{ afisafi.route_policy_in.name|placeholder}}</td>
+              <td>{{ afisafi.route_policy_out.name|placeholder }}</td>
+            </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+  <div class="col col-12 col-xl-2">
+    <div class="card">
+      <h5 class="card-header">BGP Session</h5>
+      <div class="card-body">
+        <table class="table table-hover attr-table">
+          <tr>
+            <th>State</th>
+            <td>{% badge object.get_state_display bg_color=object.get_state_color%}</td>
+          </tr>
+          <tr>
+            <th>Monitoring State</th>
+            <td>{% badge object.get_monitoring_state_display bg_color=object.get_monitoring_state_color%}</td>
+          </tr>
+          <tr>
+            <th>Password</th>
+            <td>{{ object.password|placeholder }}</td>
+          </tr>
+          <tr>
+            <th>Circuit</th>
+            <td>{{ object.circuit|placeholder }}</td>
+          </tr>
+          <tr>
+            <th>Tenant</th>
+            <td>{{ object.tenant|placeholder|linkify }}</td>
+          </tr>
+        </table>
+      </div>
+    </div>
+  </div>
+  <div class="col col-12 col-xl-5">
+    <div class="card">
+      <h5 class="card-header">Peer B</h5>
+      <div class="card-body">
+        <table class="table table-hover attr-table">
+          <tr>
+            <th>Device</td>
+            <td>{{ object.peer_b.device|linkify}}</td>
+          </tr>
+          <tr>
+            <th>Description</td>
+            <td>{{ object.peer_b.description }}</td>
+          </tr>
+          <tr>
+            <th>Local address</td>
+            <td>{{ object.peer_b.local_address|linkify}}</td>
+          </tr>
+          <tr>
+            <th>Local ASN</td>
+            <td>{{ object.peer_b.local_asn|linkify}}</td>
+          </tr>
+          <tr>
+            <th>Route Policy in</td>
+            <td>{{ object.peer_b.route_policy_in|placeholder}}</td>
+          </tr>
+          <tr>
+            <th>Route Policy out</td>
+            <td>{{ object.peer_b.route_policy_out|placeholder}}</td>
+          </tr>
+          <tr>
+            <th>Maximum prefixes</td>
+            <td>{{ object.peer_b.maximum_prefixes }}</td>
+          </tr>
+        </table>
+        <h5 class="card-text">AFI/SAFI</h5>
+        <table class="table">
+          <thead>
+            <tr>
+              <th scope="col">Name</th>
+              <th scope="col">Route Policy in</th>
+              <th scope="col">Route Policy out</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for afisafi in object.peer_b.afi_safis.all %}
+            <tr>
+              <td>{{ afisafi.afi_safi_name }}</td>
+              <td>{{ afisafi.route_policy_in.name}}</td>
+              <td>{{ afisafi.route_policy_out.name }}</td>
+            </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+</div>
+<div class="row">
+  <div class="col col-12 col-xl-5">
+  {% if object.peer_a.peer_group %}
+    <div class="card">
+      <h5 class="card-header">Peer-Group A</h5>
+      <div class="card-body">
+        <table class="table table-hover attr-table">
+          <tr>
+            <th>PG Name</td>
+            <td>{{ object.peer_a.peer_group.name}}</td>
+          </tr>
+          <tr>
+            <th>Description</td>
+            <td>{{ object.peer_a.peer_group.description }}</td>
+          </tr>
+          <tr>
+            <th>Local address</td>
+            <td>{{ object.peer_a.peer_group.local_address|placeholder|linkify}}</td>
+          </tr>
+          <tr>
+            <th>Local ASN</td>
+            <td>{{ object.peer_a.peer_group.local_asn|placeholder|linkify}}</td>
+          </tr>
+          <tr>
+            <th>Route Policy in</td>
+            <td>{{ object.peer_a.peer_group.route_policy_in.name|placeholder}}</td>
+          </tr>
+          <tr>
+            <th>Route Policy out</td>
+            <td>{{ object.peer_a.peer_group.route_policy_out.name|placeholder}}</td>
+          </tr>
+          <tr>
+            <th>Maximum prefixes</td>
+            <td>{{ object.peer_a.peer_group.maximum_prefixes|placeholder }}</td>
+          </tr>
+        </table>
+      </div>
+    </div>
+  {% endif %}
+  </div>
+  <div class="col col-12 col-xl-2">
+  </div>
+  <div class="col col-12 col-xl-5">
+    {% if object.peer_b.peer_group %}
+    <div class="card">
+      <h5 class="card-header">Peer-Group B</h5>
+      <div class="card-body">
+        <table class="table table-hover attr-table">
+          <tr>
+            <th>PG Name</td>
+            <td>{{ object.peer_b.peer_group.name}}</td>
+          </tr>
+          <tr>
+            <th>Description</td>
+            <td>{{ object.peer_b.peer_group.description }}</td>
+          </tr>
+          <tr>
+            <th>Local address</td>
+            <td>{{ object.peer_b.peer_group.local_address|placeholder|linkify}}</td>
+          </tr>
+          <tr>
+            <th>Local ASN</td>
+            <td>{{ object.peer_b.peer_group.local_asn|placeholder|linkify}}</td>
+          </tr>
+          <tr>
+            <th>Route Policy in</td>
+            <td>{{ object.peer_b.peer_group.route_policy_in.name|placeholder}}</td>
+          </tr>
+          <tr>
+            <th>Route Policy out</td>
+            <td>{{ object.peer_b.peer_group.route_policy_out.name|placeholder}}</td>
+          </tr>
+          <tr>
+            <th>Maximum prefixes</td>
+            <td>{{ object.peer_b.peer_group.maximum_prefixes|placeholder }}</td>
+          </tr>
+        </table>
+      </div>
+    </div>
+    {% endif %}
+  </div>
+{% endblock %}

@@ -1,7 +1,8 @@
 """Tables."""
-import django_tables2 as tables
-from netbox.tables import NetBoxTable
 
+import django_tables2 as tables
+
+from netbox.tables import NetBoxTable, columns
 from netbox_cmdb.models.bgp import ASN, BGPPeerGroup, BGPSession
 
 
@@ -15,15 +16,28 @@ class ASNTable(NetBoxTable):
 
 
 class BGPSessionTable(NetBoxTable):
-    peer_a = tables.Column()
-    peer_b = tables.Column()
+    id = tables.Column(linkify=True)
+    peer_a__device = tables.Column(verbose_name="Device A")
+    peer_a__description = tables.Column(verbose_name="Device A description")
+    peer_a__local_address = tables.Column(verbose_name="Device A local address")
+    peer_b__device = tables.Column(verbose_name="Device B")
+    peer_b__description = tables.Column(verbose_name="Device B description")
+    peer_b__local_address = tables.Column(verbose_name="Device B local address")
+    state = columns.ChoiceFieldColumn()
+    monitoring_state = columns.ChoiceFieldColumn()
 
     class Meta(NetBoxTable.Meta):
         model = BGPSession
         fields = (
-            "pk",
-            "peer_a",
-            "peer_b",
+            "id",
+            "peer_a__device",
+            "peer_a__description",
+            "peer_a__local_address",
+            "peer_b__device",
+            "peer_b__description",
+            "peer_b__local_address",
+            "state",
+            "monitoring_state",
         )
 
 

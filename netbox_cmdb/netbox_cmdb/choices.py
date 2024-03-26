@@ -25,9 +25,9 @@ class AssetMonitoringStateChoices(ChoiceSet):
     DISABLED = "disabled"
 
     CHOICES = (
-        (CRITICAL, "Critical"),
-        (WARNING, "Warning"),
-        (DISABLED, "Disabled"),
+        (CRITICAL, "Critical", "red"),
+        (WARNING, "Warning", "orange"),
+        (DISABLED, "Disabled", "gray"),
     )
 
 
