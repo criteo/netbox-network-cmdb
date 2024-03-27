@@ -1,11 +1,16 @@
 """Forms."""
-from dcim.models import Device
-from django import forms
-from extras.models import Tag
-from netbox.forms import NetBoxModelForm
-from utilities.forms import DynamicModelMultipleChoiceField
-from utilities.forms.fields import DynamicModelChoiceField
 
+from dcim.models import Device
+from dcim.models.devices import DeviceType
+from dcim.models.sites import SiteGroup
+from django import forms
+from django.utils.translation import gettext as _
+from extras.models import Tag
+from utilities.forms import DynamicModelMultipleChoiceField
+from utilities.forms.fields import DynamicModelChoiceField, MultipleChoiceField
+
+from netbox.forms import NetBoxModelFilterSetForm, NetBoxModelForm
+from netbox_cmdb.choices import AssetMonitoringStateChoices, AssetStateChoices
 from netbox_cmdb.models.bgp import ASN, BGPPeerGroup, BGPSession
 
 
@@ -18,18 +23,26 @@ class ASNForm(NetBoxModelForm):
 
 
 class BGPSessionForm(NetBoxModelForm):
-    tags = DynamicModelMultipleChoiceField(
-        queryset=Tag.objects.all(),
-        required=False,
-    )
-
     class Meta:
         model = BGPSession
-        fields = [
-            "peer_a",
-            "peer_b",
-            "tags",
-        ]
+        fields = ["peer_a", "peer_b", "state", "monitoring_state"]
+
+
+class BGPSessionFilterSetForm(NetBoxModelFilterSetForm):
+    device__site__group_id = DynamicModelMultipleChoiceField(
+        queryset=SiteGroup.objects.all(),
+        label=_("Site"),
+        required=False,
+    )
+    device__device_type_id = DynamicModelMultipleChoiceField(
+        queryset=DeviceType.objects.all(),
+        label=_("Device type"),
+        required=False,
+    )
+    state = MultipleChoiceField(choices=AssetStateChoices, required=False)
+    monitoring_state = MultipleChoiceField(choices=AssetMonitoringStateChoices, required=False)
+
+    model = BGPSession
 
 
 class BGPPeerGroupForm(NetBoxModelForm):

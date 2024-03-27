@@ -4,12 +4,12 @@ from django.core.validators import MaxValueValidator, MinValueValidator
 from django.db import models
 from django.db.models import Q
 from django.urls import reverse
-from netbox.models import ChangeLoggedModel
 from utilities.choices import ChoiceSet
 from utilities.querysets import RestrictedQuerySet
 
+from netbox.models import ChangeLoggedModel
+from netbox_cmdb.choices import AssetMonitoringStateChoices, AssetStateChoices
 from netbox_cmdb.constants import BGP_MAX_ASN, BGP_MIN_ASN
-from netbox_cmdb.choices import AssetStateChoices, AssetMonitoringStateChoices
 from netbox_cmdb.models.circuit import Circuit
 
 
@@ -357,3 +357,12 @@ class BGPSession(ChangeLoggedModel):
             )
 
         super().validate_unique(exclude)
+
+    def get_state_color(self):
+        return AssetStateChoices.colors.get(self.state)
+
+    def get_monitoring_state_color(self):
+        return AssetMonitoringStateChoices.colors.get(self.monitoring_state)
+
+    def get_absolute_url(self):
+        return reverse("plugins:netbox_cmdb:bgpsession", args=[self.pk])

@@ -1,4 +1,5 @@
 """URLs."""
+
 from django.urls import path
 from netbox.views.generic import ObjectChangeLogView, ObjectJournalView
 
@@ -12,6 +13,7 @@ from netbox_cmdb.views import (
     BGPPeerGroupEditView,
     BGPPeerGroupListView,
     BGPPeerGroupView,
+    BGPSessionBulkDeleteView,
     BGPSessionDeleteView,
     BGPSessionEditView,
     BGPSessionListView,
@@ -51,6 +53,7 @@ urlpatterns = [
         BGPSessionDeleteView.as_view(),
         name="bgpsession_delete",
     ),
+    path("bgp-session/delete/", BGPSessionBulkDeleteView.as_view(), name="bgpsession_bulk_delete"),
     path(
         "bgp-session/<int:pk>/changelog/",
         ObjectChangeLogView.as_view(),

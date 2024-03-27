@@ -1,4 +1,5 @@
 """Admin module."""
+
 from dcim.models import Device
 from django.contrib import admin
 from django.contrib.admin.options import StackedInline

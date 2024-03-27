@@ -1,4 +1,5 @@
 """Prefix list serializers."""
+
 from rest_framework.serializers import ModelSerializer, ValidationError
 
 from netbox_cmdb.api.common_serializers import CommonDeviceSerializer
