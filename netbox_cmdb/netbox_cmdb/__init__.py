@@ -1,4 +1,5 @@
 """Netbox CMDB plugin."""
+
 from extras.plugins import PluginConfig
 
 
