@@ -35,6 +35,14 @@
             <th>Maximum prefixes</td>
             <td>{{ object.peer_a.maximum_prefixes }}</td>
           </tr>
+          <tr>
+            <th>Enforce First AS</td>
+            <td>{% checkmark object.peer_a.enforce_first_as %}</td>
+          </tr>
+          <tr>
+            <th>Enabled</td>
+            <td>{% checkmark object.peer_a.enabled %}</td>
+          </tr>
         </table>
         <h5 class="card-text">AFI/SAFI</h5>
         <table class="table">
@@ -119,6 +127,14 @@
           <tr>
             <th>Maximum prefixes</td>
             <td>{{ object.peer_b.maximum_prefixes }}</td>
+          </tr>
+          <tr>
+            <th>Enforce First AS</td>
+            <td>{% checkmark object.peer_b.enforce_first_as %}</td>
+          </tr>
+          <tr>
+            <th>Enabled</td>
+            <td>{% checkmark object.peer_b.enabled %}</td>
           </tr>
         </table>
         <h5 class="card-text">AFI/SAFI</h5>
