@@ -7,6 +7,7 @@ from netbox_cmdb.api.bgp.views import (
     BGPGlobalViewSet,
     BGPPeerGroupViewSet,
     BGPSessionsViewSet,
+    DeviceBGPSessionsViewSet,
 )
 from netbox_cmdb.api.bgp_community_list.views import BGPCommunityListViewSet
 from netbox_cmdb.api.prefix_list.views import PrefixListViewSet
@@ -18,6 +19,7 @@ router = NetBoxRouter()
 router.register("asns", ASNViewSet)
 router.register("bgp-global", BGPGlobalViewSet)
 router.register("bgp-sessions", BGPSessionsViewSet)
+router.register("device-bgp-sessions", DeviceBGPSessionsViewSet)
 router.register("bgp-community-lists", BGPCommunityListViewSet)
 router.register("peer-groups", BGPPeerGroupViewSet)
 router.register("prefix-lists", PrefixListViewSet)

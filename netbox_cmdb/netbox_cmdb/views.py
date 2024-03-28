@@ -11,6 +11,7 @@ from netbox_cmdb.filtersets import (
     ASNFilterSet,
     BGPPeerGroupFilterSet,
     BGPSessionFilterSet,
+    DeviceBGPSessionFilterSet,
     SNMPFilterSet,
 )
 from netbox_cmdb.forms import (
@@ -18,6 +19,7 @@ from netbox_cmdb.forms import (
     BGPPeerGroupForm,
     BGPSessionFilterSetForm,
     BGPSessionForm,
+    DeviceBGPSessionForm,
     SNMPCommunityGroupForm,
     SNMPGroupForm,
 )
@@ -27,6 +29,7 @@ from netbox_cmdb.tables import (
     ASNTable,
     BGPPeerGroupTable,
     BGPSessionTable,
+    DeviceBGPSessionTable,
     SNMPCommunityTable,
     SNMPTable,
 )
@@ -86,18 +89,32 @@ class BGPSessionView(ObjectView):
     ).all()
     template_name = "netbox_cmdb/bgpsession.html"
 
-    def get_extra_context(self, request, instance):
-        # Get AFI/SAFIS
-        peer_a_afi_safis = []
-        peer_b_afi_safis = []
-        if instance.peer_a.afi_safis is not None:
-            peer_a_afi_safis = instance.peer_a.afi_safis.all()
-        if instance.peer_b.afi_safis is not None:
-            peer_b_afi_safis = instance.peer_b.afi_safis.all()
-        return {
-            "peer_a_afi_safis": peer_a_afi_safis,
-            "peer_b_afi_safis": peer_b_afi_safis,
-        }
+
+## DeviceBGPSession views
+class DeviceBGPSessionListView(ObjectListView):
+    queryset = DeviceBGPSession.objects.all()
+    filterset = DeviceBGPSessionFilterSet
+    table = DeviceBGPSessionTable
+
+
+class DeviceBGPSessionView(ObjectView):
+    queryset = DeviceBGPSession.objects.all()
+
+
+class DeviceBGPSessionEditView(ObjectEditView):
+    queryset = DeviceBGPSession.objects.all()
+    form = DeviceBGPSessionForm
+    filterset = DeviceBGPSessionFilterSet
+
+
+class DeviecBGPSessionDeleteView(ObjectDeleteView):
+    queryset = DeviceBGPSession.objects.all()
+
+
+class DeviecBGPSessionBulkDeleteView(BulkDeleteView):
+    queryset = DeviceBGPSession.objects.all()
+    filterset = DeviceBGPSessionFilterSet
+    table = DeviceBGPSessionTable
 
 
 ## Peer groups views

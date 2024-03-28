@@ -5,7 +5,8 @@ from tenancy.filtersets import TenancyFilterSet
 from utilities.filters import MultiValueCharFilter
 
 from netbox.filtersets import ChangeLoggedModelFilterSet
-from netbox_cmdb.models.bgp import ASN, BGPPeerGroup, BGPSession
+from netbox_cmdb.models.bgp import ASN, BGPPeerGroup, BGPSession, DeviceBGPSession
+from netbox_cmdb.models.route_policy import RoutePolicy
 
 device_location_filterset = [
     "device__location__name",
@@ -161,6 +162,25 @@ class BGPSessionFilterSet(ChangeLoggedModelFilterSet, TenancyFilterSet):
             | Q(peer_b__description__icontains=value)
         ).distinct()
 
+
+class DeviceBGPSessionFilterSet(ChangeLoggedModelFilterSet):
+    """Device BGP Session filterset."""
+
+    q = django_filters.CharFilter(
+        method="search",
+        label="Search",
+    )
+
+    class Meta:
+        model = DeviceBGPSession
+        fields = ["id", "device__name", "local_address", "local_asn"]
+
+    def search(self, queryset, name, value):
+        if not value.strip():
+            return queryset
+        return queryset.filter(
+            Q(device__name__icontains=value) | Q(description__icontains=value)
+        ).distinct()
 
 class BGPPeerGroupFilterSet(ChangeLoggedModelFilterSet):
     """BGP Session filterset."""

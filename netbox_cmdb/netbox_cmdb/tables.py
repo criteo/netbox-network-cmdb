@@ -3,7 +3,7 @@
 import django_tables2 as tables
 
 from netbox.tables import NetBoxTable, columns
-from netbox_cmdb.models.bgp import ASN, BGPPeerGroup, BGPSession
+from netbox_cmdb.models.bgp import ASN, BGPPeerGroup, BGPSession, DeviceBGPSession
 from netbox_cmdb.models.snmp import SNMP, SNMPCommunity
 
 
@@ -39,6 +39,30 @@ class BGPSessionTable(NetBoxTable):
             "peer_b__local_address",
             "state",
             "monitoring_state",
+        )
+
+
+class DeviceBGPSessionTable(NetBoxTable):
+    id = tables.Column()
+    device = tables.Column(verbose_name="Device")
+    description = tables.Column(verbose_name="Description")
+    local_address = tables.Column(verbose_name="Local address")
+    local_asn = tables.Column(verbose_name="Local ASN")
+    route_policy_in = tables.Column(verbose_name="Route Policy in")
+    route_policy_out = tables.Column(verbose_name="Route Policy out")
+    maximum_prefixes = tables.Column(verbose_name="Maximum prefixes")
+
+    class Meta(NetBoxTable.Meta):
+        model = DeviceBGPSession
+        fields = (
+            "id",
+            "device",
+            "description",
+            "local_address",
+            "local_asn",
+            "route_policy_in",
+            "route_policy_out",
+            "maximum_prefixes",
         )
 
 

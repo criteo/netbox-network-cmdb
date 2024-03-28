@@ -25,6 +25,10 @@ from netbox_cmdb.views import (
     SNMPDeleteView,
     SNMPEditView,
     SNMPListView,
+    DeviceBGPSessionEditView,
+    DeviceBGPSessionListView,
+    DeviceBGPSessionView,
+    DeviecBGPSessionDeleteView,
 )
 
 urlpatterns = [
@@ -72,6 +76,26 @@ urlpatterns = [
         ObjectJournalView.as_view(),
         name="bgpsession_journal",
         kwargs={"model": BGPSession},
+    ),
+    # Device BGP session
+    path("device-bgp-session/", DeviceBGPSessionListView.as_view(), name="devicebgpsession_list"),
+    path("device-bgp-session/add", DeviceBGPSessionEditView.as_view(), name="devicebgpsession_add"),
+    path("device-bgp-session/<int:pk>/", DeviceBGPSessionView.as_view(), name="devicebgpsession"),
+    path(
+        "device-bgp-session/<int:pk>/edit",
+        DeviceBGPSessionEditView.as_view(),
+        name="devicebgpsession_edit",
+    ),
+    path(
+        "device-bgp-session/<int:pk>/delete",
+        DeviecBGPSessionDeleteView.as_view(),
+        name="devicebgpsession_delete",
+    ),
+    path(
+        "device-bgp-session/<int:pk>/changelog/",
+        ObjectChangeLogView.as_view(),
+        name="devicebgpsession_changelog",
+        kwargs={"model": DeviceBGPSession},
     ),
     # Peer Group
     path("peer-group/", BGPPeerGroupListView.as_view(), name="bgppeergroup_list"),
