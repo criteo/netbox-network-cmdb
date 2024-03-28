@@ -10,7 +10,6 @@ from utilities.querysets import RestrictedQuerySet
 from netbox.models import ChangeLoggedModel
 from netbox_cmdb.choices import AssetMonitoringStateChoices, AssetStateChoices
 from netbox_cmdb.constants import BGP_MAX_ASN, BGP_MIN_ASN
-from netbox_cmdb.models.circuit import Circuit
 
 
 class BGPGlobal(ChangeLoggedModel):

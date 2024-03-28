@@ -1,5 +1,7 @@
 """Views."""
 
+from utilities.utils import count_related
+
 from netbox.views.generic import (
     ObjectDeleteView,
     ObjectEditView,
@@ -12,6 +14,7 @@ from netbox_cmdb.filtersets import (
     BGPPeerGroupFilterSet,
     BGPSessionFilterSet,
     DeviceBGPSessionFilterSet,
+    RoutePolicyFilterSet,
     SNMPFilterSet,
 )
 from netbox_cmdb.forms import (
@@ -20,16 +23,26 @@ from netbox_cmdb.forms import (
     BGPSessionFilterSetForm,
     BGPSessionForm,
     DeviceBGPSessionForm,
+    RoutePolicyFilterSetForm,
+    RoutePolicyForm,
     SNMPCommunityGroupForm,
     SNMPGroupForm,
 )
-from netbox_cmdb.models.bgp import ASN, BGPPeerGroup, BGPSession, DeviceBGPSession
+from netbox_cmdb.models.bgp import (
+    ASN,
+    AfiSafi,
+    BGPPeerGroup,
+    BGPSession,
+    DeviceBGPSession,
+)
+from netbox_cmdb.models.route_policy import RoutePolicy
 from netbox_cmdb.models.snmp import SNMP, SNMPCommunity
 from netbox_cmdb.tables import (
     ASNTable,
     BGPPeerGroupTable,
     BGPSessionTable,
     DeviceBGPSessionTable,
+    RoutePolicyTable,
     SNMPCommunityTable,
     SNMPTable,
 )
@@ -119,7 +132,7 @@ class DeviecBGPSessionBulkDeleteView(BulkDeleteView):
 
 ## Peer groups views
 class BGPPeerGroupListView(ObjectListView):
-    queryset = BGPPeerGroup.objects.all()
+    queryset = BGPPeerGroup.objects.annotate(refcount=count_related(DeviceBGPSession, "peer_group"))
     filterset = BGPPeerGroupFilterSet
     table = BGPPeerGroupTable
     template_name = "netbox_cmdb/bgppeergroup_list.html"
@@ -137,6 +150,48 @@ class BGPPeerGroupDeleteView(ObjectDeleteView):
 class BGPPeerGroupView(ObjectView):
     queryset = BGPPeerGroup.objects.all()
     template_name = "netbox_cmdb/bgppeergroup.html"
+
+
+## Route policy views
+
+
+class RoutePolicyListView(ObjectListView):
+    queryset = RoutePolicy.objects.annotate(
+        refcount=sum(
+            [
+                count_related(AfiSafi, "route_policy_in"),
+                count_related(AfiSafi, "route_policy_out"),
+                count_related(DeviceBGPSession, "route_policy_in"),
+                count_related(DeviceBGPSession, "route_policy_out"),
+                count_related(BGPPeerGroup, "route_policy_in"),
+                count_related(BGPPeerGroup, "route_policy_out"),
+            ]
+        )
+    )
+    filterset_form = RoutePolicyFilterSetForm
+    filterset = RoutePolicyFilterSet
+    table = RoutePolicyTable
+
+
+class RoutePolicyView(ObjectView):
+    queryset = RoutePolicy.objects.prefetch_related("route_policy_term").all()
+    template_name = "netbox_cmdb/routepolicy.html"
+
+
+class RoutePolicyEditView(ObjectEditView):
+    model = RoutePolicy
+    queryset = RoutePolicy.objects.prefetch_related("route_policy_term").all()
+    form = RoutePolicyForm
+    filterset = RoutePolicyFilterSet
+
+class RoutePolicyDeleteView(ObjectDeleteView):
+    queryset = RoutePolicy.objects.all()
+
+
+class RoutePolicyBulkDeleteView(BulkDeleteView):
+    queryset = RoutePolicy.objects.all()
+    filterset = RoutePolicyFilterSet
+    table = RoutePolicyTable
 
 
 ## Snmp groups views

@@ -4,13 +4,12 @@ from typing import Any, Sequence
 
 from dcim.models import Device
 from dcim.models.devices import DeviceType
-from dcim.models.sites import Site, SiteGroup
+from dcim.models.sites import SiteGroup
 from django import forms
 from django.utils.translation import gettext as _
 from extras.models import Tag
 from utilities.forms import DynamicModelMultipleChoiceField
 from utilities.forms.fields import DynamicModelChoiceField, MultipleChoiceField
-from utilities.forms.fields.fields import SlugField
 
 from netbox.forms import NetBoxModelFilterSetForm, NetBoxModelForm
 from netbox_cmdb.choices import AssetMonitoringStateChoices, AssetStateChoices
@@ -116,6 +115,30 @@ class BGPPeerGroupForm(NetBoxModelForm):
             "remote_asn",
             "tags",
         ]
+
+
+class RoutePolicyForm(NetBoxModelForm):
+    device = DynamicModelChoiceField(queryset=Device.objects.all())
+
+    class Meta:
+        model = RoutePolicy
+        fields = [
+            "name",
+            "device",
+            "description",
+        ]
+
+class RoutePolicyFilterSetForm(NetBoxModelFilterSetForm):
+    device__id = DynamicModelMultipleChoiceField(
+        queryset=Device.objects.all(),
+        label=_("Device"),
+        required=False,
+    )
+    name = forms.CharField(
+        required=False,
+    )
+
+    model = RoutePolicy
 
 
 class InlineTermForm(forms.models.BaseInlineFormSet):

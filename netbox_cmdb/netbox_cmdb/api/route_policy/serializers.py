@@ -1,10 +1,10 @@
 """Route Policy serializers."""
 
 from django.core.exceptions import ValidationError
-from netbox.api.serializers import WritableNestedSerializer
 from rest_framework import serializers
-from rest_framework.serializers import ModelSerializer
+from rest_framework.serializers import ModelSerializer, SerializerMethodField
 
+from netbox.api.serializers import WritableNestedSerializer
 from netbox_cmdb.api.bgp.serializers import AsnSerializer
 from netbox_cmdb.api.common_serializers import CommonDeviceSerializer
 from netbox_cmdb.models.bgp_community_list import BGPCommunityList
@@ -68,12 +68,15 @@ class RoutePolicyTermSerializer(ModelSerializer):
 
 class WritableRoutePolicySerializer(ModelSerializer):
     device = CommonDeviceSerializer()
-
     terms = RoutePolicyTermSerializer(many=True, source="route_policy_term")
+    display = SerializerMethodField(read_only=True)
 
     class Meta:
         model = RoutePolicy
-        fields = ["id", "name", "device", "description", "terms"]
+        fields = ["id", "name", "device", "description", "terms", "display"]
+
+    def get_display(self, obj):
+        return obj.name
 
     def _validate_terms(self, terms_data):
         if len(terms_data) < 1:

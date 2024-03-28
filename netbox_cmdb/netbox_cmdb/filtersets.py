@@ -182,6 +182,25 @@ class DeviceBGPSessionFilterSet(ChangeLoggedModelFilterSet):
             Q(device__name__icontains=value) | Q(description__icontains=value)
         ).distinct()
 
+
+class RoutePolicyFilterSet(ChangeLoggedModelFilterSet):
+    """Route Policy filterset."""
+
+    q = django_filters.CharFilter(
+        method="search",
+        label="Search",
+    )
+
+    class Meta:
+        model = RoutePolicy
+        fields = ["id", "device__id", "device__name", "name"] + device_location_filterset
+
+    def search(self, queryset, name, value):
+        if not value.strip():
+            return queryset
+        return queryset.filter(name__icontains=value)
+
+
 class BGPPeerGroupFilterSet(ChangeLoggedModelFilterSet):
     """BGP Session filterset."""
 
