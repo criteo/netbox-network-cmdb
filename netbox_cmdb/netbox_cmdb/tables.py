@@ -68,23 +68,26 @@ class DeviceBGPSessionTable(NetBoxTable):
 
 
 class BGPPeerGroupTable(NetBoxTable):
-    device = tables.LinkColumn()
-    name = tables.LinkColumn()
-    asn = tables.Column()
-    route_policy_in = tables.Column()
-    route_policy_out = tables.Column()
+    name = tables.Column(linkify=True)
+    device = tables.Column(linkify=True)
+    local_asn = tables.Column(linkify=True)
+    remote_asn = tables.Column(linkify=True)
+    route_policy_in = tables.Column(linkify=True)
+    route_policy_out = tables.Column(linkify=True)
     maximum_prefixes = tables.Column()
+    refcount = tables.Column()
 
     class Meta(NetBoxTable.Meta):
         model = BGPPeerGroup
         fields = (
-            "pk",
             "name",
+            "device",
             "local_asn",
             "remote_asn",
             "route_policy_in",
             "route_policy_out",
             "maximum_prefixes",
+            "refcount",
         )
 
 
