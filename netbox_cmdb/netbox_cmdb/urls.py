@@ -4,6 +4,7 @@ from django.urls import path
 from netbox.views.generic import ObjectChangeLogView, ObjectJournalView
 
 from netbox_cmdb.models.bgp import *
+from netbox_cmdb.models.snmp import SNMP, SNMPCommunity
 from netbox_cmdb.views import (
     ASNDeleteView,
     ASNEditView,
@@ -18,6 +19,12 @@ from netbox_cmdb.views import (
     BGPSessionEditView,
     BGPSessionListView,
     BGPSessionView,
+    SNMPCommunityDeleteView,
+    SNMPCommunityEditView,
+    SNMPCommunityListView,
+    SNMPDeleteView,
+    SNMPEditView,
+    SNMPListView,
 )
 
 urlpatterns = [
@@ -91,5 +98,43 @@ urlpatterns = [
         ObjectJournalView.as_view(),
         name="bgppeergroup_journal",
         kwargs={"model": BGPPeerGroup},
+    ),
+    # SNMP
+    path("snmp/", SNMPListView.as_view(), name="snmp_list"),
+    path("snmp/add/", SNMPEditView.as_view(), name="snmp_add"),
+    path(
+        "snmp/<int:pk>/edit/",
+        SNMPEditView.as_view(),
+        name="snmp_edit",
+    ),
+    path(
+        "snmp/<int:pk>/delete/",
+        SNMPDeleteView.as_view(),
+        name="snmp_delete",
+    ),
+    path(
+        "snmp/<int:pk>/changelog/",
+        ObjectChangeLogView.as_view(),
+        name="snmp_changelog",
+        kwargs={"model": SNMP},
+    ),
+    # SNMP Community
+    path("snmp-community/", SNMPCommunityListView.as_view(), name="snmpcommunity_list"),
+    path("snmp-community/add/", SNMPCommunityEditView.as_view(), name="snmpcommunity_add"),
+    path(
+        "snmp-community/<int:pk>/edit/",
+        SNMPCommunityEditView.as_view(),
+        name="snmpcommunity_edit",
+    ),
+    path(
+        "snmp-community/<int:pk>/delete/",
+        SNMPCommunityDeleteView.as_view(),
+        name="snmpcommunity_delete",
+    ),
+    path(
+        "snmp-community/<int:pk>/changelog/",
+        ObjectChangeLogView.as_view(),
+        name="snmpcommunity_changelog",
+        kwargs={"model": SNMPCommunity},
     ),
 ]

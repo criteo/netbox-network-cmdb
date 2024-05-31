@@ -17,9 +17,18 @@ from netbox_cmdb.forms import (
     BGPPeerGroupForm,
     BGPSessionFilterSetForm,
     BGPSessionForm,
+    SNMPCommunityGroupForm,
+    SNMPGroupForm,
 )
 from netbox_cmdb.models.bgp import ASN, BGPPeerGroup, BGPSession, DeviceBGPSession
-from netbox_cmdb.tables import ASNTable, BGPPeerGroupTable, BGPSessionTable
+from netbox_cmdb.models.snmp import SNMP, SNMPCommunity
+from netbox_cmdb.tables import (
+    ASNTable,
+    BGPPeerGroupTable,
+    BGPSessionTable,
+    SNMPCommunityTable,
+    SNMPTable,
+)
 
 
 ## ASN views
@@ -90,14 +99,6 @@ class BGPSessionView(ObjectView):
         }
 
 
-## DeviceBGPSession views
-
-
-class DeviceBGPSessionListView(ObjectListView):
-    queryset = DeviceBGPSession.objects.all()
-    filterset = None
-
-
 ## Peer groups views
 class BGPPeerGroupListView(ObjectListView):
     queryset = BGPPeerGroup.objects.all()
@@ -118,3 +119,33 @@ class BGPPeerGroupDeleteView(ObjectDeleteView):
 class BGPPeerGroupView(ObjectView):
     queryset = BGPPeerGroup.objects.all()
     template_name = "netbox_cmdb/bgppeergroup.html"
+
+
+## Snmp groups views
+class SNMPListView(ObjectListView):
+    queryset = SNMP.objects.all()
+    table = SNMPTable
+
+
+class SNMPEditView(ObjectEditView):
+    queryset = SNMP.objects.all()
+    form = SNMPGroupForm
+
+
+class SNMPDeleteView(ObjectDeleteView):
+    queryset = SNMP.objects.all()
+
+
+## Snmp Community groups views
+class SNMPCommunityListView(ObjectListView):
+    queryset = SNMPCommunity.objects.all()
+    table = SNMPCommunityTable
+
+
+class SNMPCommunityEditView(ObjectEditView):
+    queryset = SNMPCommunity.objects.all()
+    form = SNMPCommunityGroupForm
+
+
+class SNMPCommunityDeleteView(ObjectDeleteView):
+    queryset = SNMPCommunity.objects.all()
