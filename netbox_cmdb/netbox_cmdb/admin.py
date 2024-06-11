@@ -18,6 +18,7 @@ from netbox_cmdb.models.bgp import (
 from netbox_cmdb.models.bgp_community_list import BGPCommunityList, BGPCommunityListTerm
 from netbox_cmdb.models.prefix_list import PrefixList, PrefixListTerm
 from netbox_cmdb.models.route_policy import RoutePolicy, RoutePolicyTerm
+from netbox_cmdb.models.snmp import SNMP, SNMPCommunity
 
 
 class BaseAdmin(admin.ModelAdmin):
@@ -171,6 +172,35 @@ class BGPCommunityListAdmin(BaseAdmin):
         "name",
         "device",
     )
+
+
+@admin.register(SNMP)
+class SNMPAdmin(BaseAdmin):
+    """Admin class to manage SNMPCommunity objects."""
+
+    list_display = (
+        "device",
+        "community_list_display",
+        "location",
+        "contact",
+    )
+
+    def community_list_display(self, obj):
+        return ", ".join([str(community) for community in obj.community_list.all()])
+
+    community_list_display.short_description = "Community List"
+
+
+@admin.register(SNMPCommunity)
+class SNMPCommunitytAdmin(BaseAdmin):
+    """Admin class to manage SNMP objects."""
+
+    list_display = (
+        "name",
+        "type",
+        "community",
+    )
+    search_fields = ("name", "name")
 
 
 # We need to register Netbox core models to the Admin page or we won't be able to lookup

@@ -40,4 +40,28 @@ menu_items = (
             ),
         ),
     ),
+    PluginMenuItem(
+        link="plugins:netbox_cmdb:snmp_list",
+        link_text="SNMP",
+        buttons=(
+            PluginMenuButton(
+                link="plugins:netbox_cmdb:snmp_add",
+                title="SNMP",
+                icon_class="mdi mdi-plus-thick",
+                color=ButtonColorChoices.GREEN,
+            ),
+        ),
+    ),
+    PluginMenuItem(
+        link="plugins:netbox_cmdb:snmpcommunity_list",
+        link_text="SNMP Community",
+        buttons=(
+            PluginMenuButton(
+                link="plugins:netbox_cmdb:snmpcommunity_add",
+                title="SNMP Community",
+                icon_class="mdi mdi-plus-thick",
+                color=ButtonColorChoices.GREEN,
+            ),
+        ),
+    ),
 )

@@ -6,11 +6,12 @@ from dcim.models.sites import SiteGroup
 from django import forms
 from django.utils.translation import gettext as _
 from extras.models import Tag
+from netbox_cmdb.models.snmp import SNMP, SNMPCommunity
 from utilities.forms import DynamicModelMultipleChoiceField
 from utilities.forms.fields import DynamicModelChoiceField, MultipleChoiceField
 
 from netbox.forms import NetBoxModelFilterSetForm, NetBoxModelForm
-from netbox_cmdb.choices import AssetMonitoringStateChoices, AssetStateChoices
+from netbox_cmdb.choices import AssetMonitoringStateChoices, AssetStateChoices, SNMPCommunityType
 from netbox_cmdb.models.bgp import ASN, BGPPeerGroup, BGPSession
 
 
@@ -83,3 +84,17 @@ class InlineTermForm(forms.models.BaseInlineFormSet):
                 pass  # such validation is already handled in previous validation steps
         if count < 1:
             raise forms.ValidationError("You must have at least one term.")
+
+
+class SNMPGroupForm(NetBoxModelForm):
+    device = DynamicModelChoiceField(queryset=Device.objects.all())
+
+    class Meta:
+        model = SNMP
+        fields = ["device", "community_list", "location", "contact"]
+
+
+class SNMPCommunityGroupForm(NetBoxModelForm):
+    class Meta:
+        model = SNMPCommunity
+        fields = ["name", "community", "type"]

@@ -4,6 +4,7 @@ import django_tables2 as tables
 
 from netbox.tables import NetBoxTable, columns
 from netbox_cmdb.models.bgp import ASN, BGPPeerGroup, BGPSession
+from netbox_cmdb.models.snmp import SNMP, SNMPCommunity
 
 
 class ASNTable(NetBoxTable):
@@ -60,3 +61,17 @@ class BGPPeerGroupTable(NetBoxTable):
             "route_policy_out",
             "maximum_prefixes",
         )
+
+
+class SNMPTable(NetBoxTable):
+    device = tables.LinkColumn()
+
+    class Meta(NetBoxTable.Meta):
+        model = SNMP
+        fields = ("device", "community_list", "location", "contact")
+
+
+class SNMPCommunityTable(NetBoxTable):
+    class Meta(NetBoxTable.Meta):
+        model = SNMPCommunity
+        fields = ("name", "community", "type")

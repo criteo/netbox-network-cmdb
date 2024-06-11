@@ -1,6 +1,18 @@
 from utilities.choices import ChoiceSet
 
 
+class SNMPCommunityType(ChoiceSet):
+    """A ChoiceSet to define the communityType."""
+
+    RO = "readonly"
+    RW = "readwrite"
+
+    CHOICES = [
+        (RO, "ReadOnly", "green"),
+        (RW, "Read&Write", "red"),
+    ]
+
+
 class AssetStateChoices(ChoiceSet):
     """A ChoiceSet to define the state of an asset."""
 
