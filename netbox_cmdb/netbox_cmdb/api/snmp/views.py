@@ -4,7 +4,12 @@ from netbox_cmdb import filtersets
 
 from netbox_cmdb.api.viewsets import CustomNetBoxModelViewSet
 from netbox_cmdb.models.snmp import SNMP, SNMPCommunity
-from netbox_cmdb.api.snmp.serializers import SNMPCommunitySerializer, SNMPSerializer
+from netbox_cmdb.api.snmp.serializers import (
+    SNMPCommunitySerializer,
+    SNMPReadSerializer,
+    SNMPSerializer,
+)
+from rest_framework.response import Response
 
 
 class SNMPCommunityViewSet(CustomNetBoxModelViewSet):
@@ -26,3 +31,8 @@ class SNMPViewSet(CustomNetBoxModelViewSet):
         "device__id",
         "device__name",
     ] + filtersets.device_location_filterset
+
+    def list(self, request):
+        queryset = SNMP.objects.all()
+        serializer = SNMPReadSerializer(queryset, many=True)
+        return Response(serializer.data)

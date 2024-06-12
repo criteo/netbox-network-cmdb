@@ -15,6 +15,7 @@ class SNMPCommunitySerializerCreate(BaseTestCase):
 
         assert community1.community == "my_community"
         assert community1.type == SNMPCommunityType.RO
+        community1.save()
 
         data = {
             "device": self.device1.pk,
