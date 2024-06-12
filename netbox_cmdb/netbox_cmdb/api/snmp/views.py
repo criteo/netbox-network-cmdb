@@ -32,7 +32,7 @@ class SNMPViewSet(CustomNetBoxModelViewSet):
         "device__name",
     ] + filtersets.device_location_filterset
 
-    def list(self, request):
-        queryset = SNMP.objects.all()
-        serializer = SNMPReadSerializer(queryset, many=True)
-        return Response(serializer.data)
+    def get_serializer_class(self):
+        if self.action == "list":
+            return SNMPReadSerializer
+        return SNMPSerializer
