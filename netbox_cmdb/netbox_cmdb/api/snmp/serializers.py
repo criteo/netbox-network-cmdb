@@ -17,7 +17,7 @@ class SNMPCommunityReadSerializer(ModelSerializer):
 
     class Meta:
         model = SNMPCommunity
-        fields = ["community", "type"]
+        fields = ["name", "community", "type"]
 
 
 class SNMPReadSerializer(ModelSerializer):
