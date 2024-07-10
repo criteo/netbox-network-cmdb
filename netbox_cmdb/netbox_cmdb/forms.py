@@ -7,6 +7,7 @@ from django import forms
 from django.utils.translation import gettext as _
 from extras.models import Tag
 from netbox_cmdb.models.snmp import SNMP, SNMPCommunity
+from netbox_cmdb.constants import MAX_COMMUNITY_PER_DEVICE
 from utilities.forms import DynamicModelMultipleChoiceField
 from utilities.forms.fields import DynamicModelChoiceField, MultipleChoiceField
 
@@ -92,6 +93,14 @@ class SNMPGroupForm(NetBoxModelForm):
     class Meta:
         model = SNMP
         fields = ["device", "community_list", "location", "contact"]
+
+    def clean_community_list(self):
+        community_list = self.cleaned_data.get("community_list")
+        if len(community_list) > MAX_COMMUNITY_PER_DEVICE:
+            raise forms.ValidationError(
+                f"You cannot select more than {MAX_COMMUNITY_PER_DEVICE} SNMP Communities."
+            )
+        return community_list
 
 
 class SNMPCommunityGroupForm(NetBoxModelForm):

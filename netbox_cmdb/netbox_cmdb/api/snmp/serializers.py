@@ -1,9 +1,10 @@
 """Route Policy serializers."""
 
-from rest_framework.serializers import ModelSerializer
+from rest_framework.serializers import ModelSerializer, ValidationError
 
 from netbox_cmdb.models.snmp import SNMP, SNMPCommunity
 from netbox_cmdb.api.common_serializers import CommonDeviceSerializer
+from netbox_cmdb.constants import MAX_COMMUNITY_PER_DEVICE
 
 
 class SNMPCommunitySerializer(ModelSerializer):
@@ -37,3 +38,10 @@ class SNMPSerializer(ModelSerializer):
     class Meta:
         model = SNMP
         fields = "__all__"
+
+    def validate_community_list(self, value):
+        if len(value) > MAX_COMMUNITY_PER_DEVICE:
+            raise ValidationError(
+                f"You cannot select more than {MAX_COMMUNITY_PER_DEVICE} SNMP Communities."
+            )
+        return value
