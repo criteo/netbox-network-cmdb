@@ -185,6 +185,8 @@ class SNMPAdmin(BaseAdmin):
         "contact",
     )
 
+    search_fields = ("device__name", "location")
+
     def community_list_display(self, obj):
         return ", ".join([str(community) for community in obj.community_list.all()])
 

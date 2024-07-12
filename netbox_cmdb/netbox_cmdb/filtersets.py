@@ -1,5 +1,6 @@
 import django_filters
 from django.db.models import Q
+from netbox_cmdb.models.snmp import SNMP
 from tenancy.filtersets import TenancyFilterSet
 from utilities.filters import MultiValueCharFilter
 
@@ -179,3 +180,21 @@ class BGPPeerGroupFilterSet(ChangeLoggedModelFilterSet):
         return queryset.filter(
             Q(device__name__icontains=value) | Q(name__icontains=value)
         ).distinct()
+
+
+class SNMPFilterSet(ChangeLoggedModelFilterSet):
+    """AS number filterset."""
+
+    q = django_filters.CharFilter(
+        method="search",
+        label="Search",
+    )
+
+    class Meta:
+        model = SNMP
+        fields = ["device"]
+
+    def search(self, queryset, name, value):
+        if not value.strip():
+            return queryset
+        return queryset.filter(Q(device__name__icontains=value)).distinct()
