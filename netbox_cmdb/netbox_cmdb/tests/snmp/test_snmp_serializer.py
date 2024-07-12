@@ -34,3 +34,20 @@ class SNMPCommunitySerializerCreate(BaseTestCase):
         assert conf.contact == "my_team"
         assert conf.community_list.all()[0] == community1
         assert conf.device == self.device1
+
+        data = {"name": "my_comm2", "community": "my_community2", "type": "readonly"}
+        snmpcommunity_serializer = SNMPCommunitySerializer(data=data)
+        assert snmpcommunity_serializer.is_valid() == True
+        snmpcommunity_serializer.save()
+        community2 = SNMPCommunity.objects.get(name="my_comm2")
+
+        data = {
+            "device": self.device2.pk,
+            "community_list": [community1.pk, community2.pk],
+            "location": "my_location",
+            "contact": "my_team",
+        }
+
+        snmp_serializer = SNMPSerializer(data=data)
+        # We are trying to add more than 1 community to the device
+        assert snmp_serializer.is_valid() == False
