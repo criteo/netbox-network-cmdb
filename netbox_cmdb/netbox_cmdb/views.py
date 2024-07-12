@@ -11,6 +11,7 @@ from netbox_cmdb.filtersets import (
     ASNFilterSet,
     BGPPeerGroupFilterSet,
     BGPSessionFilterSet,
+    SNMPFilterSet,
 )
 from netbox_cmdb.forms import (
     ASNForm,
@@ -124,6 +125,7 @@ class BGPPeerGroupView(ObjectView):
 ## Snmp groups views
 class SNMPListView(ObjectListView):
     queryset = SNMP.objects.all()
+    filterset = SNMPFilterSet
     table = SNMPTable
 
 
