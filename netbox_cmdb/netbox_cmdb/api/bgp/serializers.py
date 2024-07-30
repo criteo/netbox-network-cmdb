@@ -189,7 +189,7 @@ class BGPSessionSerializer(ModelSerializer):
         bgp_peers["peer_b"] = DeviceBGPSession.objects.get(peer_b=instance)
         for peer, peer_instance in bgp_peers.items():
             # pop afi safi data for later creation/update
-            afi_safis_data[peer] = peers_data[peer].pop("afi_safis", {})
+            afi_safis_data[peer] = peers_data[peer].pop("afi_safis", None)
 
             # update peer instance with provided data
             peer_instance.device = peers_data[peer].get("device", peer_instance.device)
@@ -215,6 +215,11 @@ class BGPSessionSerializer(ModelSerializer):
                 "route_policy_out", peer_instance.route_policy_out
             )
             peer_instance.save()
+
+            # handle safi
+            if afi_safis_data[peer] is None:
+                # useful for PATCH requests: if the field is empty, we don't change anything
+                continue
 
             # get current list of afi safi
             current_afi_safis = list(AfiSafi.objects.filter(device_bgp_session=peer_instance))
