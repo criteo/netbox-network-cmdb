@@ -191,5 +191,5 @@ urlpatterns = [
         ObjectChangeLogView.as_view(),
         name="snmpcommunity_changelog",
         kwargs={"model": SNMPCommunity},
-    )
+    ),
 ]

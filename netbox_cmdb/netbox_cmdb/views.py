@@ -184,6 +184,7 @@ class RoutePolicyEditView(ObjectEditView):
     form = RoutePolicyForm
     filterset = RoutePolicyFilterSet
 
+
 class RoutePolicyDeleteView(ObjectDeleteView):
     queryset = RoutePolicy.objects.all()
 
