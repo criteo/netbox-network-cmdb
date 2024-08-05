@@ -5,6 +5,7 @@ from netbox.views.generic import ObjectChangeLogView, ObjectJournalView
 
 from netbox_cmdb.models.bgp import *
 from netbox_cmdb.models.snmp import SNMP, SNMPCommunity
+from netbox_cmdb.models.route_policy import RoutePolicy
 from netbox_cmdb.views import (
     ASNDeleteView,
     ASNEditView,
@@ -25,6 +26,14 @@ from netbox_cmdb.views import (
     SNMPDeleteView,
     SNMPEditView,
     SNMPListView,
+    DeviceBGPSessionEditView,
+    DeviceBGPSessionListView,
+    DeviceBGPSessionView,
+    DeviecBGPSessionDeleteView,
+    RoutePolicyDeleteView,
+    RoutePolicyEditView,
+    RoutePolicyListView,
+    RoutePolicyView,
 )
 
 urlpatterns = [
@@ -73,6 +82,26 @@ urlpatterns = [
         name="bgpsession_journal",
         kwargs={"model": BGPSession},
     ),
+    # Device BGP session
+    path("device-bgp-session/", DeviceBGPSessionListView.as_view(), name="devicebgpsession_list"),
+    path("device-bgp-session/add", DeviceBGPSessionEditView.as_view(), name="devicebgpsession_add"),
+    path("device-bgp-session/<int:pk>/", DeviceBGPSessionView.as_view(), name="devicebgpsession"),
+    path(
+        "device-bgp-session/<int:pk>/edit",
+        DeviceBGPSessionEditView.as_view(),
+        name="devicebgpsession_edit",
+    ),
+    path(
+        "device-bgp-session/<int:pk>/delete",
+        DeviecBGPSessionDeleteView.as_view(),
+        name="devicebgpsession_delete",
+    ),
+    path(
+        "device-bgp-session/<int:pk>/changelog/",
+        ObjectChangeLogView.as_view(),
+        name="devicebgpsession_changelog",
+        kwargs={"model": DeviceBGPSession},
+    ),
     # Peer Group
     path("peer-group/", BGPPeerGroupListView.as_view(), name="bgppeergroup_list"),
     path("peer-group/add/", BGPPeerGroupEditView.as_view(), name="bgppeergroup_add"),
@@ -98,6 +127,32 @@ urlpatterns = [
         ObjectJournalView.as_view(),
         name="bgppeergroup_journal",
         kwargs={"model": BGPPeerGroup},
+    ),
+    # Route Policy
+    path("route-policy/", RoutePolicyListView.as_view(), name="routepolicy_list"),
+    path("route-policy/add/", RoutePolicyEditView.as_view(), name="routepolicy_add"),
+    path("route-policy/<int:pk>/", RoutePolicyView.as_view(), name="routepolicy"),
+    path(
+        "route-policy/<int:pk>/edit/",
+        RoutePolicyEditView.as_view(),
+        name="routepolicy_edit",
+    ),
+    path(
+        "route-policy/<int:pk>/delete/",
+        RoutePolicyDeleteView.as_view(),
+        name="routepolicy_delete",
+    ),
+    path(
+        "route-policy/<int:pk>/changelog/",
+        ObjectChangeLogView.as_view(),
+        name="routepolicy_changelog",
+        kwargs={"model": RoutePolicy},
+    ),
+    path(
+        "route-policy/<int:pk>/journal/",
+        ObjectJournalView.as_view(),
+        name="routepolicy_journal",
+        kwargs={"model": RoutePolicy},
     ),
     # SNMP
     path("snmp/", SNMPListView.as_view(), name="snmp_list"),

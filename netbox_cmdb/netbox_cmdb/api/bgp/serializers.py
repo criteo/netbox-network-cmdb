@@ -1,13 +1,17 @@
 from django.core.exceptions import ValidationError
 from django.db.models import Q
 from ipam.api.nested_serializers import NestedIPAddressSerializer
-from netbox.api.serializers import WritableNestedSerializer
 from rest_framework import serializers
-from rest_framework.serializers import IntegerField, ModelSerializer
+from rest_framework.serializers import (
+    IntegerField,
+    ModelSerializer,
+    SerializerMethodField,
+)
 from tenancy.api.nested_serializers import NestedTenantSerializer
-from netbox_cmdb.choices import AssetMonitoringStateChoices
 
+from netbox.api.serializers import WritableNestedSerializer
 from netbox_cmdb.api.common_serializers import CommonDeviceSerializer
+from netbox_cmdb.choices import AssetMonitoringStateChoices
 from netbox_cmdb.constants import BGP_MAX_ASN, BGP_MIN_ASN
 from netbox_cmdb.models.bgp import (
     ASN,
@@ -126,9 +130,14 @@ class DeviceBGPSessionSerializer(ModelSerializer):
     route_policy_in = RoutePolicySerializer(required=False, many=False, allow_null=True)
     route_policy_out = RoutePolicySerializer(required=False, many=False, allow_null=True)
 
+    display = SerializerMethodField(read_only=True)
+
     class Meta:
         model = DeviceBGPSession
         fields = "__all__"
+
+    def get_display(self, obj):
+        return str(obj)
 
 
 class CircuitSerializer(ModelSerializer):
@@ -141,6 +150,10 @@ class BGPSessionSerializer(ModelSerializer):
     peer_a = DeviceBGPSessionSerializer(many=False)
     peer_b = DeviceBGPSessionSerializer(many=False)
     tenant = NestedTenantSerializer(required=False, many=False)
+    display = SerializerMethodField(read_only=True)
+
+    def get_display(self, obj):
+        return str(obj)
 
     def create(self, validated_data):
         peers_data = {}

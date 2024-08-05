@@ -1,19 +1,22 @@
 """Forms."""
 
+from typing import Any, Sequence
+
 from dcim.models import Device
 from dcim.models.devices import DeviceType
 from dcim.models.sites import SiteGroup
 from django import forms
 from django.utils.translation import gettext as _
 from extras.models import Tag
-from netbox_cmdb.models.snmp import SNMP, SNMPCommunity
-from netbox_cmdb.constants import MAX_COMMUNITY_PER_DEVICE
 from utilities.forms import DynamicModelMultipleChoiceField
 from utilities.forms.fields import DynamicModelChoiceField, MultipleChoiceField
 
 from netbox.forms import NetBoxModelFilterSetForm, NetBoxModelForm
-from netbox_cmdb.choices import AssetMonitoringStateChoices, AssetStateChoices, SNMPCommunityType
-from netbox_cmdb.models.bgp import ASN, BGPPeerGroup, BGPSession
+from netbox_cmdb.choices import AssetMonitoringStateChoices, AssetStateChoices
+from netbox_cmdb.constants import MAX_COMMUNITY_PER_DEVICE
+from netbox_cmdb.models.bgp import ASN, BGPPeerGroup, BGPSession, DeviceBGPSession
+from netbox_cmdb.models.route_policy import RoutePolicy
+from netbox_cmdb.models.snmp import SNMP, SNMPCommunity
 
 
 class ASNForm(NetBoxModelForm):
@@ -25,9 +28,56 @@ class ASNForm(NetBoxModelForm):
 
 
 class BGPSessionForm(NetBoxModelForm):
+    peer_a = DynamicModelChoiceField(
+        queryset=DeviceBGPSession.objects.all(),
+        label=_("Peer A"),
+        required=True,
+    )
+    peer_b = DynamicModelChoiceField(
+        queryset=DeviceBGPSession.objects.all(),
+        label=_("Peer B"),
+        required=True,
+    )
+
     class Meta:
         model = BGPSession
-        fields = ["peer_a", "peer_b", "state", "monitoring_state"]
+        fields = ["peer_a", "peer_b", "state", "monitoring_state", "tenant"]
+
+
+class DeviceBGPSessionForm(NetBoxModelForm):
+    def __init__(self, *args, **kwargs):
+        instance = kwargs.get("instance")
+        initial = kwargs.get("initial", {})
+        if instance is not None and instance.device:
+            initial["device"] = str(instance.device)
+            kwargs["initial"] = initial
+        super().__init__(*args, **kwargs)
+
+    device = forms.CharField(disabled=True)
+    route_policy_in = DynamicModelChoiceField(
+        queryset=RoutePolicy.objects.all(),
+        label=_("Route Policy in"),
+        query_params={
+            "device__id": "$device",
+        },
+        to_field_name="name",
+        fetch_trigger="open",
+        required=False,
+    )
+    route_policy_out = DynamicModelChoiceField(
+        queryset=RoutePolicy.objects.all(),
+        label=_("Route Policy out"),
+        query_params={
+            "device__id": "$device",
+        },
+        to_field_name="name",
+        fetch_trigger="open",
+        required=False,
+    )
+
+    class Meta:
+        model = DeviceBGPSession
+        fields = ["device", "route_policy_in", "route_policy_out"]
 
 
 class BGPSessionFilterSetForm(NetBoxModelFilterSetForm):
@@ -65,6 +115,31 @@ class BGPPeerGroupForm(NetBoxModelForm):
             "remote_asn",
             "tags",
         ]
+
+
+class RoutePolicyForm(NetBoxModelForm):
+    device = DynamicModelChoiceField(queryset=Device.objects.all())
+
+    class Meta:
+        model = RoutePolicy
+        fields = [
+            "name",
+            "device",
+            "description",
+        ]
+
+
+class RoutePolicyFilterSetForm(NetBoxModelFilterSetForm):
+    device__id = DynamicModelMultipleChoiceField(
+        queryset=Device.objects.all(),
+        label=_("Device"),
+        required=False,
+    )
+    name = forms.CharField(
+        required=False,
+    )
+
+    model = RoutePolicy
 
 
 class InlineTermForm(forms.models.BaseInlineFormSet):

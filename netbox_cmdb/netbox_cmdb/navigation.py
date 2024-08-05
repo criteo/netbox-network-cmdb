@@ -41,6 +41,18 @@ menu_items = (
         ),
     ),
     PluginMenuItem(
+        link="plugins:netbox_cmdb:routepolicy_list",
+        link_text="Route Policies",
+        buttons=(
+            PluginMenuButton(
+                link="plugins:netbox_cmdb:routepolicy_add",
+                title="Route Policies",
+                icon_class="mdi mdi-plus-thick",
+                color=ButtonColorChoices.GREEN,
+            ),
+        ),
+    ),
+    PluginMenuItem(
         link="plugins:netbox_cmdb:snmp_list",
         link_text="SNMP",
         buttons=(

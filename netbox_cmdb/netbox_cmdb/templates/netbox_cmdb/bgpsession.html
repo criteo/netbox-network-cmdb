@@ -8,39 +8,39 @@
       <div class="card-body">
         <table class="table table-hover attr-table">
           <tr>
-            <th>Device</td>
+            <th>Device</th>
             <td>{{ object.peer_a.device|linkify}}</td>
           </tr>
           <tr>
-            <th>Description</td>
+            <th>Description</th>
             <td>{{ object.peer_a.description }}</td>
           </tr>
           <tr>
-            <th>Local address</td>
+            <th>Local address</th>
             <td>{{ object.peer_a.local_address|linkify}}</td>
           </tr>
           <tr>
-            <th>Local ASN</td>
+            <th>Local ASN</th>
             <td>{{ object.peer_a.local_asn|linkify}}</td>
           </tr>
           <tr>
-            <th>Route Policy in</td>
+            <th>Route Policy in</th>
             <td>{{ object.peer_a.route_policy_in|placeholder}}</td>
           </tr>
           <tr>
-            <th>Route Policy out</td>
+            <th>Route Policy out</th>
             <td>{{ object.peer_a.route_policy_out|placeholder}}</td>
           </tr>
           <tr>
-            <th>Maximum prefixes</td>
+            <th>Maximum prefixes</th>
             <td>{{ object.peer_a.maximum_prefixes }}</td>
           </tr>
           <tr>
-            <th>Enforce First AS</td>
+            <th>Enforce First AS</th>
             <td>{% checkmark object.peer_a.enforce_first_as %}</td>
           </tr>
           <tr>
-            <th>Enabled</td>
+            <th>Enabled</th>
             <td>{% checkmark object.peer_a.enabled %}</td>
           </tr>
         </table>
@@ -87,10 +87,6 @@
             <th>Circuit</th>
             <td>{{ object.circuit|placeholder }}</td>
           </tr>
-          <tr>
-            <th>Tenant</th>
-            <td>{{ object.tenant|placeholder|linkify }}</td>
-          </tr>
         </table>
       </div>
     </div>
@@ -101,39 +97,39 @@
       <div class="card-body">
         <table class="table table-hover attr-table">
           <tr>
-            <th>Device</td>
+            <th>Device</th>
             <td>{{ object.peer_b.device|linkify}}</td>
           </tr>
           <tr>
-            <th>Description</td>
+            <th>Description</th>
             <td>{{ object.peer_b.description }}</td>
           </tr>
           <tr>
-            <th>Local address</td>
+            <th>Local address</th>
             <td>{{ object.peer_b.local_address|linkify}}</td>
           </tr>
           <tr>
-            <th>Local ASN</td>
+            <th>Local ASN</th>
             <td>{{ object.peer_b.local_asn|linkify}}</td>
           </tr>
           <tr>
-            <th>Route Policy in</td>
+            <th>Route Policy in</th>
             <td>{{ object.peer_b.route_policy_in|placeholder}}</td>
           </tr>
           <tr>
-            <th>Route Policy out</td>
+            <th>Route Policy out</th>
             <td>{{ object.peer_b.route_policy_out|placeholder}}</td>
           </tr>
           <tr>
-            <th>Maximum prefixes</td>
+            <th>Maximum prefixes</th>
             <td>{{ object.peer_b.maximum_prefixes }}</td>
           </tr>
           <tr>
-            <th>Enforce First AS</td>
+            <th>Enforce First AS</th>
             <td>{% checkmark object.peer_b.enforce_first_as %}</td>
           </tr>
           <tr>
-            <th>Enabled</td>
+            <th>Enabled</th>
             <td>{% checkmark object.peer_b.enabled %}</td>
           </tr>
         </table>
@@ -169,7 +165,7 @@
         <table class="table table-hover attr-table">
           <tr>
             <th>PG Name</td>
-            <td>{{ object.peer_a.peer_group.name}}</td>
+            <td>{{ object.peer_a.peer_group | linkify:"name" }}</td>
           </tr>
           <tr>
             <th>Description</td>
@@ -185,11 +181,11 @@
           </tr>
           <tr>
             <th>Route Policy in</td>
-            <td>{{ object.peer_a.peer_group.route_policy_in.name|placeholder}}</td>
+            <td>{{ object.peer_a.peer_group.route_policy_in|placeholder|linkify:"name"}}</td>
           </tr>
           <tr>
             <th>Route Policy out</td>
-            <td>{{ object.peer_a.peer_group.route_policy_out.name|placeholder}}</td>
+            <td>{{ object.peer_a.peer_group.route_policy_out|placeholder|linkify:"name"}}</td>
           </tr>
           <tr>
             <th>Maximum prefixes</td>
@@ -210,7 +206,7 @@
         <table class="table table-hover attr-table">
           <tr>
             <th>PG Name</td>
-            <td>{{ object.peer_b.peer_group.name}}</td>
+            <td>{{ object.peer_b.peer_group  | linkify:"name" }}</td>
           </tr>
           <tr>
             <th>Description</td>
@@ -226,11 +222,11 @@
           </tr>
           <tr>
             <th>Route Policy in</td>
-            <td>{{ object.peer_b.peer_group.route_policy_in.name|placeholder}}</td>
+            <td>{{ object.peer_b.peer_group.route_policy_in|placeholder|linkify:"name"}}</td>
           </tr>
           <tr>
             <th>Route Policy out</td>
-            <td>{{ object.peer_b.peer_group.route_policy_out.name|placeholder}}</td>
+            <td>{{ object.peer_b.peer_group.route_policy_out|placeholder|linkify:"name"}}</td>
           </tr>
           <tr>
             <th>Maximum prefixes</td>
