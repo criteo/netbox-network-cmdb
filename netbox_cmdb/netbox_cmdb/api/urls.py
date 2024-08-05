@@ -13,6 +13,7 @@ from netbox_cmdb.api.bgp_community_list.views import BGPCommunityListViewSet
 from netbox_cmdb.api.prefix_list.views import PrefixListViewSet
 from netbox_cmdb.api.route_policy.views import RoutePolicyViewSet
 from netbox_cmdb.api.snmp.views import SNMPCommunityViewSet, SNMPViewSet
+from netbox_cmdb.api.cmdb.views import DeleteAllCMDBObjectsRelatedToDevice
 
 router = NetBoxRouter()
 
@@ -31,6 +32,11 @@ urlpatterns = [
     path(
         "asns/available-asn/",
         AvailableASNsView.as_view(),
+        name="asns-available-asn",
+    ),
+    path(
+        "cmdb/delete-all-objects/",
+        DeleteAllCMDBObjectsRelatedToDevice.as_view(),
         name="asns-available-asn",
     ),
 ]
