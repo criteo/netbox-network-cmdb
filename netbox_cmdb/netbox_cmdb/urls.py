@@ -4,8 +4,8 @@ from django.urls import path
 from netbox.views.generic import ObjectChangeLogView, ObjectJournalView
 
 from netbox_cmdb.models.bgp import *
-from netbox_cmdb.models.snmp import SNMP, SNMPCommunity
 from netbox_cmdb.models.route_policy import RoutePolicy
+from netbox_cmdb.models.snmp import SNMP, SNMPCommunity
 from netbox_cmdb.views import (
     ASNDeleteView,
     ASNEditView,
@@ -20,12 +20,7 @@ from netbox_cmdb.views import (
     BGPSessionEditView,
     BGPSessionListView,
     BGPSessionView,
-    SNMPCommunityDeleteView,
-    SNMPCommunityEditView,
-    SNMPCommunityListView,
-    SNMPDeleteView,
-    SNMPEditView,
-    SNMPListView,
+    DecommissioningView,
     DeviceBGPSessionEditView,
     DeviceBGPSessionListView,
     DeviceBGPSessionView,
@@ -34,9 +29,16 @@ from netbox_cmdb.views import (
     RoutePolicyEditView,
     RoutePolicyListView,
     RoutePolicyView,
+    SNMPCommunityDeleteView,
+    SNMPCommunityEditView,
+    SNMPCommunityListView,
+    SNMPDeleteView,
+    SNMPEditView,
+    SNMPListView,
 )
 
 urlpatterns = [
+    path("decommisioning/<int:pk>/delete", DecommissioningView.as_view(), name="decommisioning_delete"),
     # ASN
     path("asn/", ASNListView.as_view(), name="asn_list"),
     path("asn/add/", ASNEditView.as_view(), name="asn_add"),

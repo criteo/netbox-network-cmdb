@@ -1,7 +1,14 @@
 """Views."""
 
-from utilities.utils import count_related
+import logging
+import time
 
+from dcim.models import Device
+from django.db import transaction
+from django.db.models import Q
+from django.shortcuts import render
+from django.urls import reverse
+from django.views.generic import View
 from netbox.views.generic import (
     ObjectDeleteView,
     ObjectEditView,
@@ -9,6 +16,12 @@ from netbox.views.generic import (
     ObjectView,
 )
 from netbox.views.generic.bulk_views import BulkDeleteView
+from rest_framework import status
+from rest_framework.response import Response
+from utilities.forms import ConfirmationForm
+from utilities.htmx import is_htmx
+from utilities.utils import count_related, get_viewname
+
 from netbox_cmdb.filtersets import (
     ASNFilterSet,
     BGPPeerGroupFilterSet,
@@ -35,6 +48,8 @@ from netbox_cmdb.models.bgp import (
     BGPSession,
     DeviceBGPSession,
 )
+from netbox_cmdb.models.bgp_community_list import BGPCommunityList
+from netbox_cmdb.models.prefix_list import PrefixList
 from netbox_cmdb.models.route_policy import RoutePolicy
 from netbox_cmdb.models.snmp import SNMP, SNMPCommunity
 from netbox_cmdb.tables import (
@@ -46,6 +61,110 @@ from netbox_cmdb.tables import (
     SNMPCommunityTable,
     SNMPTable,
 )
+
+
+## Decommission a device
+class DecommissioningView(ObjectDeleteView):
+    queryset = Device.objects.all()
+    template_name = "netbox_cmdb/decommissioning.html"
+
+    def get(self, request, *args, **kwargs):
+        """
+        GET request handler.
+
+        Args:
+            request: The current request
+        """
+        obj = self.get_object(**kwargs)
+        form = ConfirmationForm(initial=request.GET)
+
+        # If this is an HTMX request, return only the rendered deletion form as modal content
+        if is_htmx(request):
+            # form_url = reverse("decommisioning_delete", kwargs={'pk': obj.pk})
+            form_url = f"/plugins/cmdb/decommisioning/{kwargs['pk']}/delete"
+            return render(
+                request,
+                "htmx/delete_form.html",
+                {
+                    "object": obj,
+                    "object_type": self.queryset.model._meta.verbose_name,
+                    "form": form,
+                    "form_url": form_url,
+                    **self.get_extra_context(request, obj),
+                },
+            )
+
+        return render(
+            request,
+            self.template_name,
+            {
+                "object": obj,
+                "form": form,
+                "return_url": self.get_return_url(request, obj),
+                **self.get_extra_context(request, obj),
+            },
+        )
+
+    def post(self, request, *args, **kwargs):
+        # Fetch the device to delete
+        device = self.get_object(**kwargs)
+        deleted_objects = {
+            "bgp_sessions": [],
+            "device_bgp_sessions": [],
+            "bgp_peer_groups": [],
+            "route_policies": [],
+            "prefix_lists": [],
+            "bgp_community_lists": [],
+            "snmp": [],
+        }
+
+        device_name = device.name
+
+        try:
+            with transaction.atomic():
+                bgp_sessions = BGPSession.objects.filter(
+                    Q(peer_a__device__id=device.id) | Q(peer_b__device__id=device.id)
+                )
+                device_bgp_sessions = DeviceBGPSession.objects.filter(device__id=device.id)
+                bgp_peer_groups = BGPPeerGroup.objects.filter(device__id=device.id)
+                route_policies = RoutePolicy.objects.filter(device__id=device.id)
+                prefix_lists = PrefixList.objects.filter(device__id=device.id)
+                bgp_community_lists = BGPCommunityList.objects.filter(device__id=device.id)
+                snmp = SNMP.objects.filter(device__id=device.id)
+
+                deleted_objects["bgp_sessions"] = [str(val) for val in list(bgp_sessions)]
+                deleted_objects["device_bgp_sessions"] = [
+                    str(val) for val in list(device_bgp_sessions)
+                ]
+                deleted_objects["bgp_peer_groups"] = [str(val) for val in list(bgp_peer_groups)]
+                deleted_objects["route_policies"] = [str(val) for val in list(route_policies)]
+                deleted_objects["prefix_lists"] = [str(val) for val in list(prefix_lists)]
+                deleted_objects["bgp_community_lists"] = [
+                    str(val) for val in list(bgp_community_lists)
+                ]
+                deleted_objects["snmp"] = [str(val) for val in list(snmp)]
+
+                bgp_sessions.delete()
+                device_bgp_sessions.delete()
+                bgp_peer_groups.delete()
+                route_policies.delete()
+                prefix_lists.delete()
+                bgp_community_lists.delete()
+                snmp.delete()
+
+        except Exception as e:
+            # Render the template with an error message
+            return render(request, self.template_name, context={"error": str(e)})
+
+        # Call the parent class's post method to delete the device
+        super().post(request, *args, **kwargs)
+
+        # Return the HTML response with the list of deleted objects
+        return render(
+            request,
+            self.template_name,
+            context={"deleted_device": device_name, "deleted_objects": deleted_objects},
+        )
 
 
 ## ASN views
