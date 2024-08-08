@@ -1,12 +1,12 @@
 import django_filters
 from django.db.models import Q
-from netbox_cmdb.models.snmp import SNMP
+from netbox.filtersets import ChangeLoggedModelFilterSet
 from tenancy.filtersets import TenancyFilterSet
 from utilities.filters import MultiValueCharFilter
 
-from netbox.filtersets import ChangeLoggedModelFilterSet
 from netbox_cmdb.models.bgp import ASN, BGPPeerGroup, BGPSession, DeviceBGPSession
 from netbox_cmdb.models.route_policy import RoutePolicy
+from netbox_cmdb.models.snmp import SNMP
 
 device_location_filterset = [
     "device__location__name",

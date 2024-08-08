@@ -1,9 +1,10 @@
 from dcim.models.devices import Device, DeviceRole, DeviceType, Manufacturer
 from dcim.models.sites import Site
 from django.test import TestCase
+from rest_framework.serializers import ValidationError
+
 from netbox_cmdb.api.bgp_community_list.serializers import BGPCommunityListSerializer
 from netbox_cmdb.models.bgp_community_list import BGPCommunityList, BGPCommunityListTerm
-from rest_framework.serializers import ValidationError
 
 
 def validate(device, data):

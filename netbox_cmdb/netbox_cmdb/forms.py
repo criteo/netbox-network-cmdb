@@ -8,10 +8,10 @@ from dcim.models.sites import SiteGroup
 from django import forms
 from django.utils.translation import gettext as _
 from extras.models import Tag
+from netbox.forms import NetBoxModelFilterSetForm, NetBoxModelForm
 from utilities.forms import DynamicModelMultipleChoiceField
 from utilities.forms.fields import DynamicModelChoiceField, MultipleChoiceField
 
-from netbox.forms import NetBoxModelFilterSetForm, NetBoxModelForm
 from netbox_cmdb.choices import AssetMonitoringStateChoices, AssetStateChoices
 from netbox_cmdb.constants import MAX_COMMUNITY_PER_DEVICE
 from netbox_cmdb.models.bgp import ASN, BGPPeerGroup, BGPSession, DeviceBGPSession

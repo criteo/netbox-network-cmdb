@@ -1,15 +1,15 @@
 """Route Policy views."""
 
-from netbox_cmdb import filtersets
+from rest_framework.response import Response
 
-from netbox_cmdb.api.viewsets import CustomNetBoxModelViewSet
-from netbox_cmdb.models.snmp import SNMP, SNMPCommunity
+from netbox_cmdb import filtersets
 from netbox_cmdb.api.snmp.serializers import (
     SNMPCommunitySerializer,
     SNMPReadSerializer,
     SNMPSerializer,
 )
-from rest_framework.response import Response
+from netbox_cmdb.api.viewsets import CustomNetBoxModelViewSet
+from netbox_cmdb.models.snmp import SNMP, SNMPCommunity
 
 
 class SNMPCommunityViewSet(CustomNetBoxModelViewSet):

@@ -3,6 +3,7 @@ from dcim.models.sites import Site
 from django.test import TestCase
 from ipam.models.ip import IPAddress
 from tenancy.models.tenants import Tenant
+
 from netbox_cmdb.models.bgp import ASN
 
 

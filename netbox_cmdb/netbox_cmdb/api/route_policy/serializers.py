@@ -1,10 +1,10 @@
 """Route Policy serializers."""
 
 from django.core.exceptions import ValidationError
+from netbox.api.serializers import WritableNestedSerializer
 from rest_framework import serializers
 from rest_framework.serializers import ModelSerializer, SerializerMethodField
 
-from netbox.api.serializers import WritableNestedSerializer
 from netbox_cmdb.api.bgp.serializers import AsnSerializer
 from netbox_cmdb.api.common_serializers import CommonDeviceSerializer
 from netbox_cmdb.models.bgp_community_list import BGPCommunityList

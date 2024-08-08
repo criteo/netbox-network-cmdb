@@ -1,8 +1,8 @@
 """Tables."""
 
 import django_tables2 as tables
-
 from netbox.tables import NetBoxTable, columns
+
 from netbox_cmdb.models.bgp import ASN, BGPPeerGroup, BGPSession, DeviceBGPSession
 from netbox_cmdb.models.route_policy import RoutePolicy
 from netbox_cmdb.models.snmp import SNMP, SNMPCommunity

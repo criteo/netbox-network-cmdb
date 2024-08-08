@@ -1,6 +1,6 @@
 from netbox_cmdb.api.snmp.serializers import SNMPCommunitySerializer, SNMPSerializer
-from netbox_cmdb.models.snmp import SNMP, SNMPCommunity
 from netbox_cmdb.choices import SNMPCommunityType
+from netbox_cmdb.models.snmp import SNMP, SNMPCommunity
 from netbox_cmdb.tests.common import BaseTestCase
 
 

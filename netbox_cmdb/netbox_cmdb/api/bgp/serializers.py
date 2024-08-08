@@ -1,6 +1,7 @@
 from django.core.exceptions import ValidationError
 from django.db.models import Q
 from ipam.api.nested_serializers import NestedIPAddressSerializer
+from netbox.api.serializers import WritableNestedSerializer
 from rest_framework import serializers
 from rest_framework.serializers import (
     IntegerField,
@@ -9,7 +10,6 @@ from rest_framework.serializers import (
 )
 from tenancy.api.nested_serializers import NestedTenantSerializer
 
-from netbox.api.serializers import WritableNestedSerializer
 from netbox_cmdb.api.common_serializers import CommonDeviceSerializer
 from netbox_cmdb.choices import AssetMonitoringStateChoices
 from netbox_cmdb.constants import BGP_MAX_ASN, BGP_MIN_ASN

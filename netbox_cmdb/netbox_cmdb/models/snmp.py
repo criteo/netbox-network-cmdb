@@ -1,8 +1,9 @@
-from django.db import models
-from netbox_cmdb.choices import SNMPCommunityType
-from netbox.models import ChangeLoggedModel
-from django.core.exceptions import ValidationError
 from django.contrib.postgres.fields import ArrayField
+from django.core.exceptions import ValidationError
+from django.db import models
+from netbox.models import ChangeLoggedModel
+
+from netbox_cmdb.choices import SNMPCommunityType
 
 
 class SNMPCommunity(ChangeLoggedModel):
@@ -43,4 +44,4 @@ class SNMP(ChangeLoggedModel):
         verbose_name_plural = "SNMP"
 
     def __str__(self):
-        return f"SNMP configuration of {self.device.name}"
+        return f"{self.device.name}-SNMP"
