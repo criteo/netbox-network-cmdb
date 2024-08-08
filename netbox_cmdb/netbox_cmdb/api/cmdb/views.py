@@ -3,11 +3,11 @@ from django.db.models import Q
 from drf_yasg import openapi
 from drf_yasg.openapi import Parameter
 from drf_yasg.utils import swagger_auto_schema
+from netbox.api.authentication import IsAuthenticatedOrLoginNotRequired
 from rest_framework import serializers, status
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
-from netbox.api.authentication import IsAuthenticatedOrLoginNotRequired
 from netbox_cmdb.models.bgp import BGPPeerGroup, BGPSession, DeviceBGPSession
 from netbox_cmdb.models.bgp_community_list import BGPCommunityList
 from netbox_cmdb.models.prefix_list import PrefixList

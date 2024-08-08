@@ -1,7 +1,8 @@
 from extras.plugins import PluginTemplateExtension
 
+
 class Decommisioning(PluginTemplateExtension):
-    model = 'dcim.device'
+    model = "dcim.device"
 
     def buttons(self):
         return (

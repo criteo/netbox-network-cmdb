@@ -1,9 +1,9 @@
 from django.core.exceptions import ValidationError
 from django.db import models
 from django.urls import reverse
+from netbox.models import ChangeLoggedModel
 from utilities.querysets import RestrictedQuerySet
 
-from netbox.models import ChangeLoggedModel
 from netbox_cmdb.choices import DecisionChoice
 from netbox_cmdb.fields import CustomIPAddressField
 

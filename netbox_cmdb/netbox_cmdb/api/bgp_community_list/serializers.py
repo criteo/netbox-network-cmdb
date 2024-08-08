@@ -1,8 +1,9 @@
 """Route Policy serializers."""
 
+from rest_framework.serializers import ModelSerializer, ValidationError
+
 from netbox_cmdb.api.common_serializers import CommonDeviceSerializer
 from netbox_cmdb.models.bgp_community_list import BGPCommunityList, BGPCommunityListTerm
-from rest_framework.serializers import ModelSerializer, ValidationError
 
 
 class BGPCommunityListTermSerializer(ModelSerializer):

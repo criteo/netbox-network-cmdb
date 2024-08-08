@@ -2,6 +2,7 @@ from dcim.models import Device, DeviceRole, DeviceType, Manufacturer, Site
 from django.forms import ValidationError
 from django.test import TestCase
 from netaddr import IPNetwork
+
 from netbox_cmdb.models.prefix_list import PrefixList, PrefixListTerm
 
 

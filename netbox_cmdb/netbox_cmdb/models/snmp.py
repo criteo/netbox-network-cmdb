@@ -1,8 +1,9 @@
-from django.db import models
-from netbox_cmdb.choices import SNMPCommunityType
-from netbox.models import ChangeLoggedModel
-from django.core.exceptions import ValidationError
 from django.contrib.postgres.fields import ArrayField
+from django.core.exceptions import ValidationError
+from django.db import models
+from netbox.models import ChangeLoggedModel
+
+from netbox_cmdb.choices import SNMPCommunityType
 
 
 class SNMPCommunity(ChangeLoggedModel):
