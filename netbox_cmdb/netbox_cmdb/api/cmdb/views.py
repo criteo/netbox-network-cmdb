@@ -9,6 +9,7 @@ from rest_framework.views import APIView
 
 from netbox.api.authentication import IsAuthenticatedOrLoginNotRequired
 from netbox_cmdb.models.bgp import BGPPeerGroup, BGPSession, DeviceBGPSession
+from netbox_cmdb.models.bgp_community_list import BGPCommunityList
 from netbox_cmdb.models.prefix_list import PrefixList
 from netbox_cmdb.models.route_policy import RoutePolicy
 from netbox_cmdb.models.snmp import SNMP
@@ -47,6 +48,7 @@ class DeleteAllCMDBObjectsRelatedToDevice(APIView):
                 BGPPeerGroup.objects.filter(device__name=device_name).delete()
                 RoutePolicy.objects.filter(device__name=device_name).delete()
                 PrefixList.objects.filter(device__name=device_name).delete()
+                BGPCommunityList.objects.filter(device_name=device_name).delete()
                 SNMP.objects.filter(device__name=device_name).delete()
         except Exception as e:
             return Response({"error": str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
