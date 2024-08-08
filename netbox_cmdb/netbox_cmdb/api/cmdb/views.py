@@ -37,8 +37,8 @@ class DeleteAllCMDBObjectsRelatedToDevice(APIView):
                 {"error": "Device name is required"}, status=status.HTTP_400_BAD_REQUEST
             )
 
-        with transaction.atomic():
-            try:
+        try:
+            with transaction.atomic():
                 # Delete objects in reverse order of dependencies
                 BGPSession.objects.filter(
                     Q(peer_a__device__name=device_name) | Q(peer_b__device__name=device_name)
@@ -48,8 +48,8 @@ class DeleteAllCMDBObjectsRelatedToDevice(APIView):
                 RoutePolicy.objects.filter(device__name=device_name).delete()
                 PrefixList.objects.filter(device__name=device_name).delete()
                 SNMP.objects.filter(device__name=device_name).delete()
-            except Exception as e:
-                return Response({"error": str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+        except Exception as e:
+            return Response({"error": str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
         return Response(
             {"message": f"Objects related to device {device_name} have been deleted successfully"},
