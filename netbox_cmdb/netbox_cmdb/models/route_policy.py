@@ -27,7 +27,7 @@ class RoutePolicy(ChangeLoggedModel):
     objects = RestrictedQuerySet.as_manager()
 
     def __str__(self):
-        return str(self.name)
+        return f"{self.device}-{self.name}"
 
     def __repr__(self):
         return str(self.name)

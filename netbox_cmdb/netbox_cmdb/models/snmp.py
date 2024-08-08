@@ -44,4 +44,4 @@ class SNMP(ChangeLoggedModel):
         verbose_name_plural = "SNMP"
 
     def __str__(self):
-        return f"SNMP configuration of {self.device.name}"
+        return f"{self.device.name}-SNMP"
