@@ -159,7 +159,7 @@ class ASN(ChangeLoggedModel):
         """
         Return all available ASNs in a given range.
         """
-        available_asns = {asn for asn in range(min_asn, max_asn + 1)}
+        available_asns = set(range(min_asn, max_asn + 1))
         available_asns -= set(self.__class__.objects.all().values_list("number", flat=True))
 
         return sorted(available_asns)

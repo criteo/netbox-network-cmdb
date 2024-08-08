@@ -1,7 +1,5 @@
 """Route Policy views."""
 
-from rest_framework.response import Response
-
 from netbox_cmdb import filtersets
 from netbox_cmdb.api.snmp.serializers import (
     SNMPCommunitySerializer,

@@ -1,7 +1,5 @@
 """Forms."""
 
-from typing import Any, Sequence
-
 from dcim.models import Device
 from dcim.models.devices import DeviceType
 from dcim.models.sites import SiteGroup

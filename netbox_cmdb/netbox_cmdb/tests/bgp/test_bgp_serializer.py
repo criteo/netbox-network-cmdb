@@ -55,7 +55,7 @@ class BGPGlobalSerializerCreate(BaseTestCase):
             "ecmp_maximum_paths": 128,
         }
         bgp_global_serializer = BGPGlobalSerializer(data=data)
-        assert bgp_global_serializer.is_valid() == True
+        assert bgp_global_serializer.is_valid() is True
         bgp_global_serializer.save()
 
         global_conf = BGPGlobal.objects.get(device__name="router-test1")
@@ -64,9 +64,9 @@ class BGPGlobalSerializerCreate(BaseTestCase):
         assert global_conf.local_asn_id == 5
         assert global_conf.ebgp_administrative_distance == 20
         assert global_conf.ibgp_administrative_distance == 170
-        assert global_conf.graceful_restart == True
+        assert global_conf.graceful_restart is True
         assert global_conf.graceful_restart_time == 240
-        assert global_conf.ecmp == True
+        assert global_conf.ecmp is True
         assert global_conf.ecmp_maximum_paths == 128
 
 
@@ -98,7 +98,7 @@ class BGPGlobalSerializerUpdate(BaseTestCase):
             "ecmp_maximum_paths": 128,
         }
         bgp_global_serializer = BGPGlobalSerializer(data=data)
-        assert bgp_global_serializer.is_valid() == True
+        assert bgp_global_serializer.is_valid() is True
         self.assertRaises(IntegrityError, bgp_global_serializer.save)
 
     def test_update(self):
@@ -114,7 +114,7 @@ class BGPGlobalSerializerUpdate(BaseTestCase):
             "ecmp_maximum_paths": 128,
         }
         bgp_global_serializer = BGPGlobalSerializer(instance=self.global_conf1, data=data)
-        assert bgp_global_serializer.is_valid() == True
+        assert bgp_global_serializer.is_valid() is True
         bgp_global_serializer.save()
 
         global_conf = BGPGlobal.objects.get(device__name="router-test1")
@@ -148,7 +148,7 @@ class BGPSessionSerializerCreate(BaseTestCase):
         }
 
         bgp_session_serializer = BGPSessionSerializer(data=data)
-        assert bgp_session_serializer.is_valid() == True
+        assert bgp_session_serializer.is_valid() is True
         bgp_session_serializer.save()
 
         bgp_session_got = BGPSession.objects.get(
@@ -280,7 +280,7 @@ class BGPSessionSerializerUpdate(BaseTestCase):
             "password": "1234",
         }
         bgp_session_serializer = BGPSessionSerializer(data=data)
-        assert bgp_session_serializer.is_valid() == False
+        assert bgp_session_serializer.is_valid() is False
         assert bgp_session_serializer.errors["errors"][0] == ErrorDetail(
             string="[ErrorDetail(string='A BGP session already exists between these 2 devices and IP addresses.', code='invalid')]",
             code="invalid",
@@ -311,7 +311,7 @@ class BGPSessionSerializerUpdate(BaseTestCase):
         }
 
         bgp_session_serializer = BGPSessionSerializer(instance=self.bgp_session, data=data)
-        assert bgp_session_serializer.is_valid() == True
+        assert bgp_session_serializer.is_valid() is True
         bgp_session_serializer.save()
 
         bgp_session_got = BGPSession.objects.get(id=self.bgp_session.pk)
@@ -345,14 +345,14 @@ class BGPSessionSerializerUpdate(BaseTestCase):
             "password": "1234",
         }
         bgp_session_serializer = BGPSessionSerializer(instance=self.bgp_session, data=data)
-        assert bgp_session_serializer.is_valid() == True
+        assert bgp_session_serializer.is_valid() is True
         bgp_session_serializer.save()
 
         bgp_session_got = BGPSession.objects.get(id=self.bgp_session.pk)
         assert bgp_session_got.peer_a.description == "peer_a"
         assert bgp_session_got.peer_a.maximum_prefixes == 50000
         assert bgp_session_got.peer_a.enabled is False
-        assert bgp_session_got.peer_a.enforce_first_as == False
+        assert bgp_session_got.peer_a.enforce_first_as is False
         assert bgp_session_got.peer_b.description == "peer_b"
         assert bgp_session_got.peer_b.enabled is True
 
@@ -373,7 +373,7 @@ class BGPSessionSerializerUpdate(BaseTestCase):
             },
         }
         bgp_session_serializer = BGPSessionSerializer(instance=self.bgp_session, data=data)
-        assert bgp_session_serializer.is_valid() == True
+        assert bgp_session_serializer.is_valid() is True
         bgp_session_serializer.save()
 
         bgp_session_got = BGPSession.objects.get(id=self.bgp_session.pk)
@@ -383,11 +383,11 @@ class BGPSessionSerializerUpdate(BaseTestCase):
         data["peer_a"]["route_policy_out"] = None
 
         bgp_session_serializer = BGPSessionSerializer(instance=self.bgp_session, data=data)
-        assert bgp_session_serializer.is_valid() == True
+        assert bgp_session_serializer.is_valid() is True
         bgp_session_serializer.save()
 
         bgp_session_got = BGPSession.objects.get(id=self.bgp_session.pk)
-        assert bgp_session_got.peer_a.route_policy_out == None
+        assert bgp_session_got.peer_a.route_policy_out is None
 
     def test_bgp_session_update__add_afisafi(self):
         """Adding ipv4-unicast afisafi to an existing session"""
@@ -415,7 +415,7 @@ class BGPSessionSerializerUpdate(BaseTestCase):
         }
 
         bgp_session_serializer = BGPSessionSerializer(instance=self.bgp_session, data=data)
-        assert bgp_session_serializer.is_valid() == True
+        assert bgp_session_serializer.is_valid() is True
         bgp_session_serializer.save()
 
     def test_bgp_session_update__replace_afisafi(self):
@@ -451,7 +451,7 @@ class BGPSessionSerializerUpdate(BaseTestCase):
         }
 
         bgp_session_serializer = BGPSessionSerializer(instance=self.bgp_session, data=data)
-        assert bgp_session_serializer.is_valid() == True
+        assert bgp_session_serializer.is_valid() is True
         bgp_session_serializer.save()
 
         # check in database that the object has been modified

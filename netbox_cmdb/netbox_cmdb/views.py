@@ -1,14 +1,9 @@
 """Views."""
 
-import logging
-import time
-
 from dcim.models import Device
 from django.db import transaction
 from django.db.models import Q
 from django.shortcuts import render
-from django.urls import reverse
-from django.views.generic import View
 from netbox.views.generic import (
     ObjectDeleteView,
     ObjectEditView,
@@ -16,11 +11,9 @@ from netbox.views.generic import (
     ObjectView,
 )
 from netbox.views.generic.bulk_views import BulkDeleteView
-from rest_framework import status
-from rest_framework.response import Response
 from utilities.forms import ConfirmationForm
 from utilities.htmx import is_htmx
-from utilities.utils import count_related, get_viewname
+from utilities.utils import count_related
 
 from netbox_cmdb.filtersets import (
     ASNFilterSet,

@@ -3,7 +3,7 @@
 from django.urls import path
 from netbox.views.generic import ObjectChangeLogView, ObjectJournalView
 
-from netbox_cmdb.models.bgp import *
+from netbox_cmdb.models.bgp import ASN, BGPSession, DeviceBGPSession, BGPPeerGroup
 from netbox_cmdb.models.route_policy import RoutePolicy
 from netbox_cmdb.models.snmp import SNMP, SNMPCommunity
 from netbox_cmdb.views import (
