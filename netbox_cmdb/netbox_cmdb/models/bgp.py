@@ -4,10 +4,10 @@ from django.core.validators import MaxValueValidator, MinValueValidator
 from django.db import models
 from django.db.models import Q
 from django.urls import reverse
+from netbox.models import ChangeLoggedModel
 from utilities.choices import ChoiceSet
 from utilities.querysets import RestrictedQuerySet
 
-from netbox.models import ChangeLoggedModel
 from netbox_cmdb.choices import AssetMonitoringStateChoices, AssetStateChoices
 from netbox_cmdb.constants import BGP_MAX_ASN, BGP_MIN_ASN
 

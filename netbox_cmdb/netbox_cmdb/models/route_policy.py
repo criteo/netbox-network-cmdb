@@ -1,9 +1,9 @@
 from django.core.exceptions import ValidationError
 from django.db import models
 from django.urls import reverse
+from netbox.models import ChangeLoggedModel
 from utilities.querysets import RestrictedQuerySet
 
-from netbox.models import ChangeLoggedModel
 from netbox_cmdb.choices import DecisionChoice
 from netbox_cmdb.fields import CustomIPAddressField
 
@@ -27,7 +27,7 @@ class RoutePolicy(ChangeLoggedModel):
     objects = RestrictedQuerySet.as_manager()
 
     def __str__(self):
-        return str(self.name)
+        return f"{self.device}-{self.name}"
 
     def __repr__(self):
         return str(self.name)

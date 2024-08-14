@@ -2,9 +2,9 @@
 
 from rest_framework.serializers import ModelSerializer, ValidationError
 
-from netbox_cmdb.models.snmp import SNMP, SNMPCommunity
 from netbox_cmdb.api.common_serializers import CommonDeviceSerializer
 from netbox_cmdb.constants import MAX_COMMUNITY_PER_DEVICE
+from netbox_cmdb.models.snmp import SNMP, SNMPCommunity
 
 
 class SNMPCommunitySerializer(ModelSerializer):

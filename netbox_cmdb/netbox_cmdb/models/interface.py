@@ -1,7 +1,8 @@
-from django.db import models
-from netbox_cmdb.choices import AssetStateChoices, AssetMonitoringStateChoices
-from netbox.models import ChangeLoggedModel
 from django.core.exceptions import ValidationError
+from django.db import models
+from netbox.models import ChangeLoggedModel
+
+from netbox_cmdb.choices import AssetMonitoringStateChoices, AssetStateChoices
 
 FEC_CHOICES = [
     (None, "None"),
