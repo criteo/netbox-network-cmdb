@@ -1,7 +1,5 @@
 from django.db import transaction
 from django.db.models import Q
-from drf_yasg import openapi
-from drf_yasg.openapi import Parameter
 from drf_yasg.utils import swagger_auto_schema
 from netbox.api.authentication import IsAuthenticatedOrLoginNotRequired
 from rest_framework import serializers, status

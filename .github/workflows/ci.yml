@@ -17,11 +17,16 @@ jobs:
       - name: Install dependencies
         run: |
           python -m pip install --upgrade pip
-          pip install black
+          pip install black isort ruff
 
-      - name: Check black formatting
-        run: |
-          black . --check
+      - name: Lint with Ruff
+        run: ruff check .
+
+      - name: Lint with Black
+        run: black . --check --diff
+
+      - name: Lint with isort
+        run: isort . --check --diff
 
       - name: Run tests in containers
         run: |

@@ -2,7 +2,6 @@
 
 from django.core.exceptions import ValidationError
 from django.db import models
-from django.urls import reverse
 from ipam.fields import IPNetworkField
 from netbox.models import ChangeLoggedModel
 from utilities.choices import ChoiceSet

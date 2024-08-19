@@ -8,7 +8,7 @@ class SNMPCommunitySerializerCreate(BaseTestCase):
     def test_create(self):
         data = {"name": "my_comm1", "community": "my_community", "type": "readonly"}
         snmpcommunity_serializer = SNMPCommunitySerializer(data=data)
-        assert snmpcommunity_serializer.is_valid() == True
+        assert snmpcommunity_serializer.is_valid() is True
         snmpcommunity_serializer.save()
 
         community1 = SNMPCommunity.objects.get(name="my_comm1")
@@ -25,7 +25,7 @@ class SNMPCommunitySerializerCreate(BaseTestCase):
         }
 
         snmp_serializer = SNMPSerializer(data=data)
-        assert snmp_serializer.is_valid() == True
+        assert snmp_serializer.is_valid() is True
         snmp_serializer.save()
 
         conf = SNMP.objects.get(device__name=self.device1.name)
@@ -37,7 +37,7 @@ class SNMPCommunitySerializerCreate(BaseTestCase):
 
         data = {"name": "my_comm2", "community": "my_community2", "type": "readonly"}
         snmpcommunity_serializer = SNMPCommunitySerializer(data=data)
-        assert snmpcommunity_serializer.is_valid() == True
+        assert snmpcommunity_serializer.is_valid() is True
         snmpcommunity_serializer.save()
         community2 = SNMPCommunity.objects.get(name="my_comm2")
 
@@ -50,4 +50,4 @@ class SNMPCommunitySerializerCreate(BaseTestCase):
 
         snmp_serializer = SNMPSerializer(data=data)
         # We are trying to add more than 1 community to the device
-        assert snmp_serializer.is_valid() == False
+        assert snmp_serializer.is_valid() is False

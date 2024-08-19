@@ -69,7 +69,7 @@ class PrefixListSerializerCreate(BaseTestCase):
         }
 
         pf_serializer = PrefixListSerializer(data=data)
-        assert pf_serializer.is_valid() == True
+        assert pf_serializer.is_valid() is True
 
     def test_prefix_list_creation_with_empty_terms(self):
         data = {
@@ -80,7 +80,7 @@ class PrefixListSerializerCreate(BaseTestCase):
         }
 
         pf_serializer = PrefixListSerializer(data=data)
-        assert pf_serializer.is_valid() == True
+        assert pf_serializer.is_valid() is True
 
         with self.assertRaisesRegex(
             ValidationError,
@@ -96,7 +96,7 @@ class PrefixListSerializerCreate(BaseTestCase):
         }
 
         pf_serializer = PrefixListSerializer(data=data)
-        assert pf_serializer.is_valid() == False
+        assert pf_serializer.is_valid() is False
 
 
 class PrefixListSerializerUpdate(BaseTestCase):
@@ -143,7 +143,7 @@ class PrefixListSerializerUpdate(BaseTestCase):
             ],
         }
         pf_serializer = PrefixListSerializer(instance=self.prefix_list, data=data)
-        assert pf_serializer.is_valid() == True
+        assert pf_serializer.is_valid() is True
         pf_serializer.save()
         validate(self.device, data)
 
@@ -161,7 +161,7 @@ class PrefixListSerializerUpdate(BaseTestCase):
             ],
         }
         pf_serializer = PrefixListSerializer(instance=self.prefix_list, data=data)
-        assert pf_serializer.is_valid() == True
+        assert pf_serializer.is_valid() is True
         pf_serializer.save()
         validate(self.device, data)
 
@@ -184,7 +184,7 @@ class PrefixListSerializerUpdate(BaseTestCase):
             ],
         }
         pf_serializer = PrefixListSerializer(instance=self.prefix_list, data=data)
-        assert pf_serializer.is_valid() == True
+        assert pf_serializer.is_valid() is True
         pf_serializer.save()
         validate(self.device, data)
 
@@ -206,7 +206,7 @@ class PrefixListSerializerUpdate(BaseTestCase):
             ],
         }
         pf_serializer = PrefixListSerializer(instance=self.prefix_list, data=data)
-        assert pf_serializer.is_valid() == True
+        assert pf_serializer.is_valid() is True
         pf_serializer.save()
         validate(self.device, data)
 
@@ -218,7 +218,7 @@ class PrefixListSerializerUpdate(BaseTestCase):
             "terms": [],
         }
         pf_serializer = PrefixListSerializer(instance=self.prefix_list, data=data)
-        assert pf_serializer.is_valid() == True
+        assert pf_serializer.is_valid() is True
 
         with self.assertRaisesRegex(
             ValidationError,

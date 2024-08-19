@@ -128,7 +128,7 @@ class WritableRoutePolicySerializerCreate(BaseTestCase):
         }
 
         route_policy_serializer = WritableRoutePolicySerializer(data=data)
-        assert route_policy_serializer.is_valid() == True
+        assert route_policy_serializer.is_valid() is True
 
     def test_route_policy_creation_with_empty_terms(self):
         data = {
@@ -138,7 +138,7 @@ class WritableRoutePolicySerializerCreate(BaseTestCase):
         }
 
         route_policy_serializer = WritableRoutePolicySerializer(data=data)
-        assert route_policy_serializer.is_valid() == True
+        assert route_policy_serializer.is_valid() is True
 
         with self.assertRaisesRegex(
             ValidationError,
@@ -153,7 +153,7 @@ class WritableRoutePolicySerializerCreate(BaseTestCase):
         }
 
         route_policy_serializer = WritableRoutePolicySerializer(data=data)
-        assert route_policy_serializer.is_valid() == False
+        assert route_policy_serializer.is_valid() is False
 
 
 class WritableRoutePolicySerializerUpdate(BaseTestCase):
@@ -209,7 +209,7 @@ class WritableRoutePolicySerializerUpdate(BaseTestCase):
         route_policy_serializer = WritableRoutePolicySerializer(
             instance=self.route_policy, data=data
         )
-        assert route_policy_serializer.is_valid() == True
+        assert route_policy_serializer.is_valid() is True
         route_policy_serializer.save()
         validate(self.device, data)
 
@@ -240,7 +240,7 @@ class WritableRoutePolicySerializerUpdate(BaseTestCase):
         route_policy_serializer = WritableRoutePolicySerializer(
             instance=self.route_policy, data=data
         )
-        assert route_policy_serializer.is_valid() == False
+        assert route_policy_serializer.is_valid() is False
 
     def test_route_policy_update_remove_term(self):
         data = {
@@ -258,7 +258,7 @@ class WritableRoutePolicySerializerUpdate(BaseTestCase):
         route_policy_serializer = WritableRoutePolicySerializer(
             instance=self.route_policy, data=data
         )
-        assert route_policy_serializer.is_valid() == True
+        assert route_policy_serializer.is_valid() is True
         route_policy_serializer.save()
         validate(self.device, data)
 
@@ -284,7 +284,7 @@ class WritableRoutePolicySerializerUpdate(BaseTestCase):
         route_policy_serializer = WritableRoutePolicySerializer(
             instance=self.route_policy, data=data
         )
-        assert route_policy_serializer.is_valid() == True
+        assert route_policy_serializer.is_valid() is True
         route_policy_serializer.save()
         validate(self.device, data)
 
@@ -311,7 +311,7 @@ class WritableRoutePolicySerializerUpdate(BaseTestCase):
         route_policy_serializer = WritableRoutePolicySerializer(
             instance=self.route_policy, data=data
         )
-        assert route_policy_serializer.is_valid() == True
+        assert route_policy_serializer.is_valid() is True
         route_policy_serializer.save()
         validate(self.device, data)
 
@@ -356,7 +356,7 @@ class WritableRoutePolicySerializerUpdate(BaseTestCase):
         route_policy_serializer = WritableRoutePolicySerializer(
             instance=self.route_policy, data=data
         )
-        assert route_policy_serializer.is_valid() == True
+        assert route_policy_serializer.is_valid() is True
 
         with self.assertRaisesRegex(
             ValidationError,

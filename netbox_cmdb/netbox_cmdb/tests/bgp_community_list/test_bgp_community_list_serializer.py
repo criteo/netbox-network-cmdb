@@ -66,7 +66,7 @@ class BGPCommunityListSerializerCreate(BaseTestCase):
         }
 
         bgp_com_list_serializer = BGPCommunityListSerializer(data=data)
-        assert bgp_com_list_serializer.is_valid() == True
+        assert bgp_com_list_serializer.is_valid() is True
 
     def test_bgp_community_list_creation_with_empty_terms(self):
         data = {
@@ -76,7 +76,7 @@ class BGPCommunityListSerializerCreate(BaseTestCase):
         }
 
         bgp_com_list_serializer = BGPCommunityListSerializer(data=data)
-        assert bgp_com_list_serializer.is_valid() == True
+        assert bgp_com_list_serializer.is_valid() is True
 
         with self.assertRaisesRegex(
             ValidationError,
@@ -91,7 +91,7 @@ class BGPCommunityListSerializerCreate(BaseTestCase):
         }
 
         bgp_com_list_serializer = BGPCommunityListSerializer(data=data)
-        assert bgp_com_list_serializer.is_valid() == False
+        assert bgp_com_list_serializer.is_valid() is False
 
 
 class BGPCommunityListSerializerUpdate(BaseTestCase):
@@ -136,7 +136,7 @@ class BGPCommunityListSerializerUpdate(BaseTestCase):
             ],
         }
         bgp_com_list_serializer = BGPCommunityListSerializer(instance=self.prefix_list, data=data)
-        assert bgp_com_list_serializer.is_valid() == True
+        assert bgp_com_list_serializer.is_valid() is True
         bgp_com_list_serializer.save()
         validate(self.device, data)
 
@@ -152,7 +152,7 @@ class BGPCommunityListSerializerUpdate(BaseTestCase):
             ],
         }
         bgp_com_list_serializer = BGPCommunityListSerializer(instance=self.prefix_list, data=data)
-        assert bgp_com_list_serializer.is_valid() == True
+        assert bgp_com_list_serializer.is_valid() is True
         bgp_com_list_serializer.save()
         validate(self.device, data)
 
@@ -172,7 +172,7 @@ class BGPCommunityListSerializerUpdate(BaseTestCase):
             ],
         }
         bgp_com_list_serializer = BGPCommunityListSerializer(instance=self.prefix_list, data=data)
-        assert bgp_com_list_serializer.is_valid() == True
+        assert bgp_com_list_serializer.is_valid() is True
         bgp_com_list_serializer.save()
         validate(self.device, data)
 
@@ -193,7 +193,7 @@ class BGPCommunityListSerializerUpdate(BaseTestCase):
             ],
         }
         bgp_com_list_serializer = BGPCommunityListSerializer(instance=self.prefix_list, data=data)
-        assert bgp_com_list_serializer.is_valid() == True
+        assert bgp_com_list_serializer.is_valid() is True
         bgp_com_list_serializer.save()
         validate(self.device, data)
 
@@ -204,7 +204,7 @@ class BGPCommunityListSerializerUpdate(BaseTestCase):
             "terms": [],
         }
         bgp_com_list_serializer = BGPCommunityListSerializer(instance=self.prefix_list, data=data)
-        assert bgp_com_list_serializer.is_valid() == True
+        assert bgp_com_list_serializer.is_valid() is True
 
         with self.assertRaisesRegex(
             ValidationError,
