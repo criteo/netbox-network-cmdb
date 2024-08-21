@@ -1,8 +1,10 @@
 """Views."""
 
-from dcim.models import Device
+import math
+from datetime import datetime
+
+from dcim.models import Device, Site
 from django.db import transaction
-from django.db.models import Q
 from django.shortcuts import render
 from netbox.views.generic import (
     ObjectDeleteView,
@@ -12,7 +14,6 @@ from netbox.views.generic import (
 )
 from netbox.views.generic.bulk_views import BulkDeleteView
 from utilities.forms import ConfirmationForm
-from utilities.htmx import is_htmx
 from utilities.utils import count_related
 
 from netbox_cmdb.filtersets import (
@@ -34,6 +35,7 @@ from netbox_cmdb.forms import (
     SNMPCommunityGroupForm,
     SNMPGroupForm,
 )
+from netbox_cmdb.helpers import cleaning
 from netbox_cmdb.models.bgp import (
     ASN,
     AfiSafi,
@@ -41,8 +43,6 @@ from netbox_cmdb.models.bgp import (
     BGPSession,
     DeviceBGPSession,
 )
-from netbox_cmdb.models.bgp_community_list import BGPCommunityList
-from netbox_cmdb.models.prefix_list import PrefixList
 from netbox_cmdb.models.route_policy import RoutePolicy
 from netbox_cmdb.models.snmp import SNMP, SNMPCommunity
 from netbox_cmdb.tables import (
@@ -56,10 +56,11 @@ from netbox_cmdb.tables import (
 )
 
 
-## Decommission a device
-class DecommissioningView(ObjectDeleteView):
-    queryset = Device.objects.all()
-    template_name = "netbox_cmdb/decommissioning.html"
+class DecommissioningBaseView(ObjectDeleteView):
+    template_name = "netbox_cmdb/decommissioning/base.html"
+    site_template_name = "netbox_cmdb/decommissioning/site_progressive.html"
+    device_template_name = "netbox_cmdb/decommissioning/device_summary.html"
+    base_form_url = ""
 
     def get(self, request, *args, **kwargs):
         """
@@ -68,96 +69,169 @@ class DecommissioningView(ObjectDeleteView):
         Args:
             request: The current request
         """
-        obj = self.get_object(**kwargs)
+        object = self.get_object(**kwargs)
         form = ConfirmationForm(initial=request.GET)
+        devices = []
 
-        # If this is an HTMX request, return only the rendered deletion form as modal content
-        if is_htmx(request):
-            # form_url = reverse("decommisioning_delete", kwargs={'pk': obj.pk})
-            form_url = f"/plugins/cmdb/decommisioning/{kwargs['pk']}/delete"
-            return render(
-                request,
-                "htmx/delete_form.html",
-                {
-                    "object": obj,
-                    "object_type": self.queryset.model._meta.verbose_name,
-                    "form": form,
-                    "form_url": form_url,
-                    **self.get_extra_context(request, obj),
-                },
-            )
+        if isinstance(object, Device):
+            devices.append(object)
+            object_type = "device"
+        elif isinstance(object, Site):
+            devices = Device.objects.filter(site=object.id)
+            object_type = "site"
+        else:
+            error = f"{type(object)} decommissioning is not supported"
+            return render(request, self.template_name, context={"error": error})
 
         return render(
             request,
             self.template_name,
             {
-                "object": obj,
+                "object": object,
+                "object_type": object_type,
                 "form": form,
-                "return_url": self.get_return_url(request, obj),
-                **self.get_extra_context(request, obj),
+                "return_url": self.get_return_url(request, object),
+                **self.get_extra_context(request, object),
             },
         )
 
     def post(self, request, *args, **kwargs):
         # Fetch the device to delete
-        device = self.get_object(**kwargs)
-        deleted_objects = {
-            "bgp_sessions": [],
-            "device_bgp_sessions": [],
-            "bgp_peer_groups": [],
-            "route_policies": [],
-            "prefix_lists": [],
-            "bgp_community_lists": [],
-            "snmp": [],
-        }
+        object = self.get_object(**kwargs)
 
-        device_name = device.name
+        if isinstance(object, Device):
+            return self._device_cleaning(request, object, *args, **kwargs)
+
+        elif isinstance(object, Site):
+            return self._site_cleaning(request, object, *args, **kwargs)
+
+        else:
+            error = f"{type(object)} decommissioning is not supported"
+            return render(request, self.template_name, context={"error": error})
+
+    def _device_cleaning(self, request, device, *args, **kwargs):
+        try:
+            with transaction.atomic():
+                deleted = cleaning.clean_cmdb_for_devices([device.id])
+                device.delete()
+        except Exception as error:
+            return render(
+                request,
+                self.device_template_name,
+                context={"error": f"Failed to clean device: {error}"},
+            )
+
+        return render(
+            request,
+            self.device_template_name,
+            context={"deleted_device": device.name, "deleted_objects": deleted},
+        )
+
+    def _site_cleaning(self, request, site, *args, **kwargs):
+        devices = Device.objects.filter(site=site.id)
+
+        # Get list of devices to delete
+        CHUNK_SIZE = 20
+        device_ids = [dev.id for dev in devices]
+        remaining_chunks = math.ceil(len(device_ids) / CHUNK_SIZE)
+
+        # We avoid an infinite loop if we fail to delete devices
+        if request.POST.get("chunks"):
+            previously_remaining_chunks = int(request.POST["chunks"])
+            if remaining_chunks >= previously_remaining_chunks:
+                return render(
+                    request,
+                    self.site_template_name,
+                    context={
+                        "object": site,
+                        "object_type": "site",
+                        "status": '<span class="badge bg-danger">Failed</span>',
+                        "error": "devices are not being deleted, stopping here",
+                        "chunks": remaining_chunks,
+                        "stop": True,
+                    },
+                )
+
+        if not device_ids:
+            try:
+                with transaction.atomic():
+                    cleaning.clean_site_topology(site)
+            except Exception as error:
+                return render(
+                    request,
+                    self.site_template_name,
+                    context={
+                        "object": site,
+                        "object_type": "site",
+                        "status": '<span class="badge bg-danger">Failed</span>',
+                        "error": f"Topology cleaning failure: {error}",
+                        "chunks": remaining_chunks,
+                        "stop": True,
+                    },
+                )
+
+        chunk = device_ids[0:CHUNK_SIZE]
 
         try:
             with transaction.atomic():
-                bgp_sessions = BGPSession.objects.filter(
-                    Q(peer_a__device__id=device.id) | Q(peer_b__device__id=device.id)
-                )
-                device_bgp_sessions = DeviceBGPSession.objects.filter(device__id=device.id)
-                bgp_peer_groups = BGPPeerGroup.objects.filter(device__id=device.id)
-                route_policies = RoutePolicy.objects.filter(device__id=device.id)
-                prefix_lists = PrefixList.objects.filter(device__id=device.id)
-                bgp_community_lists = BGPCommunityList.objects.filter(device__id=device.id)
-                snmp = SNMP.objects.filter(device__id=device.id)
+                cleaning.clean_cmdb_for_devices(chunk)
+                device_names = [dev.name for dev in devices[0:CHUNK_SIZE]]
+                for dev in devices[0:CHUNK_SIZE]:
+                    dev.delete()
 
-                deleted_objects["bgp_sessions"] = [str(val) for val in list(bgp_sessions)]
-                deleted_objects["device_bgp_sessions"] = [
-                    str(val) for val in list(device_bgp_sessions)
-                ]
-                deleted_objects["bgp_peer_groups"] = [str(val) for val in list(bgp_peer_groups)]
-                deleted_objects["route_policies"] = [str(val) for val in list(route_policies)]
-                deleted_objects["prefix_lists"] = [str(val) for val in list(prefix_lists)]
-                deleted_objects["bgp_community_lists"] = [
-                    str(val) for val in list(bgp_community_lists)
-                ]
-                deleted_objects["snmp"] = [str(val) for val in list(snmp)]
+        except Exception as error:
+            return render(
+                request,
+                self.site_template_name,
+                context={
+                    "object": site,
+                    "object_type": "site",
+                    "status": '<span class="badge bg-danger">Failed</span>',
+                    "error": f"Device cleaning failure: {error}",
+                    "chunks": remaining_chunks,
+                    "stop": True,
+                },
+            )
 
-                bgp_sessions.delete()
-                device_bgp_sessions.delete()
-                bgp_peer_groups.delete()
-                route_policies.delete()
-                prefix_lists.delete()
-                bgp_community_lists.delete()
-                snmp.delete()
+        # Tell the client to continue requesting deletion
+        if remaining_chunks:
+            status = f"Number of devices to delete: {len(device_ids) - len(chunk)}"
+            message = f'<div class="mb-3 alert alert-secondary"><b>{datetime.now().strftime("%H:%M:%S")}</b> - deleted: {device_names}</div>'
 
-        except Exception as e:
-            # Render the template with an error message
-            return render(request, self.template_name, context={"error": str(e)})
+            return render(
+                request,
+                self.site_template_name,
+                context={
+                    "object": site,
+                    "object_type": "site",
+                    "status": status,
+                    "message": message,
+                    "chunks": remaining_chunks,
+                },
+            )
 
-        # Call the parent class's post method to delete the device
-        super().post(request, *args, **kwargs)
-
-        # Return the HTML response with the list of deleted objects
         return render(
             request,
-            self.template_name,
-            context={"deleted_device": device_name, "deleted_objects": deleted_objects},
+            self.site_template_name,
+            context={
+                "object": site,
+                "object_type": "site",
+                "status": '<span class="badge bg-success">Success</span>',
+                "message": f'<div class="mb-3 alert alert-success">{site.name}: site, racks, locations, devices and CMDB deleted</div>',
+                "chunks": remaining_chunks,
+                "stop": True,
+            },
         )
+
+
+class DeviceDecommissioningView(DecommissioningBaseView):
+    base_form_url = "/plugins/cmdb/decommisioning/device"
+    queryset = Device.objects.all()
+
+
+class SiteDecommissioningView(DecommissioningBaseView):
+    base_form_url = "/plugins/cmdb/decommisioning/site"
+    queryset = Site.objects.all()
 
 
 ## ASN views

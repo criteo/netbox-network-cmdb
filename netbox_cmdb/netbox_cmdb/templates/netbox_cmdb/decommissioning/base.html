@@ -1,0 +1,33 @@
+{% extends "base/layout.html" %}
+{% block title %}
+    {{ object.name }} decommissioning
+{% endblock %}
+
+{% block content-wrapper %}
+<div class="border-top">
+  <div class="container mt-5 mb-3 border rounded">
+
+    <div id="_status" class="mt-3 mb-3 fw-bold"></div>
+    <div id="_error"></div>
+    <div id="_history" class="ps-3"></div>
+    {% if error %}
+    <div class="alert alert-danger">{{ error }}</div>
+    {% else %}
+    <div id="_content" class="mb-3">
+      <p class="fw-bold">
+        <span class="text-danger">Warning:</span> this action will remove both
+        CMDB assets and DCIM of concerned asset(s)
+      </p>
+      <form
+        hx-target="#_content"
+        hx-post="/plugins/cmdb/decommisioning/{{ object_type }}/{{ object.id }}/delete"
+      >
+        {% csrf_token %}
+        <button class="btn btn-sm btn-danger">Confirm</button>
+      </form>
+    </div>
+    {% endif %}
+
+  </div>
+</div>
+{% endblock content-wrapper%}

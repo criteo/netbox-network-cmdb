@@ -20,15 +20,16 @@ from netbox_cmdb.views import (
     BGPSessionEditView,
     BGPSessionListView,
     BGPSessionView,
-    DecommissioningView,
     DeviceBGPSessionEditView,
     DeviceBGPSessionListView,
     DeviceBGPSessionView,
-    DeviceBGPSessionDeleteView,
+    DeviceDecommissioningView,
+    DeviecBGPSessionDeleteView,
     RoutePolicyDeleteView,
     RoutePolicyEditView,
     RoutePolicyListView,
     RoutePolicyView,
+    SiteDecommissioningView,
     SNMPCommunityDeleteView,
     SNMPCommunityEditView,
     SNMPCommunityListView,
@@ -39,9 +40,14 @@ from netbox_cmdb.views import (
 
 urlpatterns = [
     path(
-        "decommisioning/<int:pk>/delete",
-        DecommissioningView.as_view(),
-        name="decommisioning_delete",
+        "decommisioning/device/<int:pk>/delete",
+        DeviceDecommissioningView.as_view(),
+        name="device_decommisioning_delete",
+    ),
+    path(
+        "decommisioning/site/<int:pk>/delete",
+        SiteDecommissioningView.as_view(),
+        name="site_decommisioning_delete",
     ),
     # ASN
     path("asn/", ASNListView.as_view(), name="asn_list"),

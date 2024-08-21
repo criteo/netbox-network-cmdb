@@ -1,0 +1,29 @@
+{% if not stop %}
+<form
+  hx-target="#_content"
+  hx-trigger="load"
+  hx-include="*"
+  hx-post="/plugins/cmdb/decommisioning/{{ object_type }}/{{ object.id }}/delete"
+>
+  {% csrf_token %}
+  <input type="hidden" name="chunks" value="{{ chunks }}" />
+</form>
+{% endif %}
+
+{# --- #}
+{# OOB components #}
+{# -- #}
+
+<div id="_status" hx-swap-oob="innerHTML" hx-target="#_status">
+  {{ status | safe }}
+</div>
+
+{% if error %}
+<div id="_error" class="alert alert-danger" hx-swap-oob="outerHTML" hx-target="#_error">
+  {{ error | safe }}
+</div>
+{% endif %}
+
+<div id="_history" hx-swap-oob="afterbegin" hx-target="#_history">
+  {{ message | safe }}
+</div>
