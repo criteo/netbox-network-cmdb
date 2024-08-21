@@ -35,12 +35,12 @@ urlpatterns = [
         name="asns-available-asn",
     ),
     path(
-        "cmdb/delete-all-objects/",
+        "management/delete-all-objects/",
         DeleteAllCMDBObjectsRelatedToDevice.as_view(),
         name="delete-all-objects",
     ),
     path(
-        "cmdb/decommission-site/",
+        "management/decommission-site/",
         DecommissionSite.as_view(),
         name="decommission-site",
     ),
