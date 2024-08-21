@@ -27,7 +27,7 @@ class DeleteAllCMDBObjectsRelatedToDevice(APIView):
             status.HTTP_500_INTERNAL_SERVER_ERROR: "Internal Server Error: Something went wrong on the server",
         },
     )
-    def post(self, request):
+    def delete(self, request):
         device_name = request.data.get("device_name", None)
         if device_name is None:
             return Response(
@@ -73,7 +73,7 @@ class DecommissionSite(APIView):
             status.HTTP_500_INTERNAL_SERVER_ERROR: "Internal Server Error: Something went wrong on the server",
         },
     )
-    def post(self, request):
+    def delete(self, request):
         site_name = request.data.get("site_name", None)
         if site_name is None:
             return Response({"error": "site name is required"}, status=status.HTTP_400_BAD_REQUEST)
