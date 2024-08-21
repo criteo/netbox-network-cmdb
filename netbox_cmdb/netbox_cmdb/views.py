@@ -232,11 +232,11 @@ class DeviceBGPSessionEditView(ObjectEditView):
     filterset = DeviceBGPSessionFilterSet
 
 
-class DeviecBGPSessionDeleteView(ObjectDeleteView):
+class DeviceBGPSessionDeleteView(ObjectDeleteView):
     queryset = DeviceBGPSession.objects.all()
 
 
-class DeviecBGPSessionBulkDeleteView(BulkDeleteView):
+class DeviceBGPSessionBulkDeleteView(BulkDeleteView):
     queryset = DeviceBGPSession.objects.all()
     filterset = DeviceBGPSessionFilterSet
     table = DeviceBGPSessionTable

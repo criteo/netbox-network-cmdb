@@ -24,7 +24,7 @@ from netbox_cmdb.views import (
     DeviceBGPSessionEditView,
     DeviceBGPSessionListView,
     DeviceBGPSessionView,
-    DeviecBGPSessionDeleteView,
+    DeviceBGPSessionDeleteView,
     RoutePolicyDeleteView,
     RoutePolicyEditView,
     RoutePolicyListView,
@@ -99,7 +99,7 @@ urlpatterns = [
     ),
     path(
         "device-bgp-session/<int:pk>/delete",
-        DeviecBGPSessionDeleteView.as_view(),
+        DeviceBGPSessionDeleteView.as_view(),
         name="devicebgpsession_delete",
     ),
     path(
