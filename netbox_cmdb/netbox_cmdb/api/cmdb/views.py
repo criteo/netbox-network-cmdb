@@ -89,8 +89,6 @@ class DecommissionSite(APIView):
 
         devices = Device.objects.filter(site=site.id)
 
-        import logging
-
         def _start():
             CHUNK_SIZE = 20
             device_ids = [dev.id for dev in devices]
@@ -111,11 +109,9 @@ class DecommissionSite(APIView):
 
             try:
                 with transaction.atomic():
-                    logging.warning("cleaning site")
                     cleaning.clean_site_topology(site)
                     yield "{{'message': 'topology cleaned'}}\n\n"
             except Exception as e:
-                logging.warning("error: %s", e)
                 StreamingHttpResponse.status_code = 500
                 msg = {"error": str(e)}
                 yield f"{msg}\n\n"
