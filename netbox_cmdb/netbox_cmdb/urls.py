@@ -24,7 +24,7 @@ from netbox_cmdb.views import (
     DeviceBGPSessionListView,
     DeviceBGPSessionView,
     DeviceDecommissioningView,
-    DeviecBGPSessionDeleteView,
+    DeviceBGPSessionDeleteView,
     RoutePolicyDeleteView,
     RoutePolicyEditView,
     RoutePolicyListView,
