@@ -20,7 +20,7 @@
       </p>
       <form
         hx-target="#_content"
-        hx-post="/plugins/cmdb/decommisioning/{{ object_type }}/{{ object.id }}/delete"
+        hx-post="/plugins/cmdb/decommissioning/{{ object_type }}/{{ object.id }}/delete"
       >
         {% csrf_token %}
         <button class="btn btn-sm btn-danger">Confirm</button>

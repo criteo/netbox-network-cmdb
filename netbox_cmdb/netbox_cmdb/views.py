@@ -62,54 +62,31 @@ class DecommissioningBaseView(ObjectDeleteView):
     device_template_name = "netbox_cmdb/decommissioning/device_summary.html"
     base_form_url = ""
 
+
+class DeviceDecommissioningView(DecommissioningBaseView):
+    base_form_url = "/plugins/cmdb/decommissioning/device"
+    queryset = Device.objects.all()
+
     def get(self, request, *args, **kwargs):
-        """
-        GET request handler.
-
-        Args:
-            request: The current request
-        """
-        object = self.get_object(**kwargs)
+        device = self.get_object(**kwargs)
         form = ConfirmationForm(initial=request.GET)
-        devices = []
-
-        if isinstance(object, Device):
-            devices.append(object)
-            object_type = "device"
-        elif isinstance(object, Site):
-            devices = Device.objects.filter(site=object.id)
-            object_type = "site"
-        else:
-            error = f"{type(object)} decommissioning is not supported"
-            return render(request, self.template_name, context={"error": error})
 
         return render(
             request,
             self.template_name,
             {
-                "object": object,
-                "object_type": object_type,
+                "object": device,
+                "object_type": "device",
                 "form": form,
-                "return_url": self.get_return_url(request, object),
-                **self.get_extra_context(request, object),
+                "return_url": self.get_return_url(request, device),
+                **self.get_extra_context(request, device),
             },
         )
 
     def post(self, request, *args, **kwargs):
         # Fetch the device to delete
-        object = self.get_object(**kwargs)
+        device = self.get_object(**kwargs)
 
-        if isinstance(object, Device):
-            return self._device_cleaning(request, object, *args, **kwargs)
-
-        elif isinstance(object, Site):
-            return self._site_cleaning(request, object, *args, **kwargs)
-
-        else:
-            error = f"{type(object)} decommissioning is not supported"
-            return render(request, self.template_name, context={"error": error})
-
-    def _device_cleaning(self, request, device, *args, **kwargs):
         try:
             with transaction.atomic():
                 deleted = cleaning.clean_cmdb_for_devices([device.id])
@@ -127,7 +104,30 @@ class DecommissioningBaseView(ObjectDeleteView):
             context={"deleted_device": device.name, "deleted_objects": deleted},
         )
 
-    def _site_cleaning(self, request, site, *args, **kwargs):
+
+class SiteDecommissioningView(DecommissioningBaseView):
+    base_form_url = "/plugins/cmdb/decommissioning/site"
+    queryset = Site.objects.all()
+
+    def get(self, request, *args, **kwargs):
+        site = self.get_object(**kwargs)
+        form = ConfirmationForm(initial=request.GET)
+
+        return render(
+            request,
+            self.template_name,
+            {
+                "object": site,
+                "object_type": "site",
+                "form": form,
+                "return_url": self.get_return_url(request, site),
+                **self.get_extra_context(request, site),
+            },
+        )
+
+    def post(self, request, *args, **kwargs):
+        # Fetch the device to delete
+        site = self.get_object(**kwargs)
         devices = Device.objects.filter(site=site.id)
 
         # Get list of devices to delete
@@ -222,16 +222,6 @@ class DecommissioningBaseView(ObjectDeleteView):
                 "stop": True,
             },
         )
-
-
-class DeviceDecommissioningView(DecommissioningBaseView):
-    base_form_url = "/plugins/cmdb/decommisioning/device"
-    queryset = Device.objects.all()
-
-
-class SiteDecommissioningView(DecommissioningBaseView):
-    base_form_url = "/plugins/cmdb/decommisioning/site"
-    queryset = Site.objects.all()
 
 
 ## ASN views

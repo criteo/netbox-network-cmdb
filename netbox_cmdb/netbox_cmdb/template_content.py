@@ -1,22 +1,22 @@
 from extras.plugins import PluginTemplateExtension
 
 
-class DecommisioningBase(PluginTemplateExtension):
+class DecommissioningBase(PluginTemplateExtension):
     def buttons(self):
         return (
-            f'<a href="/plugins/cmdb/decommisioning/{self.obj}/{self.context["object"].id}/delete" '
+            f'<a href="/plugins/cmdb/decommissioning/{self.obj}/{self.context["object"].id}/delete" '
             'class="btn btn-sm btn-danger">Decommission</a>'
         )
 
 
-class DeviceDecommisioning(DecommisioningBase):
+class DeviceDecommissioning(DecommissioningBase):
     model = "dcim.device"
     obj = "device"
 
 
-class SiteDecommisioning(DecommisioningBase):
+class SiteDecommissioning(DecommissioningBase):
     model = "dcim.site"
     obj = "site"
 
 
-template_extensions = [DeviceDecommisioning, SiteDecommisioning]
+template_extensions = [DeviceDecommissioning, SiteDecommissioning]

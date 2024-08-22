@@ -40,14 +40,14 @@ from netbox_cmdb.views import (
 
 urlpatterns = [
     path(
-        "decommisioning/device/<int:pk>/delete",
+        "decommissioning/device/<int:pk>/delete",
         DeviceDecommissioningView.as_view(),
-        name="device_decommisioning_delete",
+        name="device_decommissioning_delete",
     ),
     path(
-        "decommisioning/site/<int:pk>/delete",
+        "decommissioning/site/<int:pk>/delete",
         SiteDecommissioningView.as_view(),
-        name="site_decommisioning_delete",
+        name="site_decommissioning_delete",
     ),
     # ASN
     path("asn/", ASNListView.as_view(), name="asn_list"),

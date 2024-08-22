@@ -3,7 +3,7 @@
   hx-target="#_content"
   hx-trigger="load"
   hx-include="*"
-  hx-post="/plugins/cmdb/decommisioning/{{ object_type }}/{{ object.id }}/delete"
+  hx-post="/plugins/cmdb/decommissioning/{{ object_type }}/{{ object.id }}/delete"
 >
   {% csrf_token %}
   <input type="hidden" name="chunks" value="{{ chunks }}" />
