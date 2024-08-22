@@ -10,16 +10,16 @@ from rest_framework.views import APIView
 from netbox_cmdb.helpers import cleaning
 
 
-class DeleteAllCMDBObjectsRelatedToDeviceSerializer(serializers.Serializer):
+class DeviceDecommissioningBaseSerializer(serializers.Serializer):
     device_name = serializers.CharField()
 
 
-class DeleteAllCMDBObjectsRelatedToDevice(APIView):
+class DeviceCMDBDecommissioningAPIView(APIView):
 
     permission_classes = [IsAuthenticatedOrLoginNotRequired]
 
     @swagger_auto_schema(
-        request_body=DeleteAllCMDBObjectsRelatedToDeviceSerializer,
+        request_body=DeviceDecommissioningBaseSerializer,
         responses={
             status.HTTP_200_OK: "Objects related to device have been deleted successfully",
             status.HTTP_400_BAD_REQUEST: "Bad Request: Device name is required",
@@ -31,7 +31,7 @@ class DeleteAllCMDBObjectsRelatedToDevice(APIView):
         device_name = request.data.get("device_name", None)
         if device_name is None:
             return Response(
-                {"error": "device name is required"}, status=status.HTTP_400_BAD_REQUEST
+                {"error": "device_name is required"}, status=status.HTTP_400_BAD_REQUEST
             )
 
         devices = Device.objects.filter(name=device_name)
@@ -49,23 +49,67 @@ class DeleteAllCMDBObjectsRelatedToDevice(APIView):
 
         return Response(
             {
-                "message": f"objects related to device {device_name} have been deleted successfully",
+                "message": f"CMDB cleaned for {device_name}",
                 "deleted": deleted,
             },
             status=status.HTTP_200_OK,
         )
 
 
-class DecommissionSiteSerializer(serializers.Serializer):
-    site_name = serializers.CharField()
-
-
-class DecommissionSite(APIView):
+class DeviceDecommissioningAPIView(APIView):
 
     permission_classes = [IsAuthenticatedOrLoginNotRequired]
 
     @swagger_auto_schema(
-        request_body=DecommissionSiteSerializer,
+        request_body=DeviceDecommissioningBaseSerializer,
+        responses={
+            status.HTTP_200_OK: "Objects related to device have been deleted successfully",
+            status.HTTP_400_BAD_REQUEST: "Bad Request: Device name is required",
+            status.HTTP_404_NOT_FOUND: "Bad Request: Device not found",
+            status.HTTP_500_INTERNAL_SERVER_ERROR: "Internal Server Error: Something went wrong on the server",
+        },
+    )
+    def delete(self, request):
+        device_name = request.data.get("device_name", None)
+        if device_name is None:
+            return Response(
+                {"error": "device_name is required"}, status=status.HTTP_400_BAD_REQUEST
+            )
+
+        devices = Device.objects.filter(name=device_name)
+        device_ids = [dev.id for dev in devices]
+        if not device_ids:
+            return Response(
+                {"error": "no matching devices found"}, status=status.HTTP_404_NOT_FOUND
+            )
+
+        try:
+            with transaction.atomic():
+                deleted = cleaning.clean_cmdb_for_devices(device_ids)
+                for device in devices:
+                    device.delete()
+        except Exception as e:
+            return Response({"error": str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+        return Response(
+            {
+                "message": f"{device_name} decommissionned",
+                "deleted": deleted,
+            },
+            status=status.HTTP_200_OK,
+        )
+
+
+class SiteDecommissioningSerializer(serializers.Serializer):
+    site_name = serializers.CharField()
+
+
+class SiteDecommissioningAPIView(APIView):
+
+    permission_classes = [IsAuthenticatedOrLoginNotRequired]
+
+    @swagger_auto_schema(
+        request_body=SiteDecommissioningSerializer,
         responses={
             status.HTTP_200_OK: "Site have been deleted successfully",
             status.HTTP_400_BAD_REQUEST: "Bad Request: Site name is required",
@@ -76,7 +120,7 @@ class DecommissionSite(APIView):
     def delete(self, request):
         site_name = request.data.get("site_name", None)
         if site_name is None:
-            return Response({"error": "site name is required"}, status=status.HTTP_400_BAD_REQUEST)
+            return Response({"error": "site_name is required"}, status=status.HTTP_400_BAD_REQUEST)
 
         try:
             site = Site.objects.get(name=site_name)

@@ -13,7 +13,11 @@ from netbox_cmdb.api.bgp_community_list.views import BGPCommunityListViewSet
 from netbox_cmdb.api.prefix_list.views import PrefixListViewSet
 from netbox_cmdb.api.route_policy.views import RoutePolicyViewSet
 from netbox_cmdb.api.snmp.views import SNMPCommunityViewSet, SNMPViewSet
-from netbox_cmdb.api.cmdb.views import DeleteAllCMDBObjectsRelatedToDevice, DecommissionSite
+from netbox_cmdb.api.cmdb.views import (
+    DeviceCMDBDecommissioningAPIView,
+    DeviceDecommissioningAPIView,
+    SiteDecommissioningAPIView,
+)
 
 router = NetBoxRouter()
 
@@ -35,14 +39,19 @@ urlpatterns = [
         name="asns-available-asn",
     ),
     path(
-        "management/delete-all-objects/",
-        DeleteAllCMDBObjectsRelatedToDevice.as_view(),
-        name="delete-all-objects",
+        "management/device-cmdb-decommissioning/",
+        DeviceCMDBDecommissioningAPIView.as_view(),
+        name="device-cmdb-decommissioning",
     ),
     path(
-        "management/decommission-site/",
-        DecommissionSite.as_view(),
-        name="decommission-site",
+        "management/device-decommissioning/",
+        DeviceDecommissioningAPIView.as_view(),
+        name="device-decommissioning",
+    ),
+    path(
+        "management/site-decommissioning/",
+        SiteDecommissioningAPIView.as_view(),
+        name="site-decommissioning",
     ),
 ]
 urlpatterns += router.urls
