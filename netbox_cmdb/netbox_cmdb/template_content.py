@@ -1,15 +1,22 @@
 from extras.plugins import PluginTemplateExtension
 
 
-class Decommisioning(PluginTemplateExtension):
-    model = "dcim.device"
-
+class DecommissioningBase(PluginTemplateExtension):
     def buttons(self):
         return (
-            f'<a href="#" hx-get="/plugins/cmdb/decommisioning/{self.context["object"].id}/delete" '
-            'hx-target="#htmx-modal-content" class="btn btn-sm btn-danger" data-bs-toggle="modal" data-bs-target="#htmx-modal" '
+            f'<a href="/plugins/cmdb/decommissioning/{self.obj}/{self.context["object"].id}/delete" '
             'class="btn btn-sm btn-danger">Decommission</a>'
         )
 
 
-template_extensions = [Decommisioning]
+class DeviceDecommissioning(DecommissioningBase):
+    model = "dcim.device"
+    obj = "device"
+
+
+class SiteDecommissioning(DecommissioningBase):
+    model = "dcim.site"
+    obj = "site"
+
+
+template_extensions = [DeviceDecommissioning, SiteDecommissioning]
