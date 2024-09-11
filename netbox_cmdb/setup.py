@@ -25,6 +25,9 @@ setup(
     author="Criteo",
     install_requires=[],
     packages=find_namespace_packages(),
-    package_data={"netbox_cmdb.templates.netbox_cmdb": ["*.html"]},
+    package_data={
+        "netbox_cmdb.templates.netbox_cmdb": ["*.html"],
+        "netbox_cmdb.templates.netbox_cmdb.decommissioning": ["*.html"],
+    },
     zip_safe=False,
 )
