@@ -16,6 +16,7 @@ class DeviceDecommissioningBaseSerializer(serializers.Serializer):
 
 class DeviceCMDBDecommissioningAPIView(APIView):
 
+    detail = "Device CMDB decommissioning"
     permission_classes = [IsAuthenticatedOrLoginNotRequired]
 
     @swagger_auto_schema(
@@ -58,6 +59,7 @@ class DeviceCMDBDecommissioningAPIView(APIView):
 
 class DeviceDecommissioningAPIView(APIView):
 
+    detail = "Device full decommissioning"
     permission_classes = [IsAuthenticatedOrLoginNotRequired]
 
     @swagger_auto_schema(
@@ -106,6 +108,7 @@ class SiteDecommissioningSerializer(serializers.Serializer):
 
 class SiteDecommissioningAPIView(APIView):
 
+    detail = "Site full decommissioning"
     permission_classes = [IsAuthenticatedOrLoginNotRequired]
 
     @swagger_auto_schema(
