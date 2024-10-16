@@ -4,10 +4,12 @@ from django.urls import reverse
 from netbox.models import ChangeLoggedModel
 from utilities.querysets import RestrictedQuerySet
 
+from netbox_cmdb import protect
 from netbox_cmdb.choices import DecisionChoice
 from netbox_cmdb.fields import CustomIPAddressField
 
 
+@protect.from_device_name_change("device")
 class RoutePolicy(ChangeLoggedModel):
     """
     A RoutePolicy contains a name and a description and is optionally linked to a Device.
