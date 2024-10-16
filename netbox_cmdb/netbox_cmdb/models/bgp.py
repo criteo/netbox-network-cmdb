@@ -8,10 +8,12 @@ from netbox.models import ChangeLoggedModel
 from utilities.choices import ChoiceSet
 from utilities.querysets import RestrictedQuerySet
 
+from netbox_cmdb import protect
 from netbox_cmdb.choices import AssetMonitoringStateChoices, AssetStateChoices
 from netbox_cmdb.constants import BGP_MAX_ASN, BGP_MIN_ASN
 
 
+@protect.from_device_name_change("device")
 class BGPGlobal(ChangeLoggedModel):
     """Global BGP configuration.
 
@@ -197,6 +199,7 @@ class BGPSessionCommon(ChangeLoggedModel):
         abstract = True
 
 
+@protect.from_device_name_change("device")
 class BGPPeerGroup(BGPSessionCommon):
     """A BGP Peer Group contains a set of BGP neighbors that shares common attributes."""
 
@@ -229,6 +232,8 @@ class BGPPeerGroup(BGPSessionCommon):
         return reverse("plugins:netbox_cmdb:bgppeergroup", args=[self.pk])
 
 
+@protect.from_device_name_change("device")
+@protect.from_ip_address_change("local_address")
 class DeviceBGPSession(BGPSessionCommon):
     """A Device BGP Session is a BGP session from a given device's perspective.
     It contains BGP local parameters for the given devices (as the local address / ASN)."""

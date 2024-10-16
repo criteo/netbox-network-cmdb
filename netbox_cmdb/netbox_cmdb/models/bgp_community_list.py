@@ -1,7 +1,10 @@
 from django.db import models
 from netbox.models import ChangeLoggedModel
 
+from netbox_cmdb import protect
 
+
+@protect.from_device_name_change("device")
 class BGPCommunityList(ChangeLoggedModel):
     """An object used in RoutePolicy object to filter on a list of BGP communities."""
 

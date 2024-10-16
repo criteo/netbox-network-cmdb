@@ -1,6 +1,7 @@
 from django.db import models
 from netbox.models import ChangeLoggedModel
 
+from netbox_cmdb import protect
 from netbox_cmdb.choices import SNMPCommunityType
 
 
@@ -23,6 +24,7 @@ class SNMPCommunity(ChangeLoggedModel):
         verbose_name_plural = "SNMP Communities"
 
 
+@protect.from_device_name_change("device")
 class SNMP(ChangeLoggedModel):
     """A Snmp configuration"""
 

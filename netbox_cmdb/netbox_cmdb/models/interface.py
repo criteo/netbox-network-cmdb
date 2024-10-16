@@ -2,6 +2,7 @@ from django.core.exceptions import ValidationError
 from django.db import models
 from netbox.models import ChangeLoggedModel
 
+from netbox_cmdb import protect
 from netbox_cmdb.choices import AssetMonitoringStateChoices, AssetStateChoices
 
 FEC_CHOICES = [
@@ -22,6 +23,7 @@ LOGICAL_INTERFACE_MODE_CHOICES = [
 ]
 
 
+@protect.from_device_name_change("device")
 class DeviceInterface(ChangeLoggedModel):
     """A device interface configuration."""
 
@@ -67,6 +69,7 @@ class DeviceInterface(ChangeLoggedModel):
         unique_together = ("device", "name")
 
 
+@protect.from_ip_address_change("ipv4_address", "ipv6_address")
 class LogicalInterface(ChangeLoggedModel):
     """A logical interface configuration."""
 
