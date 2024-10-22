@@ -6,6 +6,8 @@ from ipam.fields import IPNetworkField
 from netbox.models import ChangeLoggedModel
 from utilities.choices import ChoiceSet
 
+from netbox_cmdb import protect
+
 
 class PrefixListIPVersionChoices(ChoiceSet):
     """Prefix list IP versions choices."""
@@ -19,6 +21,7 @@ class PrefixListIPVersionChoices(ChoiceSet):
     )
 
 
+@protect.from_device_name_change("device")
 class PrefixList(ChangeLoggedModel):
     """Prefix list main model."""
 
