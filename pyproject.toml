@@ -19,10 +19,12 @@ ignore = [
     "C901",     # function is too complex
     "PLR2004",  # magic value used in comparison
     "PLR1711",  # useless `return` statement at end of function
+    "PLC0415",  # import-outside-top-level
     "PLC1901",  # compare-to-empty-string
     "PLR0911",  # too many return statements
     "PLR0912",  # too many branches
     "PLR0915",  # too many statements
+    "PLW1508",  # Invalid type for environment variable default
     "B009",     # do not call getattr with a constant attribute value
     "B904",     # raise without from inside except
     "S311",     # standard pseudo-random generators are not suitable for cryptographic purposes
