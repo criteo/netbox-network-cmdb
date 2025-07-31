@@ -162,6 +162,36 @@ class LogicalInterface(ChangeLoggedModel):
         unique_together = ("index", "parent_interface")
 
 
+class Link(ChangeLoggedModel):
+    """A link between two DeviceInterface."""
+
+    interface_a = models.ForeignKey(
+        to="DeviceInterface",
+        related_name="%(class)s_interface_a",
+        on_delete=models.CASCADE,
+    )
+    interface_b = models.ForeignKey(
+        to="DeviceInterface",
+        related_name="%(class)s_interface_b",
+        on_delete=models.CASCADE,
+    )
+    state = models.CharField(
+        max_length=50,
+        choices=AssetStateChoices,
+        default=AssetStateChoices.STATE_STAGING,
+        help_text="State of this Link",
+    )
+    monitoring_state = models.CharField(
+        max_length=50,
+        choices=AssetMonitoringStateChoices,
+        default=AssetMonitoringStateChoices.DISABLED,
+        help_text="Monitoring state of this Link",
+    )
+
+    def __str__(self):
+        return f"{self.interface_a} <--> {self.interface_b}"
+
+
 class PortLayout(ChangeLoggedModel):
     """A port layout configuration on a Network device."""
 
