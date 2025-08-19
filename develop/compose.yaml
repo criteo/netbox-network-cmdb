@@ -1,5 +1,4 @@
 ---
-version: '3'
 services:
   netbox:
     build:
@@ -19,6 +18,7 @@ services:
       - ./configuration.py:/opt/netbox/netbox/netbox/configuration.py
       - ../netbox_cmdb:/source/netbox_cmdb
     tty: true
+
   worker:
     build:
       context: ../
@@ -30,11 +30,13 @@ services:
       - ./dev.env
     volumes: *volumes
     tty: true
+
   postgres:
     image: postgres:13
     env_file: dev.env
     volumes:
       - pgdata_netbox_cmdb:/var/lib/postgresql/data
+
   redis:
     image: redis:5-alpine
     command:
@@ -42,5 +44,6 @@ services:
       - -c # this is to evaluate the $REDIS_PASSWORD from the env
       - redis-server --appendonly yes --requirepass $$REDIS_PASSWORD ## $$ because of docker-compose
     env_file: ./dev.env
+
 volumes:
   pgdata_netbox_cmdb:

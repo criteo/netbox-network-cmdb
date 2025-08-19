@@ -1,4 +1,4 @@
-COMPOSE_FILE=./develop/docker-compose.yml
+COMPOSE_FILE=./develop/compose.yaml
 BUILD_NAME=netbox-cmdb
 PLUGINS_LIST=netbox_cmdb
 
