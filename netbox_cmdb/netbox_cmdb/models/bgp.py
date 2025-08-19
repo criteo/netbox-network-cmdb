@@ -246,6 +246,12 @@ class DeviceBGPSession(BGPSessionCommon):
     )
     # instance = models.ForeignKey(...)
     enabled = models.BooleanField(default=True)
+    delay_open_timer = models.PositiveSmallIntegerField(
+        default=0,
+        blank=True,
+        validators=[MinValueValidator(0), MaxValueValidator(240)],
+        help_text="Delay open timer value (0-240 seconds)"
+    )
 
     peer_group = models.ForeignKey(
         to="BGPPeerGroup",
