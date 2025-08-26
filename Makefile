@@ -54,6 +54,7 @@ test:
 
 backupdb:
 	docker compose -f ${COMPOSE_FILE} -p ${BUILD_NAME} up -d postgres
+	docker compose -f ${COMPOSE_FILE} -p ${BUILD_NAME} exec postgres rm /tmp/backup.sql
 	docker compose -f ${COMPOSE_FILE} -p ${BUILD_NAME} exec postgres pg_dump --username netbox --host localhost netbox --file /tmp/backup.sql
 	docker compose -f ${COMPOSE_FILE} -p ${BUILD_NAME} cp postgres:/tmp/backup.sql ./db_backup.sql
 
