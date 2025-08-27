@@ -10,6 +10,9 @@ from netbox_cmdb.forms import InlineTermForm
 from netbox_cmdb.models.bgp import (
     ASN,
     AfiSafi,
+    Aggregate,
+    RedistributedNetwork,
+    GlobalAfiSafi,
     BGPGlobal,
     BGPPeerGroup,
     BGPSession,
@@ -31,8 +34,19 @@ class BaseAdmin(admin.ModelAdmin):
 class AfiSafiInline(StackedInline):
     model = AfiSafi
 
-    autocomplete_fields = ("route_policy_in", "route_policy_out")
-    extra = 1
+
+class AggregateInline(StackedInline):
+    model = Aggregate
+
+
+class RedistributedNetworkInline(StackedInline):
+    model = RedistributedNetwork
+
+
+@admin.register(GlobalAfiSafi)
+class GlobalAfiSafiAdmin(BaseAdmin):
+    model = GlobalAfiSafi
+    inlines = [AggregateInline, RedistributedNetworkInline]
 
 
 @admin.register(BGPGlobal)
