@@ -303,7 +303,7 @@ class DeviceBGPSession(BGPSessionCommon):
         default=0,
         blank=True,
         validators=[MinValueValidator(0), MaxValueValidator(240)],
-        help_text="Delay open timer value (0-240 seconds)"
+        help_text="Delay open timer value (0-240 seconds)",
     )
 
     peer_group = models.ForeignKey(

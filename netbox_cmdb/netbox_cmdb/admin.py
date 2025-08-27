@@ -11,12 +11,12 @@ from netbox_cmdb.models.bgp import (
     ASN,
     AfiSafi,
     Aggregate,
-    RedistributedNetwork,
-    GlobalAfiSafi,
     BGPGlobal,
     BGPPeerGroup,
     BGPSession,
     DeviceBGPSession,
+    GlobalAfiSafi,
+    RedistributedNetwork,
 )
 from netbox_cmdb.models.bgp_community_list import BGPCommunityList, BGPCommunityListTerm
 from netbox_cmdb.models.prefix_list import PrefixList, PrefixListTerm
