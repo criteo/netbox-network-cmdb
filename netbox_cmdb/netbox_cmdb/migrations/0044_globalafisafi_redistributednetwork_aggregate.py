@@ -6,7 +6,7 @@ import ipam.fields
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('netbox_cmdb', '0041_devicebgpsession_delay_open_timer'),
+        ('netbox_cmdb', '0043_devicebgpsession_delay_open_timer'),
     ]
 
     operations = [

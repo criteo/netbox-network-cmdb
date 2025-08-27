@@ -5,7 +5,7 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('netbox_cmdb', '0040_snmpcommunity_snmp'),
+        ('netbox_cmdb', '0042_link'),
     ]
 
     operations = [
