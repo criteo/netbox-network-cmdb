@@ -36,6 +36,10 @@
             <td>{{ object.peer_a.maximum_prefixes }}</td>
           </tr>
           <tr>
+            <th>Delay Open Timer</th>
+            <td>{{ object.peer_a.delay_open_timer }}</td>
+          </tr>
+          <tr>
             <th>Enforce First AS</th>
             <td>{% checkmark object.peer_a.enforce_first_as %}</td>
           </tr>
@@ -123,6 +127,10 @@
           <tr>
             <th>Maximum prefixes</th>
             <td>{{ object.peer_b.maximum_prefixes }}</td>
+          </tr>
+          <tr>
+            <th>Delay Open Timer</th>
+            <td>{{ object.peer_b.delay_open_timer }}</td>
           </tr>
           <tr>
             <th>Enforce First AS</th>
