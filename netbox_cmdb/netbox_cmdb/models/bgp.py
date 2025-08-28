@@ -4,6 +4,7 @@ from django.core.validators import MaxValueValidator, MinValueValidator
 from django.db import models
 from django.db.models import Q
 from django.urls import reverse
+from ipam.fields import IPNetworkField
 from netbox.models import ChangeLoggedModel
 from utilities.choices import ChoiceSet
 from utilities.querysets import RestrictedQuerySet
@@ -68,6 +69,58 @@ class AfiSafiChoices(ChoiceSet):
         (L2VPN_EVPN, "l2vpn-evpn"),
         (IPV4_FLOWSPEC, "ipv4-flowspec"),
     )
+
+
+class GlobalAfiSafi(ChangeLoggedModel):
+    """GlobalAfiSafi represents AFI/SAFI global capabilities configured for a network instance."""
+
+    afi_safi_name = models.CharField(
+        max_length=50,
+        choices=AfiSafiChoices,
+        help_text="AFI SAFI",
+    )
+
+    bgp_global = models.ForeignKey(
+        to="BGPGlobal",
+        related_name="afi_safis",
+        on_delete=models.CASCADE,
+        null=True,
+        blank=True,
+    )
+
+    def __str__(self):
+        return str(self.afi_safi_name)
+
+    class Meta:
+        unique_together = ("bgp_global", "afi_safi_name")
+
+
+class Aggregate(ChangeLoggedModel):
+    global_afi_safi = models.ForeignKey(
+        to="GlobalAfiSafi",
+        related_name="aggregates",
+        on_delete=models.CASCADE,
+        null=True,
+        blank=True,
+    )
+    prefix = IPNetworkField()
+
+    class Meta:
+        unique_together = ("global_afi_safi", "prefix")
+
+
+class RedistributedNetwork(ChangeLoggedModel):
+    global_afi_safi = models.ForeignKey(
+        to="GlobalAfiSafi",
+        related_name="redistributed_networks",
+        on_delete=models.CASCADE,
+        null=True,
+        blank=True,
+    )
+    prefix = IPNetworkField()
+
+    class Meta:
+        unique_together = ("global_afi_safi", "prefix")
 
 
 class AfiSafi(ChangeLoggedModel):
@@ -246,6 +299,12 @@ class DeviceBGPSession(BGPSessionCommon):
     )
     # instance = models.ForeignKey(...)
     enabled = models.BooleanField(default=True)
+    delay_open_timer = models.PositiveSmallIntegerField(
+        default=0,
+        blank=True,
+        validators=[MinValueValidator(0), MaxValueValidator(240)],
+        help_text="Delay open timer value (0-240 seconds)",
+    )
 
     peer_group = models.ForeignKey(
         to="BGPPeerGroup",

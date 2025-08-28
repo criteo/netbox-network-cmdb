@@ -16,11 +16,14 @@ from netbox_cmdb.constants import BGP_MAX_ASN, BGP_MIN_ASN
 from netbox_cmdb.models.bgp import (
     ASN,
     AfiSafi,
+    Aggregate,
     BGPGlobal,
     BGPPeerGroup,
     BGPSession,
     BGPSessionCommon,
     DeviceBGPSession,
+    GlobalAfiSafi,
+    RedistributedNetwork,
 )
 from netbox_cmdb.models.circuit import Circuit
 from netbox_cmdb.models.route_policy import RoutePolicy
@@ -41,15 +44,107 @@ class AvailableAsnSerializer(ModelSerializer):
         fields = ["organization_name", "min_asn", "max_asn"]
 
 
+class NestedAggregateSerializer(ModelSerializer):
+    class Meta:
+        model = Aggregate
+        fields = ["id", "prefix"]
+
+
+class NestedRedistributedNetworkSerializer(ModelSerializer):
+    class Meta:
+        model = RedistributedNetwork
+        fields = ["id", "prefix"]
+
+
+class NestedGlobalAfiSafiSerializer(ModelSerializer):
+    aggregates = NestedAggregateSerializer(required=False, many=True, allow_null=True)
+    redistributed_networks = NestedRedistributedNetworkSerializer(
+        required=False, many=True, allow_null=True
+    )
+
+    class Meta:
+        model = GlobalAfiSafi
+        fields = ["id", "afi_safi_name", "aggregates", "redistributed_networks"]
+
+
 class BGPGlobalSerializer(ModelSerializer):
     device = CommonDeviceSerializer()
     local_asn = AsnSerializer(
         required=True,
     )
+    afi_safis = NestedGlobalAfiSafiSerializer(required=False, many=True, allow_null=True)
 
     class Meta:
         model = BGPGlobal
         fields = "__all__"
+
+    def create(self, validated_data):
+        afi_safis_data = validated_data.pop("afi_safis", [])
+
+        bgp_global = BGPGlobal.objects.create(**validated_data)
+
+        for afi_safi_data in afi_safis_data:
+            aggregates_data = afi_safi_data.pop("aggregates", [])
+            redistributed_networks_data = afi_safi_data.pop("redistributed_networks", [])
+
+            global_afi_safi = GlobalAfiSafi.objects.create(bgp_global=bgp_global, **afi_safi_data)
+
+            for aggregate_data in aggregates_data:
+                Aggregate.objects.create(global_afi_safi=global_afi_safi, **aggregate_data)
+
+            for redistributed_network_data in redistributed_networks_data:
+                RedistributedNetwork.objects.create(
+                    global_afi_safi=global_afi_safi, **redistributed_network_data
+                )
+
+        return bgp_global
+
+    def update(self, instance, validated_data):
+        afi_safis_data = validated_data.pop("afi_safis", None)
+
+        for attr, value in validated_data.items():
+            setattr(instance, attr, value)
+        instance.save()
+
+        if afi_safis_data is not None:
+            existing_afi_safis = {
+                afi_safi.afi_safi_name: afi_safi for afi_safi in instance.afi_safis.all()
+            }
+
+            updated_afi_safi_names = set()
+
+            for afi_safi_data in afi_safis_data:
+                afi_safi_name = afi_safi_data["afi_safi_name"]
+                updated_afi_safi_names.add(afi_safi_name)
+
+                aggregates_data = afi_safi_data.pop("aggregates", [])
+                redistributed_networks_data = afi_safi_data.pop("redistributed_networks", [])
+
+                if afi_safi_name in existing_afi_safis:
+                    global_afi_safi = existing_afi_safis[afi_safi_name]
+                else:
+                    global_afi_safi = GlobalAfiSafi.objects.create(
+                        bgp_global=instance, **afi_safi_data
+                    )
+
+                # Update aggregates - replace all existing ones
+                global_afi_safi.aggregates.all().delete()
+                for aggregate_data in aggregates_data:
+                    Aggregate.objects.create(global_afi_safi=global_afi_safi, **aggregate_data)
+
+                # Update redistributed networks - replace all existing ones
+                global_afi_safi.redistributed_networks.all().delete()
+                for redistributed_network_data in redistributed_networks_data:
+                    RedistributedNetwork.objects.create(
+                        global_afi_safi=global_afi_safi, **redistributed_network_data
+                    )
+
+            # Delete AFI/SAFIs that are no longer present
+            for afi_safi_name, afi_safi in existing_afi_safis.items():
+                if afi_safi_name not in updated_afi_safi_names:
+                    afi_safi.delete()
+
+        return instance
 
 
 class BGPSessionCommonSerializer(ModelSerializer):
