@@ -10,14 +10,22 @@ from netbox_cmdb.api.bgp.views import (
     DeviceBGPSessionsViewSet,
 )
 from netbox_cmdb.api.bgp_community_list.views import BGPCommunityListViewSet
-from netbox_cmdb.api.prefix_list.views import PrefixListViewSet
-from netbox_cmdb.api.route_policy.views import RoutePolicyViewSet
-from netbox_cmdb.api.snmp.views import SNMPCommunityViewSet, SNMPViewSet
 from netbox_cmdb.api.cmdb.views import (
     DeviceCMDBDecommissioningAPIView,
     DeviceDecommissioningAPIView,
     SiteDecommissioningAPIView,
 )
+from netbox_cmdb.api.interface.views import (
+    DeviceInterfaceViewSet,
+    LinkViewSet,
+    LogicalInterfaceViewSet,
+    PortLayoutViewSet,
+)
+from netbox_cmdb.api.prefix_list.views import PrefixListViewSet
+from netbox_cmdb.api.route_policy.views import RoutePolicyViewSet
+from netbox_cmdb.api.snmp.views import SNMPCommunityViewSet, SNMPViewSet
+from netbox_cmdb.api.vlan.views import VLANViewSet
+from netbox_cmdb.api.vrf.views import VRFViewSet
 
 router = NetBoxRouter()
 
@@ -26,11 +34,17 @@ router.register("bgp-global", BGPGlobalViewSet)
 router.register("bgp-sessions", BGPSessionsViewSet)
 router.register("device-bgp-sessions", DeviceBGPSessionsViewSet)
 router.register("bgp-community-lists", BGPCommunityListViewSet)
+router.register("device-interfaces", DeviceInterfaceViewSet)
+router.register("logical-interfaces", LogicalInterfaceViewSet)
+router.register("links", LinkViewSet)
 router.register("peer-groups", BGPPeerGroupViewSet)
+router.register("port-layouts", PortLayoutViewSet)
 router.register("prefix-lists", PrefixListViewSet)
 router.register("route-policies", RoutePolicyViewSet)
 router.register("snmp", SNMPViewSet)
 router.register("snmp-community", SNMPCommunityViewSet)
+router.register("vlans", VLANViewSet)
+router.register("vrfs", VRFViewSet)
 
 urlpatterns = [
     path(
