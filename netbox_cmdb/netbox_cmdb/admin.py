@@ -33,6 +33,8 @@ class BaseAdmin(admin.ModelAdmin):
 
 class AfiSafiInline(StackedInline):
     model = AfiSafi
+    autocomplete_fields = ("route_policy_in", "route_policy_out")
+    extra = 1
 
 
 class AggregateInline(StackedInline):
