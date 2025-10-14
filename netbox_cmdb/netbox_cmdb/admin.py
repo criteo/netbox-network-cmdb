@@ -50,6 +50,10 @@ class GlobalAfiSafiAdmin(BaseAdmin):
     model = GlobalAfiSafi
     inlines = [AggregateInline, RedistributedNetworkInline]
 
+    search_fields = ("device__name", "afi_safi_name")
+    autocomplete_fields = ("bgp_global",)
+    list_display = ("bgp_global", "afi_safi_name")
+
 
 @admin.register(BGPGlobal)
 class BGPGlobalAdmin(BaseAdmin):
