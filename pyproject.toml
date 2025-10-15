@@ -35,7 +35,7 @@ max-args = 10
 
 [tool.ruff.lint.per-file-ignores]
 "__init__.py" = ["F401", "F403"]
-"netbox_cmdb/netbox_cmdb/tests/**.py" = ["E402", "S", "PL"]
+"netbox_cmdb/netbox_cmdb/tests/**.py" = ["E402", "S", "PL", "B905"]
 
 [tool.black]
 line-length = 100
