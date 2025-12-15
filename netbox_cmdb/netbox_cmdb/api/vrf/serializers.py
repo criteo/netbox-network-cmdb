@@ -18,6 +18,7 @@ class VRFSerializer(ModelSerializer):
 
 
 class NestedVRFSerializer(WritableNestedSerializer):
+
     class Meta:
         model = VRF
-        fields = ["id", "name", "tenant"]
+        fields = ["id", "name"]
