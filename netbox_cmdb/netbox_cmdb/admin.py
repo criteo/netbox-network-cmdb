@@ -5,6 +5,7 @@ from django.contrib import admin
 from django.contrib.admin.options import StackedInline
 from django.db import transaction
 from ipam.models import IPAddress
+from tenancy.models import Tenant
 
 from netbox_cmdb.forms import InlineTermForm
 from netbox_cmdb.models.bgp import (
@@ -19,9 +20,17 @@ from netbox_cmdb.models.bgp import (
     RedistributedNetwork,
 )
 from netbox_cmdb.models.bgp_community_list import BGPCommunityList, BGPCommunityListTerm
+from netbox_cmdb.models.interface import (
+    DeviceInterface,
+    Link,
+    LogicalInterface,
+    PortLayout,
+)
 from netbox_cmdb.models.prefix_list import PrefixList, PrefixListTerm
 from netbox_cmdb.models.route_policy import RoutePolicy, RoutePolicyTerm
 from netbox_cmdb.models.snmp import SNMP, SNMPCommunity
+from netbox_cmdb.models.vlan import VLAN
+from netbox_cmdb.models.vrf import VRF
 
 
 class BaseAdmin(admin.ModelAdmin):
@@ -225,6 +234,158 @@ class SNMPCommunitytAdmin(BaseAdmin):
     search_fields = ("name", "name")
 
 
+class LogicalInterfaceInline(StackedInline):
+    """Admin class to manage LogicalInterface objects within DeviceInterface admin page."""
+
+    model = LogicalInterface
+    autocomplete_fields = (
+        "vrf",
+        "ipv4_address",
+        "ipv6_address",
+        "untagged_vlan",
+        "native_vlan",
+    )
+    extra = 0
+    fields = (
+        "index",
+        "enabled",
+        "state",
+        "monitoring_state",
+        "mtu",
+        "type",
+        "vrf",
+        "ipv4_address",
+        "ipv6_address",
+        "mode",
+        "untagged_vlan",
+        "native_vlan",
+        "description",
+    )
+    filter_horizontal = ("tagged_vlans",)
+
+
+@admin.register(DeviceInterface)
+class DeviceInterfaceAdmin(BaseAdmin):
+    """Admin class to manage DeviceInterface objects."""
+
+    search_fields = ("name", "device__name", "description")
+    autocomplete_fields = ("device",)
+    list_display = (
+        "name",
+        "device",
+        "enabled",
+        "state",
+        "monitoring_state",
+        "speed",
+        "fec",
+    )
+    list_filter = ("enabled", "state", "monitoring_state", "fec")
+    inlines = [LogicalInterfaceInline]
+
+
+@admin.register(LogicalInterface)
+class LogicalInterfaceAdmin(BaseAdmin):
+    """Admin class to manage LogicalInterface objects."""
+
+    search_fields = (
+        "parent_interface__name",
+        "parent_interface__device__name",
+        "description",
+    )
+    autocomplete_fields = (
+        "parent_interface",
+        "vrf",
+        "ipv4_address",
+        "ipv6_address",
+        "untagged_vlan",
+        "native_vlan",
+    )
+    list_display = (
+        "parent_interface",
+        "index",
+        "enabled",
+        "state",
+        "monitoring_state",
+        "type",
+        "vrf",
+        "ipv4_address",
+        "ipv6_address",
+    )
+    list_filter = ("enabled", "state", "monitoring_state", "type", "mode")
+    filter_horizontal = ("tagged_vlans",)
+
+
+@admin.register(Link)
+class LinkAdmin(BaseAdmin):
+    """Admin class to manage Link objects."""
+
+    search_fields = (
+        "interface_a__name",
+        "interface_a__device__name",
+        "interface_b__name",
+        "interface_b__device__name",
+    )
+    autocomplete_fields = ("interface_a", "interface_b")
+    list_display = (
+        "interface_a",
+        "interface_b",
+        "state",
+        "monitoring_state",
+    )
+    list_filter = ("state", "monitoring_state")
+
+
+@admin.register(PortLayout)
+class PortLayoutAdmin(BaseAdmin):
+    """Admin class to manage PortLayout objects."""
+
+    search_fields = (
+        "name",
+        "label_name",
+        "logical_name",
+        "vendor_name",
+        "device_type__model",
+        "network_role__name",
+    )
+    list_display = (
+        "name",
+        "device_type",
+        "network_role",
+        "label_name",
+        "logical_name",
+        "vendor_name",
+    )
+    list_filter = ("device_type", "network_role")
+
+
+@admin.register(VRF)
+class VRFAdmin(BaseAdmin):
+    """Admin class to manage VRF objects."""
+
+    search_fields = ("name", "tenant__name")
+    autocomplete_fields = ("tenant",)
+    list_display = (
+        "name",
+        "tenant",
+    )
+    list_filter = ("tenant",)
+
+
+@admin.register(VLAN)
+class VLANAdmin(BaseAdmin):
+    """Admin class to manage VLAN objects."""
+
+    search_fields = ("name", "vid", "tenant__name", "description")
+    autocomplete_fields = ("tenant",)
+    list_display = (
+        "vid",
+        "name",
+        "tenant",
+        "description",
+    )
+    list_filter = ("tenant",)
+
+
 # We need to register Netbox core models to the Admin page or we won't be able to lookup
 # dynamically over the objects.
 @admin.register(IPAddress)
@@ -234,4 +395,9 @@ class IPAddressAdmin(admin.ModelAdmin):
 
 @admin.register(Device)
 class DeviceAdmin(admin.ModelAdmin):
+    search_fields = ["name"]
+
+
+@admin.register(Tenant)
+class TenantAdmin(admin.ModelAdmin):
     search_fields = ["name"]
