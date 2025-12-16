@@ -18,6 +18,8 @@ from netbox_cmdb.models.interface import (
 
 
 class NestedDeviceInterfaceSerializer(WritableNestedSerializer):
+    device = CommonDeviceSerializer(read_only=True)
+
     class Meta:
         model = DeviceInterface
         fields = ["id", "name", "device"]
