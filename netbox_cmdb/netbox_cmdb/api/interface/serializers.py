@@ -53,6 +53,12 @@ class LogicalInterfaceSerializer(ModelSerializer):
     def get_display(self, obj):
         return str(obj)
 
+    def get_unique_together_validators(self):
+        """Overriding method to disable unique together checks.
+        This is needed as we only accept an ID on creation/update and obviously don't need to validate uniqueness.
+        """
+        return []
+
 
 class DeviceInterfaceLiteSerializer(ModelSerializer):
     class Meta:
