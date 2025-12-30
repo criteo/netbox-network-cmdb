@@ -6,6 +6,7 @@ from netbox_cmdb.models.bgp_community_list import BGPCommunityList
 from netbox_cmdb.models.prefix_list import PrefixList
 from netbox_cmdb.models.route_policy import RoutePolicy
 from netbox_cmdb.models.snmp import SNMP
+from netbox_cmdb.models.syslog import Syslog
 
 
 def clean_cmdb_for_devices(device_ids: list[int]):
@@ -17,6 +18,7 @@ def clean_cmdb_for_devices(device_ids: list[int]):
         "prefix_lists": [],
         "bgp_community_lists": [],
         "snmp": [],
+        "syslog": [],
     }
 
     bgp_sessions = BGPSession.objects.filter(
@@ -28,6 +30,7 @@ def clean_cmdb_for_devices(device_ids: list[int]):
     prefix_lists = PrefixList.objects.filter(device__id__in=device_ids)
     bgp_community_lists = BGPCommunityList.objects.filter(device__id__in=device_ids)
     snmp = SNMP.objects.filter(device__id__in=device_ids)
+    syslog = Syslog.objects.filter(device__id__in=device_ids)
 
     deleted_objects["bgp_sessions"] = [str(val) for val in list(bgp_sessions)]
     deleted_objects["device_bgp_sessions"] = [str(val) for val in list(device_bgp_sessions)]
@@ -36,6 +39,7 @@ def clean_cmdb_for_devices(device_ids: list[int]):
     deleted_objects["prefix_lists"] = [str(val) for val in list(prefix_lists)]
     deleted_objects["bgp_community_lists"] = [str(val) for val in list(bgp_community_lists)]
     deleted_objects["snmp"] = [str(val) for val in list(snmp)]
+    deleted_objects["syslog"] = [str(val) for val in list(syslog)]
 
     bgp_sessions.delete()
     device_bgp_sessions.delete()
@@ -44,6 +48,7 @@ def clean_cmdb_for_devices(device_ids: list[int]):
     prefix_lists.delete()
     bgp_community_lists.delete()
     snmp.delete()
+    syslog.delete()
 
     return deleted_objects
 
