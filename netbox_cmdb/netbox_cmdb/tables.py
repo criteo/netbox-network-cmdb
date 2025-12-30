@@ -6,6 +6,8 @@ from netbox.tables import NetBoxTable, columns
 from netbox_cmdb.models.bgp import ASN, BGPPeerGroup, BGPSession, DeviceBGPSession
 from netbox_cmdb.models.route_policy import RoutePolicy
 from netbox_cmdb.models.snmp import SNMP, SNMPCommunity
+from netbox_cmdb.models.syslog import Syslog, SyslogServer
+
 
 
 class ASNTable(NetBoxTable):
@@ -113,3 +115,17 @@ class SNMPCommunityTable(NetBoxTable):
     class Meta(NetBoxTable.Meta):
         model = SNMPCommunity
         fields = ("name", "community", "type")
+
+
+class SyslogTable(NetBoxTable):
+    device = tables.LinkColumn()
+
+    class Meta(NetBoxTable.Meta):
+        model = Syslog
+        fields = ("device", "server_address",)
+
+class SyslogServerTable(NetBoxTable):
+
+    class Meta(NetBoxTable.Meta):
+        model = SyslogServer
+        fields = ("server_address",)

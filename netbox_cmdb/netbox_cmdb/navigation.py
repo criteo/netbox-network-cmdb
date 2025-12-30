@@ -76,4 +76,28 @@ menu_items = (
             ),
         ),
     ),
+    PluginMenuItem(
+        link="plugins:netbox_cmdb:syslog_list",
+        link_text="Syslog",
+        buttons=(
+            PluginMenuButton(
+                link="plugins:netbox_cmdb:syslog_add",
+                title="Syslog",
+                icon_class="mdi mdi-plus-thick",
+                color=ButtonColorChoices.GREEN,
+            ),
+        ),
+    ),
+    PluginMenuItem(
+        link="plugins:netbox_cmdb:syslogserver_list",
+        link_text="Syslog Server",
+        buttons=(
+            PluginMenuButton(
+                link="plugins:netbox_cmdb:syslogserver_add",
+                title="Syslog Server",
+                icon_class="mdi mdi-plus-thick",
+                color=ButtonColorChoices.GREEN,
+            ),
+        ),
+    ),
 )
