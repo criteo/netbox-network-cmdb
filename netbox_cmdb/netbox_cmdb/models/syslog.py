@@ -27,7 +27,7 @@ class Syslog(ChangeLoggedModel):
         related_name="%(class)s_syslog_server",
         blank=True,
         default=None
-    )        
+    )
 
     device = models.OneToOneField(
         to="dcim.Device",
