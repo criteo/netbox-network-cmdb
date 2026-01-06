@@ -29,9 +29,10 @@ from netbox_cmdb.models.interface import (
 from netbox_cmdb.models.prefix_list import PrefixList, PrefixListTerm
 from netbox_cmdb.models.route_policy import RoutePolicy, RoutePolicyTerm
 from netbox_cmdb.models.snmp import SNMP, SNMPCommunity
+from netbox_cmdb.models.syslog import Syslog, SyslogServer
 from netbox_cmdb.models.vlan import VLAN
 from netbox_cmdb.models.vrf import VRF
-from netbox_cmdb.models.syslog import Syslog, SyslogServer
+
 
 class BaseAdmin(admin.ModelAdmin):
     """AdminCommon is a Django ModelAdmin class containing common attributes."""
@@ -410,9 +411,7 @@ class SyslogAdmin(BaseAdmin):
 class SyslogServerAdmin(BaseAdmin):
     """Admin class to manage Syslog Server objects."""
 
-    list_display = (
-        "server_address",
-    )
+    list_display = ("server_address",)
 
     search_fields = ("server_address",)
 

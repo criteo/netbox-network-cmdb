@@ -9,7 +9,6 @@ from netbox_cmdb.models.snmp import SNMP, SNMPCommunity
 from netbox_cmdb.models.syslog import Syslog, SyslogServer
 
 
-
 class ASNTable(NetBoxTable):
     number = tables.LinkColumn()
     organization_name = tables.Column()
@@ -122,7 +121,11 @@ class SyslogTable(NetBoxTable):
 
     class Meta(NetBoxTable.Meta):
         model = Syslog
-        fields = ("device", "server_address",)
+        fields = (
+            "device",
+            "server_address",
+        )
+
 
 class SyslogServerTable(NetBoxTable):
 

@@ -1,5 +1,6 @@
 from django.db import models
 from netbox.models import ChangeLoggedModel
+
 from netbox_cmdb import protect
 
 
@@ -23,10 +24,7 @@ class Syslog(ChangeLoggedModel):
     """
 
     server_list = models.ManyToManyField(
-        to=SyslogServer,
-        related_name="%(class)s_syslog_server",
-        blank=True,
-        default=None
+        to=SyslogServer, related_name="%(class)s_syslog_server", blank=True, default=None
     )
 
     device = models.OneToOneField(
@@ -39,4 +37,3 @@ class Syslog(ChangeLoggedModel):
 
     def __str__(self):
         return f"{self.device.name}-Syslog"
-

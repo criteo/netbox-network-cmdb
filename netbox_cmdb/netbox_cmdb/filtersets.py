@@ -9,7 +9,6 @@ from netbox_cmdb.models.route_policy import RoutePolicy
 from netbox_cmdb.models.snmp import SNMP
 from netbox_cmdb.models.syslog import Syslog
 
-
 device_location_filterset = [
     "device__location__name",
     "device__site__name",
@@ -239,6 +238,7 @@ class SNMPFilterSet(ChangeLoggedModelFilterSet):
         if not value.strip():
             return queryset
         return queryset.filter(Q(device__name__icontains=value)).distinct()
+
 
 class SyslogFilterSet(ChangeLoggedModelFilterSet):
     """Syslog filterset."""

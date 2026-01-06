@@ -2,10 +2,10 @@
 
 from netbox_cmdb import filtersets
 from netbox_cmdb.api.syslog.serializers import (
-    SyslogServerSerializer,
-    SyslogServerReadSerializer,
     SyslogReadSerializer,
     SyslogSerializer,
+    SyslogServerReadSerializer,
+    SyslogServerSerializer,
 )
 from netbox_cmdb.api.viewsets import CustomNetBoxModelViewSet
 from netbox_cmdb.models.syslog import Syslog, SyslogServer
@@ -53,5 +53,3 @@ class SyslogViewSet(CustomNetBoxModelViewSet):
         server_list = serializer.validated_data.get("server_list")
         if server_list is not None:
             obj.server_list.set(server_list)
-
-

@@ -18,7 +18,6 @@ from netbox_cmdb.models.snmp import SNMP, SNMPCommunity
 from netbox_cmdb.models.syslog import Syslog, SyslogServer
 
 
-
 class ASNForm(NetBoxModelForm):
     tags = DynamicModelMultipleChoiceField(queryset=Tag.objects.all(), required=False)
 
@@ -183,12 +182,14 @@ class SNMPCommunityGroupForm(NetBoxModelForm):
         model = SNMPCommunity
         fields = ["name", "community", "type"]
 
+
 class SyslogForm(NetBoxModelForm):
     device = DynamicModelChoiceField(queryset=Device.objects.all())
 
     class Meta:
         model = Syslog
         fields = ["device", "server_list"]
+
 
 class SyslogServerForm(NetBoxModelForm):
 

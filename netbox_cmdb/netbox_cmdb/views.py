@@ -23,7 +23,7 @@ from netbox_cmdb.filtersets import (
     DeviceBGPSessionFilterSet,
     RoutePolicyFilterSet,
     SNMPFilterSet,
-    SyslogFilterSet
+    SyslogFilterSet,
 )
 from netbox_cmdb.forms import (
     ASNForm,
@@ -35,9 +35,8 @@ from netbox_cmdb.forms import (
     RoutePolicyForm,
     SNMPCommunityGroupForm,
     SNMPGroupForm,
-    SyslogServerForm,
     SyslogForm,
-
+    SyslogServerForm,
 )
 from netbox_cmdb.helpers import cleaning
 from netbox_cmdb.models.bgp import (
@@ -58,8 +57,8 @@ from netbox_cmdb.tables import (
     RoutePolicyTable,
     SNMPCommunityTable,
     SNMPTable,
-    SyslogTable,
     SyslogServerTable,
+    SyslogTable,
 )
 
 
@@ -408,6 +407,7 @@ class SNMPCommunityEditView(ObjectEditView):
 class SNMPCommunityDeleteView(ObjectDeleteView):
     queryset = SNMPCommunity.objects.all()
 
+
 class SyslogListView(ObjectListView):
     queryset = Syslog.objects.all()
     filterset = SyslogFilterSet
@@ -421,6 +421,7 @@ class SyslogEditView(ObjectEditView):
 
 class SyslogDeleteView(ObjectDeleteView):
     queryset = Syslog.objects.all()
+
 
 class SyslogServerListView(ObjectListView):
     queryset = SyslogServer.objects.all()

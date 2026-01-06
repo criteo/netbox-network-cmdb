@@ -11,6 +11,7 @@ class SyslogServerSerializer(ModelSerializer):
     """
     Serializer used for write/create/update operations.
     """
+
     class Meta:
         model = SyslogServer
         fields = "__all__"
@@ -20,6 +21,7 @@ class SyslogServerReadSerializer(ModelSerializer):
     """
     Serializer used for read operations.
     """
+
     class Meta:
         model = SyslogServer
         fields = "__all__"
@@ -34,9 +36,7 @@ class SyslogSerializer(ModelSerializer):
 
     # Writable list of FK (PK list)
     server_list = serializers.PrimaryKeyRelatedField(
-        many=True,
-        queryset=SyslogServer.objects.all(),
-        required=False
+        many=True, queryset=SyslogServer.objects.all(), required=False
     )
 
     class Meta:
@@ -55,4 +55,3 @@ class SyslogReadSerializer(ModelSerializer):
     class Meta:
         model = Syslog
         fields = "__all__"
-
