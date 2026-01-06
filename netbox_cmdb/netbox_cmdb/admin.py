@@ -31,7 +31,7 @@ from netbox_cmdb.models.route_policy import RoutePolicy, RoutePolicyTerm
 from netbox_cmdb.models.snmp import SNMP, SNMPCommunity
 from netbox_cmdb.models.vlan import VLAN
 from netbox_cmdb.models.vrf import VRF
-
+from netbox_cmdb.models.syslog import Syslog, SyslogServer
 
 class BaseAdmin(admin.ModelAdmin):
     """AdminCommon is a Django ModelAdmin class containing common attributes."""
@@ -384,6 +384,37 @@ class VLANAdmin(BaseAdmin):
         "description",
     )
     list_filter = ("tenant",)
+
+
+@admin.register(Syslog)
+class SyslogAdmin(BaseAdmin):
+    """Admin class to manage Syslog configuration objects."""
+
+    list_display = (
+        "device",
+        "get_servers",
+    )
+
+    search_fields = ("device__name", "server_list__server_address")
+
+    def get_servers(self, obj):
+        """
+        Return a comma-separated list of Syslog servers bound to this device.
+        """
+        return ", ".join(s.server_address for s in obj.server_list.all())
+
+    get_servers.short_description = "Syslog Servers"
+
+
+@admin.register(SyslogServer)
+class SyslogServerAdmin(BaseAdmin):
+    """Admin class to manage Syslog Server objects."""
+
+    list_display = (
+        "server_address",
+    )
+
+    search_fields = ("server_address",)
 
 
 # We need to register Netbox core models to the Admin page or we won't be able to lookup

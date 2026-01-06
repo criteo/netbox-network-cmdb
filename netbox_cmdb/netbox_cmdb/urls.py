@@ -6,6 +6,7 @@ from netbox.views.generic import ObjectChangeLogView, ObjectJournalView
 from netbox_cmdb.models.bgp import ASN, BGPSession, DeviceBGPSession, BGPPeerGroup
 from netbox_cmdb.models.route_policy import RoutePolicy
 from netbox_cmdb.models.snmp import SNMP, SNMPCommunity
+from netbox_cmdb.models.syslog import Syslog, SyslogServer
 from netbox_cmdb.views import (
     ASNDeleteView,
     ASNEditView,
@@ -36,6 +37,12 @@ from netbox_cmdb.views import (
     SNMPDeleteView,
     SNMPEditView,
     SNMPListView,
+    SyslogListView,
+    SyslogEditView,
+    SyslogDeleteView,
+    SyslogServerListView,
+    SyslogServerEditView,
+    SyslogServerDeleteView,
 )
 
 urlpatterns = [
@@ -203,5 +210,43 @@ urlpatterns = [
         ObjectChangeLogView.as_view(),
         name="snmpcommunity_changelog",
         kwargs={"model": SNMPCommunity},
+    ),
+    # SYSLOG
+    path("syslog/", SyslogListView.as_view(), name="syslog_list"),
+    path("syslog/add/", SyslogEditView.as_view(), name="syslog_add"),
+    path(
+        "syslog/<int:pk>/edit/",
+        SyslogEditView.as_view(),
+        name="syslog_edit",
+    ),
+    path(
+        "syslog/<int:pk>/delete/",
+        SyslogDeleteView.as_view(),
+        name="syslog_delete",
+    ),
+    path(
+        "syslog/<int:pk>/changelog/",
+        ObjectChangeLogView.as_view(),
+        name="syslog_changelog",
+        kwargs={"model": Syslog},
+    ),
+    # SYSLOG SERVERS
+    path("syslog-server/", SyslogServerListView.as_view(), name="syslogserver_list"),
+    path("syslog-server/add/", SyslogServerEditView.as_view(), name="syslogserver_add"),
+    path(
+        "syslog-server/<int:pk>/edit/",
+        SyslogServerEditView.as_view(),
+        name="syslogserver_edit",
+    ),
+    path(
+        "syslog-server/<int:pk>/delete/",
+        SyslogServerDeleteView.as_view(),
+        name="syslogserver_delete",
+    ),
+    path(
+        "syslog-server/<int:pk>/changelog/",
+        ObjectChangeLogView.as_view(),
+        name="syslogserver_changelog",
+        kwargs={"model": SyslogServer},
     ),
 ]

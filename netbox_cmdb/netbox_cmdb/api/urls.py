@@ -26,6 +26,7 @@ from netbox_cmdb.api.route_policy.views import RoutePolicyViewSet
 from netbox_cmdb.api.snmp.views import SNMPCommunityViewSet, SNMPViewSet
 from netbox_cmdb.api.vlan.views import VLANViewSet
 from netbox_cmdb.api.vrf.views import VRFViewSet
+from netbox_cmdb.api.syslog.views import SyslogServerViewSet, SyslogViewSet
 
 router = NetBoxRouter()
 
@@ -45,6 +46,8 @@ router.register("snmp", SNMPViewSet)
 router.register("snmp-community", SNMPCommunityViewSet)
 router.register("vlans", VLANViewSet)
 router.register("vrfs", VRFViewSet)
+router.register("syslog", SyslogViewSet)
+router.register("syslog-server", SyslogServerViewSet)
 
 urlpatterns = [
     path(

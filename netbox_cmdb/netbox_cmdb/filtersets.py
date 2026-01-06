@@ -7,6 +7,8 @@ from utilities.filters import MultiValueCharFilter
 from netbox_cmdb.models.bgp import ASN, BGPPeerGroup, BGPSession, DeviceBGPSession
 from netbox_cmdb.models.route_policy import RoutePolicy
 from netbox_cmdb.models.snmp import SNMP
+from netbox_cmdb.models.syslog import Syslog
+
 
 device_location_filterset = [
     "device__location__name",
@@ -231,6 +233,23 @@ class SNMPFilterSet(ChangeLoggedModelFilterSet):
 
     class Meta:
         model = SNMP
+        fields = ["device"]
+
+    def search(self, queryset, name, value):
+        if not value.strip():
+            return queryset
+        return queryset.filter(Q(device__name__icontains=value)).distinct()
+
+class SyslogFilterSet(ChangeLoggedModelFilterSet):
+    """Syslog filterset."""
+
+    q = django_filters.CharFilter(
+        method="search",
+        label="Search",
+    )
+
+    class Meta:
+        model = Syslog
         fields = ["device"]
 
     def search(self, queryset, name, value):
