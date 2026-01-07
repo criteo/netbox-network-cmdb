@@ -15,6 +15,7 @@ from netbox_cmdb.constants import MAX_COMMUNITY_PER_DEVICE
 from netbox_cmdb.models.bgp import ASN, BGPPeerGroup, BGPSession, DeviceBGPSession
 from netbox_cmdb.models.route_policy import RoutePolicy
 from netbox_cmdb.models.snmp import SNMP, SNMPCommunity
+from netbox_cmdb.models.syslog import Syslog, SyslogServer
 
 
 class ASNForm(NetBoxModelForm):
@@ -180,3 +181,18 @@ class SNMPCommunityGroupForm(NetBoxModelForm):
     class Meta:
         model = SNMPCommunity
         fields = ["name", "community", "type"]
+
+
+class SyslogForm(NetBoxModelForm):
+    device = DynamicModelChoiceField(queryset=Device.objects.all())
+
+    class Meta:
+        model = Syslog
+        fields = ["device", "server_list"]
+
+
+class SyslogServerForm(NetBoxModelForm):
+
+    class Meta:
+        model = SyslogServer
+        fields = ["server_address"]
