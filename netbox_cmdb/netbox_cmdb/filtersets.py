@@ -8,6 +8,7 @@ from netbox_cmdb.models.bgp import ASN, BGPPeerGroup, BGPSession, DeviceBGPSessi
 from netbox_cmdb.models.route_policy import RoutePolicy
 from netbox_cmdb.models.snmp import SNMP
 from netbox_cmdb.models.syslog import Syslog
+from netbox_cmdb.models.tacacs import Tacacs
 
 device_location_filterset = [
     "device__location__name",
@@ -250,6 +251,24 @@ class SyslogFilterSet(ChangeLoggedModelFilterSet):
 
     class Meta:
         model = Syslog
+        fields = ["device"]
+
+    def search(self, queryset, name, value):
+        if not value.strip():
+            return queryset
+        return queryset.filter(Q(device__name__icontains=value)).distinct()
+
+
+class TacacsFilterSet(ChangeLoggedModelFilterSet):
+    """TACACS filterset."""
+
+    q = django_filters.CharFilter(
+        method="search",
+        label="Search",
+    )
+
+    class Meta:
+        model = Tacacs
         fields = ["device"]
 
     def search(self, queryset, name, value):

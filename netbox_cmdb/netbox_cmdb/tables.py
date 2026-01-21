@@ -7,6 +7,7 @@ from netbox_cmdb.models.bgp import ASN, BGPPeerGroup, BGPSession, DeviceBGPSessi
 from netbox_cmdb.models.route_policy import RoutePolicy
 from netbox_cmdb.models.snmp import SNMP, SNMPCommunity
 from netbox_cmdb.models.syslog import Syslog, SyslogServer
+from netbox_cmdb.models.tacacs import Tacacs, TacacsServer
 
 
 class ASNTable(NetBoxTable):
@@ -132,3 +133,43 @@ class SyslogServerTable(NetBoxTable):
     class Meta(NetBoxTable.Meta):
         model = SyslogServer
         fields = ("server_address",)
+
+
+class TacacsTable(NetBoxTable):
+    device = tables.LinkColumn()
+
+    servers = tables.Column(
+        accessor="server_list",
+        verbose_name="Tacacs Servers",
+    )
+
+    class Meta(NetBoxTable.Meta):
+        model = Tacacs
+        fields = (
+            "device",
+            "passkey",
+            "servers",
+        )
+
+    def render_servers(self, value):
+        """
+        Render TACACS servers as:
+        1.1.1.1:49 (prio 1), 2.2.2.2:49 (prio 2)
+        """
+        if not value.exists():
+            return "—"
+
+        return ", ".join(
+            f"{s.server_address}:{s.tcp_port} (prio {s.priority})" for s in value.all()
+        )
+
+
+class TacacsServerTable(NetBoxTable):
+
+    class Meta(NetBoxTable.Meta):
+        model = TacacsServer
+        fields = (
+            "server_address",
+            "priority",
+            "tcp_port",
+        )

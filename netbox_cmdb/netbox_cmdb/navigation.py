@@ -100,4 +100,28 @@ menu_items = (
             ),
         ),
     ),
+    PluginMenuItem(
+        link="plugins:netbox_cmdb:tacacs_list",
+        link_text="Tacacs",
+        buttons=(
+            PluginMenuButton(
+                link="plugins:netbox_cmdb:tacacs_add",
+                title="Tacacs",
+                icon_class="mdi mdi-plus-thick",
+                color=ButtonColorChoices.GREEN,
+            ),
+        ),
+    ),
+    PluginMenuItem(
+        link="plugins:netbox_cmdb:tacacsserver_list",
+        link_text="Tacacs Server",
+        buttons=(
+            PluginMenuButton(
+                link="plugins:netbox_cmdb:tacacsserver_add",
+                title="Tacacs Server",
+                icon_class="mdi mdi-plus-thick",
+                color=ButtonColorChoices.GREEN,
+            ),
+        ),
+    ),
 )

@@ -24,6 +24,7 @@ from netbox_cmdb.filtersets import (
     RoutePolicyFilterSet,
     SNMPFilterSet,
     SyslogFilterSet,
+    TacacsFilterSet,
 )
 from netbox_cmdb.forms import (
     ASNForm,
@@ -37,6 +38,8 @@ from netbox_cmdb.forms import (
     SNMPGroupForm,
     SyslogForm,
     SyslogServerForm,
+    TacacsForm,
+    TacacsServerForm,
 )
 from netbox_cmdb.helpers import cleaning
 from netbox_cmdb.models.bgp import (
@@ -49,6 +52,7 @@ from netbox_cmdb.models.bgp import (
 from netbox_cmdb.models.route_policy import RoutePolicy
 from netbox_cmdb.models.snmp import SNMP, SNMPCommunity
 from netbox_cmdb.models.syslog import Syslog, SyslogServer
+from netbox_cmdb.models.tacacs import Tacacs, TacacsServer
 from netbox_cmdb.tables import (
     ASNTable,
     BGPPeerGroupTable,
@@ -59,6 +63,8 @@ from netbox_cmdb.tables import (
     SNMPTable,
     SyslogServerTable,
     SyslogTable,
+    TacacsServerTable,
+    TacacsTable,
 )
 
 
@@ -436,3 +442,33 @@ class SyslogServerEditView(ObjectEditView):
 
 class SyslogServerDeleteView(ObjectDeleteView):
     queryset = SyslogServer.objects.all()
+
+
+class TacacsListView(ObjectListView):
+    queryset = Tacacs.objects.all()
+    filterset = TacacsFilterSet
+    table = TacacsTable
+
+
+class TacacsEditView(ObjectEditView):
+    queryset = Tacacs.objects.all()
+    form = TacacsForm
+
+
+class TacacsDeleteView(ObjectDeleteView):
+    queryset = Tacacs.objects.all()
+
+
+class TacacsServerListView(ObjectListView):
+    queryset = TacacsServer.objects.all()
+    filterset = TacacsFilterSet
+    table = TacacsServerTable
+
+
+class TacacsServerEditView(ObjectEditView):
+    queryset = TacacsServer.objects.all()
+    form = TacacsServerForm
+
+
+class TacacsServerDeleteView(ObjectDeleteView):
+    queryset = TacacsServer.objects.all()

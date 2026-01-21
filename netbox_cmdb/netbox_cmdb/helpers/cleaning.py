@@ -7,6 +7,7 @@ from netbox_cmdb.models.prefix_list import PrefixList
 from netbox_cmdb.models.route_policy import RoutePolicy
 from netbox_cmdb.models.snmp import SNMP
 from netbox_cmdb.models.syslog import Syslog
+from netbox_cmdb.models.tacacs import Tacacs
 
 
 def clean_cmdb_for_devices(device_ids: list[int]):
@@ -19,6 +20,7 @@ def clean_cmdb_for_devices(device_ids: list[int]):
         "bgp_community_lists": [],
         "snmp": [],
         "syslog": [],
+        "tacacs": [],
     }
 
     bgp_sessions = BGPSession.objects.filter(
@@ -31,6 +33,7 @@ def clean_cmdb_for_devices(device_ids: list[int]):
     bgp_community_lists = BGPCommunityList.objects.filter(device__id__in=device_ids)
     snmp = SNMP.objects.filter(device__id__in=device_ids)
     syslog = Syslog.objects.filter(device__id__in=device_ids)
+    tacacs = Tacacs.objects.filter(device__id__in=device_ids)
 
     deleted_objects["bgp_sessions"] = [str(val) for val in list(bgp_sessions)]
     deleted_objects["device_bgp_sessions"] = [str(val) for val in list(device_bgp_sessions)]
@@ -40,6 +43,7 @@ def clean_cmdb_for_devices(device_ids: list[int]):
     deleted_objects["bgp_community_lists"] = [str(val) for val in list(bgp_community_lists)]
     deleted_objects["snmp"] = [str(val) for val in list(snmp)]
     deleted_objects["syslog"] = [str(val) for val in list(syslog)]
+    deleted_objects["tacacs"] = [str(val) for val in list(tacacs)]
 
     bgp_sessions.delete()
     device_bgp_sessions.delete()
@@ -49,6 +53,7 @@ def clean_cmdb_for_devices(device_ids: list[int]):
     bgp_community_lists.delete()
     snmp.delete()
     syslog.delete()
+    tacacs.delete()
 
     return deleted_objects
 
