@@ -16,6 +16,7 @@ from netbox_cmdb.models.bgp import ASN, BGPPeerGroup, BGPSession, DeviceBGPSessi
 from netbox_cmdb.models.route_policy import RoutePolicy
 from netbox_cmdb.models.snmp import SNMP, SNMPCommunity
 from netbox_cmdb.models.syslog import Syslog, SyslogServer
+from netbox_cmdb.models.tacacs import Tacacs, TacacsServer
 
 
 class ASNForm(NetBoxModelForm):
@@ -196,3 +197,32 @@ class SyslogServerForm(NetBoxModelForm):
     class Meta:
         model = SyslogServer
         fields = ["server_address"]
+
+
+class TacacsForm(NetBoxModelForm):
+    device = DynamicModelChoiceField(queryset=Device.objects.all())
+
+    class Meta:
+        model = Tacacs
+        fields = [
+            "device",
+            "passkey",
+            "server_list",
+        ]
+
+    def clean_passkey(self):
+        passkey = self.cleaned_data.get("passkey")
+        if passkey and len(passkey) < 8:
+            raise forms.ValidationError("passkey should contain at least 8 caracters.")
+        return passkey
+
+
+class TacacsServerForm(NetBoxModelForm):
+
+    class Meta:
+        model = TacacsServer
+        fields = [
+            "server_address",
+            "priority",
+            "tcp_port",
+        ]
