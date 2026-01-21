@@ -30,6 +30,7 @@ from netbox_cmdb.models.prefix_list import PrefixList, PrefixListTerm
 from netbox_cmdb.models.route_policy import RoutePolicy, RoutePolicyTerm
 from netbox_cmdb.models.snmp import SNMP, SNMPCommunity
 from netbox_cmdb.models.syslog import Syslog, SyslogServer
+from netbox_cmdb.models.tacacs import Tacacs, TacacsServer
 from netbox_cmdb.models.vlan import VLAN
 from netbox_cmdb.models.vrf import VRF
 
@@ -412,6 +413,45 @@ class SyslogServerAdmin(BaseAdmin):
     """Admin class to manage Syslog Server objects."""
 
     list_display = ("server_address",)
+
+    search_fields = ("server_address",)
+
+
+@admin.register(Tacacs)
+class TacacsAdmin(BaseAdmin):
+    """Admin class to manage Tacacs configuration objects."""
+
+    list_display = (
+        "device",
+        "passkey",
+        "get_servers",
+    )
+
+    search_fields = (
+        "device__name",
+        "server_list__server_address",
+    )
+
+    def get_servers(self, obj):
+        """
+        Return a list of Tacacs servers bound to the device.
+        """
+        return ", ".join(
+            f"{s.server_address}:{s.tcp_port} (prio {s.priority})" for s in obj.server_list.all()
+        )
+
+    get_servers.short_description = "Tacacs Servers"
+
+
+@admin.register(TacacsServer)
+class TacacsServerAdmin(BaseAdmin):
+    """Admin class to manage TACACS Server objects."""
+
+    list_display = (
+        "server_address",
+        "tcp_port",
+        "priority",
+    )
 
     search_fields = ("server_address",)
 
