@@ -12,6 +12,7 @@ class VRFSerializer(ModelSerializer):
     class Meta:
         model = VRF
         fields = "__all__"
+        ref_name = "NetboxCMDB_VRFSerializer"
 
     def get_display(self, obj):
         return str(obj)
@@ -22,3 +23,4 @@ class NestedVRFSerializer(WritableNestedSerializer):
     class Meta:
         model = VRF
         fields = ["id", "name"]
+        ref_name = "NetboxCMDB_NestedVRFSerializer"

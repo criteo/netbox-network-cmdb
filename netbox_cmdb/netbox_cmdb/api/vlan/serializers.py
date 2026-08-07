@@ -12,6 +12,7 @@ class VLANSerializer(ModelSerializer):
     class Meta:
         model = VLAN
         fields = "__all__"
+        ref_name = "NetboxCMDB_VLANSerializer"
 
     def get_display(self, obj):
         return str(obj)
@@ -21,3 +22,4 @@ class NestedVLANSerializer(WritableNestedSerializer):
     class Meta:
         model = VLAN
         fields = ["id", "vid", "name", "description", "tenant"]
+        ref_name = "NetboxCMDB_NestedVLANSerializer"
