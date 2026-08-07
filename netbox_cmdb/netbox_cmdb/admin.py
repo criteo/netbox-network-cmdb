@@ -7,7 +7,7 @@ from django.db import transaction
 from ipam.models import IPAddress
 from tenancy.models import Tenant
 
-from netbox_cmdb.forms import InlineTermForm
+from netbox_cmdb.forms import InlineTermForm, TacacsAdminForm
 from netbox_cmdb.models.bgp import (
     ASN,
     AfiSafi,
@@ -420,6 +420,8 @@ class SyslogServerAdmin(BaseAdmin):
 @admin.register(Tacacs)
 class TacacsAdmin(BaseAdmin):
     """Admin class to manage Tacacs configuration objects."""
+
+    form = TacacsAdminForm
 
     list_display = (
         "device",

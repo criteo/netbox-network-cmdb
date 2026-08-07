@@ -461,7 +461,6 @@ class TacacsDeleteView(ObjectDeleteView):
 
 class TacacsServerListView(ObjectListView):
     queryset = TacacsServer.objects.all()
-    filterset = TacacsFilterSet
     table = TacacsServerTable
 
 

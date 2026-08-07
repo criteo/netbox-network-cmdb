@@ -5,7 +5,8 @@ from rest_framework import serializers
 from rest_framework.serializers import ModelSerializer
 
 from netbox_cmdb.api.common_serializers import CommonDeviceSerializer
-from netbox_cmdb.models.tacacs import Tacacs, TacacsServer
+from netbox_cmdb.constants import MIN_TACACS_PASSKEY_LENGTH
+from netbox_cmdb.models.tacacs import Tacacs, TacacsServer, duplicate_priorities
 
 
 class TacacsServerSerializer(ModelSerializer):
@@ -47,8 +48,26 @@ class TacacsSerializer(ModelSerializer):
         model = Tacacs
         fields = "__all__"
 
+    def validate_passkey(self, value):
+        if value and len(value) < MIN_TACACS_PASSKEY_LENGTH:
+            raise serializers.ValidationError(
+                f"passkey should contain at least {MIN_TACACS_PASSKEY_LENGTH} characters."
+            )
+        return value
+
+    def validate_server_list(self, value):
+        duplicates = duplicate_priorities(value)
+        if duplicates:
+            raise serializers.ValidationError(
+                "Servers of a same device must have distinct priorities, "
+                f"already used more than once: {duplicates}."
+            )
+        return value
+
     def create(self, validated_data):
-        servers = validated_data.pop("server_list", [])
+        # None and not [], as a POST acts as an upsert: an omitted server_list must leave the
+        # servers of an existing configuration untouched, the way update() does.
+        servers = validated_data.pop("server_list", None)
         device_data = validated_data.pop("device")
 
         # If Device is already an object, use it
@@ -65,7 +84,8 @@ class TacacsSerializer(ModelSerializer):
         else:
             raise serializers.ValidationError("Invalid device data")
 
-        tacacs, created = Tacacs.objects.get_or_create(
+        # A POST on a device that already holds a configuration updates it, one per device.
+        tacacs, _ = Tacacs.objects.get_or_create(
             device=device,
             defaults={
                 "passkey": validated_data.get("passkey"),
@@ -77,7 +97,8 @@ class TacacsSerializer(ModelSerializer):
             tacacs.passkey = validated_data["passkey"]
             tacacs.save()
 
-        tacacs.server_list.set(servers)
+        if servers is not None:
+            tacacs.server_list.set(servers)
         return tacacs
 
     def update(self, instance, validated_data):

@@ -16,7 +16,7 @@ class Migration(migrations.Migration):
                 ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False)),
                 ('created', models.DateTimeField(auto_now_add=True, null=True)),
                 ('last_updated', models.DateTimeField(auto_now=True, null=True)),
-                ('server_address', models.GenericIPAddressField()),
+                ('server_address', models.GenericIPAddressField(unique=True)),
                 ('priority', models.PositiveIntegerField(default=1)),
                 ('tcp_port', models.PositiveIntegerField(default=49)),
             ],

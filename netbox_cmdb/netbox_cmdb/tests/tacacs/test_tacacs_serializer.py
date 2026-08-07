@@ -1,7 +1,10 @@
+from django.core.exceptions import ValidationError as DjangoValidationError
+
 from netbox_cmdb.api.tacacs.serializers import (
     TacacsSerializer,
     TacacsServerSerializer,
 )
+from netbox_cmdb.forms import TacacsAdminForm, TacacsForm
 from netbox_cmdb.models.tacacs import Tacacs, TacacsServer
 from netbox_cmdb.tests.common import BaseTestCase
 
@@ -88,3 +91,118 @@ class TacacsSerializerCreate(BaseTestCase):
         assert tacacs_obj2.passkey == "secret-updated"
         assert tacacs_obj2.server_list.count() == 1
         assert tacacs_obj2.server_list.first() == server1
+
+    def test_passkey_too_short_is_rejected_by_the_api(self):
+        """A passkey shorter than MIN_TACACS_PASSKEY_LENGTH must be refused."""
+
+        serializer = TacacsSerializer(
+            data={
+                "device": {"id": self.device1.pk},
+                "passkey": "short",
+            }
+        )
+        assert serializer.is_valid() is False
+        assert "passkey" in serializer.errors
+
+    def test_passkey_can_be_omitted(self):
+        """passkey is optional: omitting it must not trigger the length check."""
+
+        serializer = TacacsSerializer(data={"device": {"id": self.device1.pk}})
+        assert serializer.is_valid() is True
+
+    def test_passkey_too_short_is_rejected_by_the_model(self):
+        """Tacacs.clean() enforces the same rule for the plugin UI and the Django admin."""
+
+        tacacs = Tacacs(device=self.device1, passkey="short")
+        with self.assertRaises(DjangoValidationError) as ctx:
+            tacacs.full_clean()
+        assert "passkey" in ctx.exception.error_dict
+
+    def test_upsert_without_server_list_preserves_the_servers(self):
+        """A POST acts as an upsert: omitting server_list must not wipe an existing one."""
+
+        server = TacacsServer.objects.create(server_address="10.10.10.10", priority=1)
+        created = TacacsSerializer(
+            data={
+                "device": {"id": self.device1.pk},
+                "passkey": "Passkey1",
+                "server_list": [server.pk],
+            }
+        )
+        assert created.is_valid() is True
+        created.save()
+
+        # Same device, passkey only: this goes through create() thanks to get_or_create().
+        upserted = TacacsSerializer(data={"device": {"id": self.device1.pk}, "passkey": "Passkey2"})
+        assert upserted.is_valid() is True
+        tacacs = upserted.save()
+
+        assert tacacs.passkey == "Passkey2"
+        assert list(tacacs.server_list.all()) == [server]
+
+    def test_upsert_with_a_server_list_replaces_the_servers(self):
+        """When server_list is provided, it stays authoritative."""
+
+        first = TacacsServer.objects.create(server_address="10.10.10.10", priority=1)
+        second = TacacsServer.objects.create(server_address="10.10.10.11", priority=2)
+        Tacacs.objects.create(device=self.device1).server_list.set([first])
+
+        upserted = TacacsSerializer(
+            data={"device": {"id": self.device1.pk}, "server_list": [second.pk]}
+        )
+        assert upserted.is_valid() is True
+        tacacs = upserted.save()
+
+        assert list(tacacs.server_list.all()) == [second]
+
+    def test_duplicate_server_addresses_are_rejected(self):
+        """An address identifies a single server, it cannot be stored twice."""
+
+        TacacsServer.objects.create(server_address="10.20.20.1", priority=1, tcp_port=49)
+        serializer = TacacsServerSerializer(
+            data={"server_address": "10.20.20.1", "priority": 2, "tcp_port": 49}
+        )
+        assert serializer.is_valid() is False
+        assert "server_address" in serializer.errors
+
+    def test_duplicate_priorities_are_rejected_by_the_api(self):
+        """Two servers of a same device sharing a priority leaves the failover undefined."""
+
+        first = TacacsServer.objects.create(server_address="10.20.20.1", priority=1)
+        second = TacacsServer.objects.create(server_address="10.20.20.2", priority=1)
+        serializer = TacacsSerializer(
+            data={
+                "device": {"id": self.device1.pk},
+                "server_list": [first.pk, second.pk],
+            }
+        )
+        assert serializer.is_valid() is False
+        assert "server_list" in serializer.errors
+
+    def test_distinct_priorities_are_accepted_by_the_api(self):
+        """The nominal SONiC case: one server per priority."""
+
+        first = TacacsServer.objects.create(server_address="10.10.10.10", priority=1)
+        second = TacacsServer.objects.create(server_address="10.10.10.11", priority=2)
+        serializer = TacacsSerializer(
+            data={
+                "device": {"id": self.device1.pk},
+                "server_list": [first.pk, second.pk],
+            }
+        )
+        assert serializer.is_valid() is True
+
+    def test_duplicate_priorities_are_rejected_by_the_forms(self):
+        """Both ModelForm based surfaces enforce the rule the API enforces."""
+
+        first = TacacsServer.objects.create(server_address="10.20.20.1", priority=1)
+        second = TacacsServer.objects.create(server_address="10.20.20.2", priority=1)
+        data = {
+            "device": self.device1.pk,
+            "server_list": [first.pk, second.pk],
+        }
+
+        for form_class in (TacacsForm, TacacsAdminForm):
+            form = form_class(data=data)
+            assert form.is_valid() is False, f"{form_class.__name__} should reject duplicates"
+            assert "server_list" in form.errors
