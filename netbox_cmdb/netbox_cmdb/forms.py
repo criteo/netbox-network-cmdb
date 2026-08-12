@@ -1,6 +1,6 @@
 """Forms."""
 
-from dcim.models import Device
+from dcim.models import Device, DeviceRole
 from dcim.models.devices import DeviceType
 from dcim.models.sites import SiteGroup
 from django import forms
@@ -13,6 +13,7 @@ from utilities.forms.fields import DynamicModelChoiceField, MultipleChoiceField
 from netbox_cmdb.choices import AssetMonitoringStateChoices, AssetStateChoices
 from netbox_cmdb.constants import MAX_COMMUNITY_PER_DEVICE
 from netbox_cmdb.models.bgp import ASN, BGPPeerGroup, BGPSession, DeviceBGPSession
+from netbox_cmdb.models.interface import PortLayout
 from netbox_cmdb.models.route_policy import RoutePolicy
 from netbox_cmdb.models.snmp import SNMP, SNMPCommunity
 from netbox_cmdb.models.syslog import Syslog, SyslogServer
@@ -197,6 +198,30 @@ class SyslogServerForm(NetBoxModelForm):
     class Meta:
         model = SyslogServer
         fields = ["server_address"]
+
+
+class PortLayoutForm(NetBoxModelForm):
+    device_type = DynamicModelChoiceField(
+        queryset=DeviceType.objects.all(),
+        label=_("Device type"),
+    )
+    network_role = DynamicModelChoiceField(
+        queryset=DeviceRole.objects.all(),
+        label=_("Network role"),
+    )
+
+    class Meta:
+        model = PortLayout
+        fields = [
+            "device_type",
+            "network_role",
+            "name",
+            "label_name",
+            "logical_name",
+            "vendor_name",
+            "vendor_short_name",
+            "vendor_long_name",
+        ]
 
 
 class TacacsServerListCleanMixin:
