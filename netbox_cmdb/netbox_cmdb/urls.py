@@ -7,6 +7,7 @@ from netbox_cmdb.models.bgp import ASN, BGPSession, DeviceBGPSession, BGPPeerGro
 from netbox_cmdb.models.route_policy import RoutePolicy
 from netbox_cmdb.models.snmp import SNMP, SNMPCommunity
 from netbox_cmdb.models.syslog import Syslog, SyslogServer
+from netbox_cmdb.models.tacacs import Tacacs, TacacsServer
 from netbox_cmdb.views import (
     ASNDeleteView,
     ASNEditView,
@@ -43,6 +44,12 @@ from netbox_cmdb.views import (
     SyslogServerListView,
     SyslogServerEditView,
     SyslogServerDeleteView,
+    TacacsListView,
+    TacacsEditView,
+    TacacsDeleteView,
+    TacacsServerListView,
+    TacacsServerEditView,
+    TacacsServerDeleteView,
 )
 
 urlpatterns = [
@@ -248,5 +255,43 @@ urlpatterns = [
         ObjectChangeLogView.as_view(),
         name="syslogserver_changelog",
         kwargs={"model": SyslogServer},
+    ),
+    # TACACS
+    path("tacacs/", TacacsListView.as_view(), name="tacacs_list"),
+    path("tacacs/add/", TacacsEditView.as_view(), name="tacacs_add"),
+    path(
+        "tacacs/<int:pk>/edit/",
+        TacacsEditView.as_view(),
+        name="tacacs_edit",
+    ),
+    path(
+        "tacacs/<int:pk>/delete/",
+        TacacsDeleteView.as_view(),
+        name="tacacs_delete",
+    ),
+    path(
+        "tacacs/<int:pk>/changelog/",
+        ObjectChangeLogView.as_view(),
+        name="tacacs_changelog",
+        kwargs={"model": Tacacs},
+    ),
+    # TACACS SERVERS
+    path("tacacs-server/", TacacsServerListView.as_view(), name="tacacsserver_list"),
+    path("tacacs-server/add/", TacacsServerEditView.as_view(), name="tacacsserver_add"),
+    path(
+        "tacacs-server/<int:pk>/edit/",
+        TacacsServerEditView.as_view(),
+        name="tacacsserver_edit",
+    ),
+    path(
+        "tacacs-server/<int:pk>/delete/",
+        TacacsServerDeleteView.as_view(),
+        name="tacacsserver_delete",
+    ),
+    path(
+        "tacacs-server/<int:pk>/changelog/",
+        ObjectChangeLogView.as_view(),
+        name="tacacsserver_changelog",
+        kwargs={"model": TacacsServer},
     ),
 ]

@@ -16,6 +16,7 @@ from netbox_cmdb.models.bgp import ASN, BGPPeerGroup, BGPSession, DeviceBGPSessi
 from netbox_cmdb.models.route_policy import RoutePolicy
 from netbox_cmdb.models.snmp import SNMP, SNMPCommunity
 from netbox_cmdb.models.syslog import Syslog, SyslogServer
+from netbox_cmdb.models.tacacs import Tacacs, TacacsServer, duplicate_priorities
 
 
 class ASNForm(NetBoxModelForm):
@@ -196,3 +197,56 @@ class SyslogServerForm(NetBoxModelForm):
     class Meta:
         model = SyslogServer
         fields = ["server_address"]
+
+
+class TacacsServerListCleanMixin:
+    """Shared server_list validation, for both the plugin UI and the Django admin forms.
+
+    The API enforces the same rule in TacacsSerializer.validate_server_list(). It cannot live in
+    Tacacs.clean() as a ModelForm validates the instance before saving its m2m fields.
+    """
+
+    def clean(self):
+        cleaned_data = super().clean()
+        duplicates = duplicate_priorities(cleaned_data.get("server_list") or [])
+        if duplicates:
+            raise forms.ValidationError(
+                {
+                    "server_list": "Servers of a same device must have distinct priorities, "
+                    f"already used more than once: {duplicates}."
+                }
+            )
+        return cleaned_data
+
+
+class TacacsForm(TacacsServerListCleanMixin, NetBoxModelForm):
+    device = DynamicModelChoiceField(queryset=Device.objects.all())
+
+    class Meta:
+        model = Tacacs
+        fields = [
+            "device",
+            "passkey",
+            "server_list",
+        ]
+
+    # passkey length is validated by Tacacs.clean()
+
+
+class TacacsAdminForm(TacacsServerListCleanMixin, forms.ModelForm):
+    """Django admin form for Tacacs, the admin does not use TacacsForm."""
+
+    class Meta:
+        model = Tacacs
+        fields = "__all__"
+
+
+class TacacsServerForm(NetBoxModelForm):
+
+    class Meta:
+        model = TacacsServer
+        fields = [
+            "server_address",
+            "priority",
+            "tcp_port",
+        ]
