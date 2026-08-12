@@ -193,6 +193,15 @@ class Link(ChangeLoggedModel):
     def __str__(self):
         return f"{self.interface_a} <--> {self.interface_b}"
 
+    def get_state_color(self):
+        return AssetStateChoices.colors.get(self.state)
+
+    def get_monitoring_state_color(self):
+        return AssetMonitoringStateChoices.colors.get(self.monitoring_state)
+
+    def get_absolute_url(self):
+        return reverse("plugins:netbox_cmdb:link", args=[self.pk])
+
 
 class PortLayout(ChangeLoggedModel):
     """A port layout configuration on a Network device."""

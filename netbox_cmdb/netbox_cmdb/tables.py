@@ -4,7 +4,7 @@ import django_tables2 as tables
 from netbox.tables import NetBoxTable, columns
 
 from netbox_cmdb.models.bgp import ASN, BGPPeerGroup, BGPSession, DeviceBGPSession
-from netbox_cmdb.models.interface import PortLayout
+from netbox_cmdb.models.interface import Link, PortLayout
 from netbox_cmdb.models.route_policy import RoutePolicy
 from netbox_cmdb.models.snmp import SNMP, SNMPCommunity
 from netbox_cmdb.models.syslog import Syslog, SyslogServer
@@ -134,6 +134,44 @@ class SyslogServerTable(NetBoxTable):
     class Meta(NetBoxTable.Meta):
         model = SyslogServer
         fields = ("server_address",)
+
+
+class LinkTable(NetBoxTable):
+    id = tables.Column(linkify=True)
+    interface_a__device = tables.Column(verbose_name="Device A", linkify=True)
+    # Both sides link to the Link object itself, so clicking either side opens the link.
+    interface_a__name = tables.Column(
+        verbose_name="Interface A",
+        linkify=lambda record: record.get_absolute_url(),
+    )
+    interface_b__device = tables.Column(verbose_name="Device B", linkify=True)
+    interface_b__name = tables.Column(
+        verbose_name="Interface B",
+        linkify=lambda record: record.get_absolute_url(),
+    )
+    state = columns.ChoiceFieldColumn()
+    monitoring_state = columns.ChoiceFieldColumn()
+
+    class Meta(NetBoxTable.Meta):
+        model = Link
+        fields = (
+            "pk",
+            "id",
+            "interface_a__device",
+            "interface_a__name",
+            "interface_b__device",
+            "interface_b__name",
+            "state",
+            "monitoring_state",
+        )
+        default_columns = (
+            "interface_a__device",
+            "interface_a__name",
+            "interface_b__device",
+            "interface_b__name",
+            "state",
+            "monitoring_state",
+        )
 
 
 class PortLayoutTable(NetBoxTable):

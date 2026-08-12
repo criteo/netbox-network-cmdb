@@ -5,6 +5,7 @@ from tenancy.filtersets import TenancyFilterSet
 from utilities.filters import MultiValueCharFilter
 
 from netbox_cmdb.models.bgp import ASN, BGPPeerGroup, BGPSession, DeviceBGPSession
+from netbox_cmdb.models.interface import Link
 from netbox_cmdb.models.route_policy import RoutePolicy
 from netbox_cmdb.models.snmp import SNMP
 from netbox_cmdb.models.syslog import Syslog
@@ -220,6 +221,35 @@ class BGPPeerGroupFilterSet(ChangeLoggedModelFilterSet):
             return queryset
         return queryset.filter(
             Q(device__name__icontains=value) | Q(name__icontains=value)
+        ).distinct()
+
+
+class LinkFilterSet(ChangeLoggedModelFilterSet):
+    """Link filterset."""
+
+    q = django_filters.CharFilter(
+        method="search",
+        label="Search",
+    )
+
+    class Meta:
+        model = Link
+        fields = [
+            "id",
+            "interface_a__device__name",
+            "interface_b__device__name",
+            "state",
+            "monitoring_state",
+        ]
+
+    def search(self, queryset, name, value):
+        if not value.strip():
+            return queryset
+        return queryset.filter(
+            Q(interface_a__name__icontains=value)
+            | Q(interface_a__device__name__icontains=value)
+            | Q(interface_b__name__icontains=value)
+            | Q(interface_b__device__name__icontains=value)
         ).distinct()
 
 

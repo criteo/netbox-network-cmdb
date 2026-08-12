@@ -1,0 +1,29 @@
+{% extends 'generic/object.html' %} {% load helpers %}
+{% block title %}{{ object.interface_a.device }} ({{ object.interface_a.name }}) <> {{ object.interface_b.device }} ({{ object.interface_b.name }}){% endblock %}
+{% block content %}
+<div class="row">
+  <div class="col col-12 col-xl-5">
+    {% include 'netbox_cmdb/inc/link_side.html' with interface=object.interface_a side="A" return_url=object.get_absolute_url %}
+  </div>
+  <div class="col col-12 col-xl-2">
+    <div class="card">
+      <h5 class="card-header">Link</h5>
+      <div class="card-body">
+        <table class="table table-hover attr-table">
+          <tr>
+            <th>State</th>
+            <td>{% badge object.get_state_display bg_color=object.get_state_color %}</td>
+          </tr>
+          <tr>
+            <th>Monitoring State</th>
+            <td>{% badge object.get_monitoring_state_display bg_color=object.get_monitoring_state_color %}</td>
+          </tr>
+        </table>
+      </div>
+    </div>
+  </div>
+  <div class="col col-12 col-xl-5">
+    {% include 'netbox_cmdb/inc/link_side.html' with interface=object.interface_b side="B" return_url=object.get_absolute_url %}
+  </div>
+</div>
+{% endblock %}

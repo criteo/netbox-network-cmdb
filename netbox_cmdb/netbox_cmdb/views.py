@@ -26,6 +26,7 @@ from netbox_cmdb.filtersets import (
     BGPPeerGroupFilterSet,
     BGPSessionFilterSet,
     DeviceBGPSessionFilterSet,
+    LinkFilterSet,
     RoutePolicyFilterSet,
     SNMPFilterSet,
     SyslogFilterSet,
@@ -37,6 +38,9 @@ from netbox_cmdb.forms import (
     BGPSessionFilterSetForm,
     BGPSessionForm,
     DeviceBGPSessionForm,
+    DeviceInterfaceForm,
+    LinkForm,
+    LogicalInterfaceForm,
     PortLayoutForm,
     RoutePolicyFilterSetForm,
     RoutePolicyForm,
@@ -55,7 +59,12 @@ from netbox_cmdb.models.bgp import (
     BGPSession,
     DeviceBGPSession,
 )
-from netbox_cmdb.models.interface import PortLayout
+from netbox_cmdb.models.interface import (
+    DeviceInterface,
+    Link,
+    LogicalInterface,
+    PortLayout,
+)
 from netbox_cmdb.models.route_policy import RoutePolicy
 from netbox_cmdb.models.snmp import SNMP, SNMPCommunity
 from netbox_cmdb.models.syslog import Syslog, SyslogServer
@@ -65,6 +74,7 @@ from netbox_cmdb.tables import (
     BGPPeerGroupTable,
     BGPSessionTable,
     DeviceBGPSessionTable,
+    LinkTable,
     PortLayoutTable,
     RoutePolicyTable,
     SNMPCommunityTable,
@@ -450,6 +460,50 @@ class SyslogServerEditView(ObjectEditView):
 
 class SyslogServerDeleteView(ObjectDeleteView):
     queryset = SyslogServer.objects.all()
+
+
+## Device interface views
+class DeviceInterfaceEditView(ObjectEditView):
+    queryset = DeviceInterface.objects.all()
+    form = DeviceInterfaceForm
+
+
+## Logical interface views
+class LogicalInterfaceEditView(ObjectEditView):
+    queryset = LogicalInterface.objects.all()
+    form = LogicalInterfaceForm
+
+
+## Link views
+class LinkListView(ObjectListView):
+    queryset = Link.objects.select_related("interface_a__device", "interface_b__device").all()
+    filterset = LinkFilterSet
+    table = LinkTable
+
+
+class LinkView(ObjectView):
+    queryset = Link.objects.select_related(
+        "interface_a__device", "interface_b__device"
+    ).prefetch_related(
+        "interface_a__logicalinterface",
+        "interface_b__logicalinterface",
+    )
+    template_name = "netbox_cmdb/link.html"
+
+
+class LinkEditView(ObjectEditView):
+    queryset = Link.objects.all()
+    form = LinkForm
+
+
+class LinkDeleteView(ObjectDeleteView):
+    queryset = Link.objects.all()
+
+
+class LinkBulkDeleteView(BulkDeleteView):
+    queryset = Link.objects.all()
+    filterset = LinkFilterSet
+    table = LinkTable
 
 
 class PortLayoutGroupListView(ObjectPermissionRequiredMixin, View):
