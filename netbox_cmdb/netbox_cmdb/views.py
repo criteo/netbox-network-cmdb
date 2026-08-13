@@ -3,9 +3,12 @@
 import math
 from datetime import datetime
 
-from dcim.models import Device, Site
+from dcim.models import Device, DeviceRole, DeviceType, Site
 from django.db import transaction
-from django.shortcuts import render
+from django.db.models import Count, Q
+from django.shortcuts import get_object_or_404, render
+from django.views.generic import View
+from django_tables2 import RequestConfig
 from netbox.views.generic import (
     ObjectDeleteView,
     ObjectEditView,
@@ -14,7 +17,9 @@ from netbox.views.generic import (
 )
 from netbox.views.generic.bulk_views import BulkDeleteView
 from utilities.forms import ConfirmationForm
+from utilities.paginator import EnhancedPaginator, get_paginate_count
 from utilities.utils import count_related
+from utilities.views import ObjectPermissionRequiredMixin
 
 from netbox_cmdb.filtersets import (
     ASNFilterSet,
@@ -32,6 +37,7 @@ from netbox_cmdb.forms import (
     BGPSessionFilterSetForm,
     BGPSessionForm,
     DeviceBGPSessionForm,
+    PortLayoutForm,
     RoutePolicyFilterSetForm,
     RoutePolicyForm,
     SNMPCommunityGroupForm,
@@ -49,6 +55,7 @@ from netbox_cmdb.models.bgp import (
     BGPSession,
     DeviceBGPSession,
 )
+from netbox_cmdb.models.interface import PortLayout
 from netbox_cmdb.models.route_policy import RoutePolicy
 from netbox_cmdb.models.snmp import SNMP, SNMPCommunity
 from netbox_cmdb.models.syslog import Syslog, SyslogServer
@@ -58,6 +65,7 @@ from netbox_cmdb.tables import (
     BGPPeerGroupTable,
     BGPSessionTable,
     DeviceBGPSessionTable,
+    PortLayoutTable,
     RoutePolicyTable,
     SNMPCommunityTable,
     SNMPTable,
@@ -442,6 +450,103 @@ class SyslogServerEditView(ObjectEditView):
 
 class SyslogServerDeleteView(ObjectDeleteView):
     queryset = SyslogServer.objects.all()
+
+
+class PortLayoutGroupListView(ObjectPermissionRequiredMixin, View):
+    """Lists every hardware (device type) / network role combination having a port layout."""
+
+    queryset = PortLayout.objects.all()
+
+    def get_required_permission(self):
+        return "netbox_cmdb.view_portlayout"
+
+    def get(self, request):
+        queryset = self.queryset
+        search_value = request.GET.get("q", "").strip()
+        if search_value:
+            queryset = queryset.filter(
+                Q(device_type__model__icontains=search_value)
+                | Q(device_type__manufacturer__name__icontains=search_value)
+                | Q(network_role__name__icontains=search_value)
+            )
+
+        layouts = (
+            queryset.values(
+                "device_type",
+                "device_type__manufacturer__name",
+                "device_type__model",
+                "network_role",
+                "network_role__name",
+            )
+            .annotate(port_count=Count("id"))
+            .order_by(
+                "device_type__manufacturer__name",
+                "device_type__model",
+                "network_role__name",
+            )
+        )
+
+        return render(
+            request,
+            "netbox_cmdb/portlayout_list.html",
+            {
+                "layouts": layouts,
+                "search_value": search_value,
+            },
+        )
+
+
+class PortLayoutGroupView(ObjectPermissionRequiredMixin, View):
+    """Shows all port layout entries of a given hardware (device type) / network role."""
+
+    queryset = PortLayout.objects.all()
+
+    def get_required_permission(self):
+        return "netbox_cmdb.view_portlayout"
+
+    def get(self, request, device_type_id, network_role_id):
+        device_type = get_object_or_404(DeviceType, pk=device_type_id)
+        network_role = get_object_or_404(DeviceRole, pk=network_role_id)
+
+        # Materialize the queryset so the table sorts in Python, allowing natural ordering
+        # of interface names via the `natural_name` model property (etp2 before etp10).
+        # select_related is needed because list data bypasses NetBoxTable's auto-prefetching.
+        table = PortLayoutTable(
+            list(
+                self.queryset.filter(
+                    device_type=device_type, network_role=network_role
+                ).select_related("device_type", "network_role")
+            ),
+            user=request.user,
+        )
+        RequestConfig(
+            request,
+            {"paginator_class": EnhancedPaginator, "per_page": get_paginate_count(request)},
+        ).configure(table)
+
+        return render(
+            request,
+            "netbox_cmdb/portlayout_group.html",
+            {
+                "device_type": device_type,
+                "network_role": network_role,
+                "table": table,
+            },
+        )
+
+
+class PortLayoutView(ObjectView):
+    queryset = PortLayout.objects.all()
+    template_name = "netbox_cmdb/portlayout.html"
+
+
+class PortLayoutEditView(ObjectEditView):
+    queryset = PortLayout.objects.all()
+    form = PortLayoutForm
+
+
+class PortLayoutDeleteView(ObjectDeleteView):
+    queryset = PortLayout.objects.all()
 
 
 class TacacsListView(ObjectListView):

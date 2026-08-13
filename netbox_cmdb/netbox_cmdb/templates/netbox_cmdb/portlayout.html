@@ -1,0 +1,51 @@
+{% extends 'generic/object.html' %}
+
+{% block content %}
+<div class="row">
+  <div class="col col-md-6">
+    <div class="card">
+      <h5 class="card-header">Port Layout</h5>
+      <div class="card-body">
+        <table class="table table-hover attr-table">
+          <tr>
+            <td>Device type</td>
+            <td>
+              <a href="{% url 'plugins:netbox_cmdb:portlayout_group' device_type_id=object.device_type.pk network_role_id=object.network_role.pk %}">
+                {{ object.device_type }}
+              </a>
+            </td>
+          </tr>
+          <tr>
+            <td>Network role</td>
+            <td>{{ object.network_role }}</td>
+          </tr>
+          <tr>
+            <td>Name</td>
+            <td>{{ object.name }}</td>
+          </tr>
+          <tr>
+            <td>Label name</td>
+            <td>{{ object.label_name }}</td>
+          </tr>
+          <tr>
+            <td>Logical name</td>
+            <td>{{ object.logical_name }}</td>
+          </tr>
+          <tr>
+            <td>Vendor name</td>
+            <td>{{ object.vendor_name }}</td>
+          </tr>
+          <tr>
+            <td>Vendor short name</td>
+            <td>{{ object.vendor_short_name }}</td>
+          </tr>
+          <tr>
+            <td>Vendor long name</td>
+            <td>{{ object.vendor_long_name }}</td>
+          </tr>
+        </table>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

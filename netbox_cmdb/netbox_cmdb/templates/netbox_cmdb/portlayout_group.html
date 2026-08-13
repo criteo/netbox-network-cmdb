@@ -1,0 +1,51 @@
+{% extends "base/layout.html" %}
+{% load render_table from django_tables2 %}
+
+{% block title %}Port Layout: {{ device_type }} ({{ network_role }}){% endblock %}
+
+{% block content-wrapper %}
+<div class="content-container">
+  <div class="content px-3">
+    <div class="d-flex justify-content-between align-items-center my-3">
+      {% if perms.netbox_cmdb.add_portlayout %}
+      <a href="{% url 'plugins:netbox_cmdb:portlayout_add' %}?device_type={{ device_type.pk }}&network_role={{ network_role.pk }}&return_url={{ request.path }}"
+         class="btn btn-sm btn-primary">
+        <i class="mdi mdi-plus-thick" aria-hidden="true"></i> Add a port
+      </a>
+      {% endif %}
+    </div>
+
+    <div class="row mb-3">
+      <div class="col col-md-6">
+        <div class="card">
+          <h5 class="card-header">Hardware</h5>
+          <div class="card-body">
+            <table class="table table-hover attr-table">
+              <tr>
+                <td>Manufacturer</td>
+                <td>{{ device_type.manufacturer }}</td>
+              </tr>
+              <tr>
+                <td>Device type</td>
+                <td><a href="{{ device_type.get_absolute_url }}">{{ device_type }}</a></td>
+              </tr>
+              <tr>
+                <td>Network role</td>
+                <td><a href="{{ network_role.get_absolute_url }}">{{ network_role }}</a></td>
+              </tr>
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="card">
+      <h5 class="card-header">Ports</h5>
+      <div class="card-body table-responsive">
+        {% render_table table 'inc/table.html' %}
+        {% include 'inc/paginator.html' with paginator=table.paginator page=table.page %}
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock content-wrapper %}

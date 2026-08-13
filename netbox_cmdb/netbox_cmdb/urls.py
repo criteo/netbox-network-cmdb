@@ -4,6 +4,7 @@ from django.urls import path
 from netbox.views.generic import ObjectChangeLogView, ObjectJournalView
 
 from netbox_cmdb.models.bgp import ASN, BGPSession, DeviceBGPSession, BGPPeerGroup
+from netbox_cmdb.models.interface import PortLayout
 from netbox_cmdb.models.route_policy import RoutePolicy
 from netbox_cmdb.models.snmp import SNMP, SNMPCommunity
 from netbox_cmdb.models.syslog import Syslog, SyslogServer
@@ -27,6 +28,11 @@ from netbox_cmdb.views import (
     DeviceBGPSessionView,
     DeviceDecommissioningView,
     DeviceBGPSessionDeleteView,
+    PortLayoutDeleteView,
+    PortLayoutEditView,
+    PortLayoutGroupListView,
+    PortLayoutGroupView,
+    PortLayoutView,
     RoutePolicyDeleteView,
     RoutePolicyEditView,
     RoutePolicyListView,
@@ -236,6 +242,37 @@ urlpatterns = [
         ObjectChangeLogView.as_view(),
         name="syslog_changelog",
         kwargs={"model": Syslog},
+    ),
+    # PORT LAYOUTS
+    path("port-layout/", PortLayoutGroupListView.as_view(), name="portlayout_list"),
+    path("port-layout/add/", PortLayoutEditView.as_view(), name="portlayout_add"),
+    path(
+        "port-layout/device-type/<int:device_type_id>/role/<int:network_role_id>/",
+        PortLayoutGroupView.as_view(),
+        name="portlayout_group",
+    ),
+    path("port-layout/<int:pk>/", PortLayoutView.as_view(), name="portlayout"),
+    path(
+        "port-layout/<int:pk>/edit/",
+        PortLayoutEditView.as_view(),
+        name="portlayout_edit",
+    ),
+    path(
+        "port-layout/<int:pk>/delete/",
+        PortLayoutDeleteView.as_view(),
+        name="portlayout_delete",
+    ),
+    path(
+        "port-layout/<int:pk>/changelog/",
+        ObjectChangeLogView.as_view(),
+        name="portlayout_changelog",
+        kwargs={"model": PortLayout},
+    ),
+    path(
+        "port-layout/<int:pk>/journal/",
+        ObjectJournalView.as_view(),
+        name="portlayout_journal",
+        kwargs={"model": PortLayout},
     ),
     # SYSLOG SERVERS
     path("syslog-server/", SyslogServerListView.as_view(), name="syslogserver_list"),

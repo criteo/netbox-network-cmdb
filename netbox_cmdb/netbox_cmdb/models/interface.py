@@ -1,6 +1,8 @@
 from django.core.exceptions import ValidationError
 from django.db import models
+from django.urls import reverse
 from netbox.models import ChangeLoggedModel
+from utilities.ordering import naturalize_interface
 
 from netbox_cmdb import protect
 from netbox_cmdb.choices import AssetMonitoringStateChoices, AssetStateChoices
@@ -223,3 +225,18 @@ class PortLayout(ChangeLoggedModel):
     vendor_long_name = models.CharField(
         max_length=64, help_text="The long vendor-specific name of the interface."
     )
+
+    def __str__(self):
+        return f"{self.device_type}--{self.network_role}--{self.name}"
+
+    @property
+    def natural_name(self):
+        """Naturalized version of `name`, suitable as a sort key (etp2 before etp10).
+
+        Lowercased first, since Python string comparison is case-sensitive and would
+        otherwise sort e.g. `etp5B` before `etp5a`.
+        """
+        return naturalize_interface(self.name.lower(), max_length=100)
+
+    def get_absolute_url(self):
+        return reverse("plugins:netbox_cmdb:portlayout", args=[self.pk])

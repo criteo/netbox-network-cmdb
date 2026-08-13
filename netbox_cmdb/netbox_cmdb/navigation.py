@@ -53,6 +53,18 @@ menu_items = (
         ),
     ),
     PluginMenuItem(
+        link="plugins:netbox_cmdb:portlayout_list",
+        link_text="Port Layouts",
+        buttons=(
+            PluginMenuButton(
+                link="plugins:netbox_cmdb:portlayout_add",
+                title="Port Layouts",
+                icon_class="mdi mdi-plus-thick",
+                color=ButtonColorChoices.GREEN,
+            ),
+        ),
+    ),
+    PluginMenuItem(
         link="plugins:netbox_cmdb:snmp_list",
         link_text="SNMP",
         buttons=(

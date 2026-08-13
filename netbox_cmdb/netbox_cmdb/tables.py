@@ -4,6 +4,7 @@ import django_tables2 as tables
 from netbox.tables import NetBoxTable, columns
 
 from netbox_cmdb.models.bgp import ASN, BGPPeerGroup, BGPSession, DeviceBGPSession
+from netbox_cmdb.models.interface import PortLayout
 from netbox_cmdb.models.route_policy import RoutePolicy
 from netbox_cmdb.models.snmp import SNMP, SNMPCommunity
 from netbox_cmdb.models.syslog import Syslog, SyslogServer
@@ -133,6 +134,37 @@ class SyslogServerTable(NetBoxTable):
     class Meta(NetBoxTable.Meta):
         model = SyslogServer
         fields = ("server_address",)
+
+
+class PortLayoutTable(NetBoxTable):
+    # `natural_name` is a model property; sorting on it requires the table to be fed a list
+    # (in-memory sorting), not a queryset.
+    name = tables.Column(linkify=True, order_by=("natural_name",))
+    device_type = tables.Column(linkify=True)
+    network_role = tables.Column(linkify=True)
+
+    class Meta(NetBoxTable.Meta):
+        model = PortLayout
+        order_by = ("name",)
+        fields = (
+            "pk",
+            "name",
+            "device_type",
+            "network_role",
+            "label_name",
+            "logical_name",
+            "vendor_name",
+            "vendor_short_name",
+            "vendor_long_name",
+        )
+        default_columns = (
+            "name",
+            "label_name",
+            "logical_name",
+            "vendor_name",
+            "vendor_short_name",
+            "vendor_long_name",
+        )
 
 
 class TacacsTable(NetBoxTable):
