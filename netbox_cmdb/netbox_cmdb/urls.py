@@ -4,7 +4,7 @@ from django.urls import path
 from netbox.views.generic import ObjectChangeLogView, ObjectJournalView
 
 from netbox_cmdb.models.bgp import ASN, BGPSession, DeviceBGPSession, BGPPeerGroup
-from netbox_cmdb.models.interface import PortLayout
+from netbox_cmdb.models.interface import Link, PortLayout
 from netbox_cmdb.models.route_policy import RoutePolicy
 from netbox_cmdb.models.snmp import SNMP, SNMPCommunity
 from netbox_cmdb.models.syslog import Syslog, SyslogServer
@@ -28,6 +28,13 @@ from netbox_cmdb.views import (
     DeviceBGPSessionView,
     DeviceDecommissioningView,
     DeviceBGPSessionDeleteView,
+    DeviceInterfaceEditView,
+    LinkBulkDeleteView,
+    LinkDeleteView,
+    LinkEditView,
+    LinkListView,
+    LinkView,
+    LogicalInterfaceEditView,
     PortLayoutDeleteView,
     PortLayoutEditView,
     PortLayoutGroupListView,
@@ -242,6 +249,36 @@ urlpatterns = [
         ObjectChangeLogView.as_view(),
         name="syslog_changelog",
         kwargs={"model": Syslog},
+    ),
+    # DEVICE / LOGICAL INTERFACES
+    path(
+        "device-interface/<int:pk>/edit/",
+        DeviceInterfaceEditView.as_view(),
+        name="deviceinterface_edit",
+    ),
+    path(
+        "logical-interface/<int:pk>/edit/",
+        LogicalInterfaceEditView.as_view(),
+        name="logicalinterface_edit",
+    ),
+    # LINKS
+    path("link/", LinkListView.as_view(), name="link_list"),
+    path("link/add/", LinkEditView.as_view(), name="link_add"),
+    path("link/delete/", LinkBulkDeleteView.as_view(), name="link_bulk_delete"),
+    path("link/<int:pk>/", LinkView.as_view(), name="link"),
+    path("link/<int:pk>/edit/", LinkEditView.as_view(), name="link_edit"),
+    path("link/<int:pk>/delete/", LinkDeleteView.as_view(), name="link_delete"),
+    path(
+        "link/<int:pk>/changelog/",
+        ObjectChangeLogView.as_view(),
+        name="link_changelog",
+        kwargs={"model": Link},
+    ),
+    path(
+        "link/<int:pk>/journal/",
+        ObjectJournalView.as_view(),
+        name="link_journal",
+        kwargs={"model": Link},
     ),
     # PORT LAYOUTS
     path("port-layout/", PortLayoutGroupListView.as_view(), name="portlayout_list"),

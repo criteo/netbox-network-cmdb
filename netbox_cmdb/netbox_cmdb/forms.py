@@ -6,6 +6,7 @@ from dcim.models.sites import SiteGroup
 from django import forms
 from django.utils.translation import gettext as _
 from extras.models import Tag
+from ipam.models import IPAddress
 from netbox.forms import NetBoxModelFilterSetForm, NetBoxModelForm
 from utilities.forms import DynamicModelMultipleChoiceField
 from utilities.forms.fields import DynamicModelChoiceField, MultipleChoiceField
@@ -13,11 +14,18 @@ from utilities.forms.fields import DynamicModelChoiceField, MultipleChoiceField
 from netbox_cmdb.choices import AssetMonitoringStateChoices, AssetStateChoices
 from netbox_cmdb.constants import MAX_COMMUNITY_PER_DEVICE
 from netbox_cmdb.models.bgp import ASN, BGPPeerGroup, BGPSession, DeviceBGPSession
-from netbox_cmdb.models.interface import PortLayout
+from netbox_cmdb.models.interface import (
+    DeviceInterface,
+    Link,
+    LogicalInterface,
+    PortLayout,
+)
 from netbox_cmdb.models.route_policy import RoutePolicy
 from netbox_cmdb.models.snmp import SNMP, SNMPCommunity
 from netbox_cmdb.models.syslog import Syslog, SyslogServer
 from netbox_cmdb.models.tacacs import Tacacs, TacacsServer, duplicate_priorities
+from netbox_cmdb.models.vlan import VLAN
+from netbox_cmdb.models.vrf import VRF
 
 
 class ASNForm(NetBoxModelForm):
@@ -198,6 +206,104 @@ class SyslogServerForm(NetBoxModelForm):
     class Meta:
         model = SyslogServer
         fields = ["server_address"]
+
+
+class DeviceInterfaceForm(NetBoxModelForm):
+    device = DynamicModelChoiceField(
+        queryset=Device.objects.all(),
+        label=_("Device"),
+    )
+
+    class Meta:
+        model = DeviceInterface
+        fields = [
+            "device",
+            "name",
+            "enabled",
+            "state",
+            "monitoring_state",
+            "autonegotiation",
+            "speed",
+            "fec",
+            "description",
+        ]
+
+
+class LogicalInterfaceForm(NetBoxModelForm):
+    parent_interface = DynamicModelChoiceField(
+        queryset=DeviceInterface.objects.all(),
+        label=_("Parent interface"),
+    )
+    vrf = DynamicModelChoiceField(
+        queryset=VRF.objects.all(),
+        label=_("VRF"),
+        required=False,
+    )
+    ipv4_address = DynamicModelChoiceField(
+        queryset=IPAddress.objects.all(),
+        label=_("IPv4 address"),
+        required=False,
+    )
+    ipv6_address = DynamicModelChoiceField(
+        queryset=IPAddress.objects.all(),
+        label=_("IPv6 address"),
+        required=False,
+    )
+    untagged_vlan = DynamicModelChoiceField(
+        queryset=VLAN.objects.all(),
+        label=_("Untagged VLAN"),
+        required=False,
+    )
+    tagged_vlans = DynamicModelMultipleChoiceField(
+        queryset=VLAN.objects.all(),
+        label=_("Tagged VLANs"),
+        required=False,
+    )
+    native_vlan = DynamicModelChoiceField(
+        queryset=VLAN.objects.all(),
+        label=_("Native VLAN"),
+        required=False,
+    )
+
+    class Meta:
+        model = LogicalInterface
+        fields = [
+            "parent_interface",
+            "index",
+            "enabled",
+            "state",
+            "monitoring_state",
+            "type",
+            "mode",
+            "mtu",
+            "vrf",
+            "ipv4_address",
+            "ipv6_address",
+            "untagged_vlan",
+            "tagged_vlans",
+            "native_vlan",
+            "description",
+        ]
+
+
+class LinkForm(NetBoxModelForm):
+    interface_a = DynamicModelChoiceField(
+        queryset=DeviceInterface.objects.all(),
+        label=_("Interface A"),
+    )
+    interface_b = DynamicModelChoiceField(
+        queryset=DeviceInterface.objects.all(),
+        label=_("Interface B"),
+    )
+
+    class Meta:
+        model = Link
+        fields = [
+            "interface_a",
+            "interface_b",
+            "state",
+            "monitoring_state",
+        ]
 
 
 class PortLayoutForm(NetBoxModelForm):
