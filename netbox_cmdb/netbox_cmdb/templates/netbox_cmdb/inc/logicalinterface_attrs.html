@@ -1,0 +1,61 @@
+{% load helpers %}
+<table class="table table-hover attr-table">
+  <tr>
+    <th>Index</th>
+    <td>{{ logical.index }}</td>
+  </tr>
+  <tr>
+    <th>Type</th>
+    <td>{{ logical.get_type_display|placeholder }}</td>
+  </tr>
+  <tr>
+    <th>Mode</th>
+    <td>{{ logical.get_mode_display|placeholder }}</td>
+  </tr>
+  <tr>
+    <th>Enabled</th>
+    <td>{% checkmark logical.enabled %}</td>
+  </tr>
+  <tr>
+    <th>State</th>
+    <td>{% badge logical.get_state_display bg_color=logical.get_state_color %}</td>
+  </tr>
+  <tr>
+    <th>Monitoring state</th>
+    <td>{% badge logical.get_monitoring_state_display bg_color=logical.get_monitoring_state_color %}</td>
+  </tr>
+  <tr>
+    <th>MTU</th>
+    <td>{{ logical.mtu|placeholder }}</td>
+  </tr>
+  <tr>
+    <th>VRF</th>
+    <td>{{ logical.vrf|placeholder }}</td>
+  </tr>
+  <tr>
+    <th>IPv4 address</th>
+    <td>{{ logical.ipv4_address|placeholder|linkify }}</td>
+  </tr>
+  <tr>
+    <th>IPv6 address</th>
+    <td>{{ logical.ipv6_address|placeholder|linkify }}</td>
+  </tr>
+  <tr>
+    <th>Untagged VLAN</th>
+    <td>{{ logical.untagged_vlan|placeholder }}</td>
+  </tr>
+  <tr>
+    <th>Native VLAN</th>
+    <td>{{ logical.native_vlan|placeholder }}</td>
+  </tr>
+  <tr>
+    <th>Tagged VLANs</th>
+    <td>
+      {% for vlan in logical.tagged_vlans.all %}{{ vlan }}{% if not forloop.last %}, {% endif %}{% empty %}{{ ""|placeholder }}{% endfor %}
+    </td>
+  </tr>
+  <tr>
+    <th>Description</th>
+    <td>{{ logical.description|placeholder }}</td>
+  </tr>
+</table>

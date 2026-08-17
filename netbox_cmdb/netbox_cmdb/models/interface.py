@@ -67,6 +67,15 @@ class DeviceInterface(ChangeLoggedModel):
     def __str__(self):
         return f"{self.device.name}--{self.name}"
 
+    def get_state_color(self):
+        return AssetStateChoices.colors.get(self.state)
+
+    def get_monitoring_state_color(self):
+        return AssetMonitoringStateChoices.colors.get(self.monitoring_state)
+
+    def get_absolute_url(self):
+        return reverse("plugins:netbox_cmdb:deviceinterface", args=[self.pk])
+
     class Meta:
         unique_together = ("device", "name")
 
@@ -146,6 +155,20 @@ class LogicalInterface(ChangeLoggedModel):
 
     def __str__(self):
         return f"{self.parent_interface.name}--{self.index}"
+
+    @property
+    def name(self):
+        """Conventional display name, e.g. `ge-0/0/32.0`."""
+        return f"{self.parent_interface.name}.{self.index}"
+
+    def get_state_color(self):
+        return AssetStateChoices.colors.get(self.state)
+
+    def get_monitoring_state_color(self):
+        return AssetMonitoringStateChoices.colors.get(self.monitoring_state)
+
+    def get_absolute_url(self):
+        return reverse("plugins:netbox_cmdb:logicalinterface", args=[self.pk])
 
     def clean(self):
         # List of checks to perform

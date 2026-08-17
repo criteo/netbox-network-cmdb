@@ -27,6 +27,7 @@ from netbox_cmdb.filtersets import (
     BGPSessionFilterSet,
     DeviceBGPSessionFilterSet,
     LinkFilterSet,
+    LogicalInterfaceFilterSet,
     RoutePolicyFilterSet,
     SNMPFilterSet,
     SyslogFilterSet,
@@ -75,6 +76,7 @@ from netbox_cmdb.tables import (
     BGPSessionTable,
     DeviceBGPSessionTable,
     LinkTable,
+    LogicalInterfaceTable,
     PortLayoutTable,
     RoutePolicyTable,
     SNMPCommunityTable,
@@ -463,15 +465,43 @@ class SyslogServerDeleteView(ObjectDeleteView):
 
 
 ## Device interface views
+class DeviceInterfaceView(ObjectView):
+    queryset = DeviceInterface.objects.select_related("device").prefetch_related("logicalinterface")
+    template_name = "netbox_cmdb/deviceinterface.html"
+
+
 class DeviceInterfaceEditView(ObjectEditView):
     queryset = DeviceInterface.objects.all()
     form = DeviceInterfaceForm
 
 
+class DeviceInterfaceDeleteView(ObjectDeleteView):
+    queryset = DeviceInterface.objects.all()
+
+
 ## Logical interface views
+class LogicalInterfaceListView(ObjectListView):
+    queryset = LogicalInterface.objects.select_related(
+        "parent_interface__device", "vrf", "ipv4_address", "ipv6_address"
+    ).all()
+    filterset = LogicalInterfaceFilterSet
+    table = LogicalInterfaceTable
+
+
+class LogicalInterfaceView(ObjectView):
+    queryset = LogicalInterface.objects.select_related(
+        "parent_interface__device", "vrf", "ipv4_address", "ipv6_address"
+    ).prefetch_related("tagged_vlans")
+    template_name = "netbox_cmdb/logicalinterface.html"
+
+
 class LogicalInterfaceEditView(ObjectEditView):
     queryset = LogicalInterface.objects.all()
     form = LogicalInterfaceForm
+
+
+class LogicalInterfaceDeleteView(ObjectDeleteView):
+    queryset = LogicalInterface.objects.all()
 
 
 ## Link views

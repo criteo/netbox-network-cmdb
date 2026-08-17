@@ -1,0 +1,35 @@
+{% extends 'generic/object.html' %} {% load helpers %}
+{% block title %}{{ object.parent_interface.device }} ({{ object.name }}){% endblock %}
+{% block breadcrumbs %}
+  {{ block.super }}
+  <li class="breadcrumb-item">{{ object.parent_interface.device|linkify }}</li>
+  <li class="breadcrumb-item">
+    <a href="{{ object.parent_interface.get_absolute_url }}">{{ object.parent_interface.name }}</a>
+  </li>
+{% endblock %}
+{% block content %}
+<div class="row">
+  <div class="col col-12 col-xl-6">
+    <div class="card">
+      <h5 class="card-header">Logical Interface</h5>
+      <div class="card-body">
+        <table class="table table-hover attr-table">
+          <tr>
+            <th>Device</th>
+            <td>{{ object.parent_interface.device|linkify }}</td>
+          </tr>
+          <tr>
+            <th>Parent interface</th>
+            <td><a href="{{ object.parent_interface.get_absolute_url }}">{{ object.parent_interface.name }}</a></td>
+          </tr>
+          <tr>
+            <th>Name</th>
+            <td>{{ object.name }}</td>
+          </tr>
+        </table>
+        {% include 'netbox_cmdb/inc/logicalinterface_attrs.html' with logical=object %}
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

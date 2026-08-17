@@ -4,7 +4,7 @@ import django_tables2 as tables
 from netbox.tables import NetBoxTable, columns
 
 from netbox_cmdb.models.bgp import ASN, BGPPeerGroup, BGPSession, DeviceBGPSession
-from netbox_cmdb.models.interface import Link, PortLayout
+from netbox_cmdb.models.interface import Link, LogicalInterface, PortLayout
 from netbox_cmdb.models.route_policy import RoutePolicy
 from netbox_cmdb.models.snmp import SNMP, SNMPCommunity
 from netbox_cmdb.models.syslog import Syslog, SyslogServer
@@ -172,6 +172,58 @@ class LinkTable(NetBoxTable):
             "state",
             "monitoring_state",
         )
+
+
+class LogicalInterfaceTable(NetBoxTable):
+    id = tables.Column(linkify=True)
+    # `name` is a model property (parent interface name + index), so it cannot be sorted
+    # directly at the database level; order by the underlying fields instead.
+    name = tables.Column(
+        verbose_name="Name",
+        order_by=("parent_interface__name", "index"),
+        linkify=True,
+    )
+    parent_interface__device = tables.Column(verbose_name="Device", linkify=True)
+    parent_interface = tables.Column(verbose_name="Parent interface", linkify=True)
+    type = tables.Column(verbose_name="Type")
+    mode = tables.Column(verbose_name="Mode")
+    vrf = tables.Column(verbose_name="VRF")
+    ipv4_address = tables.Column(verbose_name="IPv4 address", linkify=True)
+    ipv6_address = tables.Column(verbose_name="IPv6 address", linkify=True)
+    state = columns.ChoiceFieldColumn()
+    monitoring_state = columns.ChoiceFieldColumn()
+
+    class Meta(NetBoxTable.Meta):
+        model = LogicalInterface
+        fields = (
+            "pk",
+            "id",
+            "name",
+            "parent_interface__device",
+            "parent_interface",
+            "type",
+            "mode",
+            "vrf",
+            "ipv4_address",
+            "ipv6_address",
+            "state",
+            "monitoring_state",
+            "description",
+        )
+        default_columns = (
+            "name",
+            "parent_interface__device",
+            "parent_interface",
+            "type",
+            "mode",
+            "ipv4_address",
+            "ipv6_address",
+            "state",
+            "monitoring_state",
+        )
+
+    def render_parent_interface(self, value):
+        return value.name
 
 
 class PortLayoutTable(NetBoxTable):
