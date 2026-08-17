@@ -1,0 +1,89 @@
+{% load helpers %}
+<div class="card">
+  <h5 class="card-header d-flex justify-content-between align-items-center">
+    CMDB Interfaces <span class="badge bg-secondary">{{ cmdb_interfaces|length }}</span>
+  </h5>
+  <div class="card-body table-responsive">
+    {% if cmdb_interfaces %}
+    <table class="table table-hover">
+      <thead>
+        <tr>
+          <th>Name</th>
+          <th>Enabled</th>
+          <th>State</th>
+          <th>Monitoring state</th>
+          <th>Autonegotiation</th>
+          <th>Speed</th>
+          <th>FEC</th>
+          <th>Logical interfaces</th>
+          <th>Description</th>
+          <th></th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for interface in cmdb_interfaces %}
+        <tr>
+          <td><a href="{{ interface.get_absolute_url }}">{{ interface.name }}</a></td>
+          <td>{% checkmark interface.enabled %}</td>
+          <td>{% badge interface.get_state_display bg_color=interface.get_state_color %}</td>
+          <td>{% badge interface.get_monitoring_state_display bg_color=interface.get_monitoring_state_color %}</td>
+          <td>{% checkmark interface.autonegotiation %}</td>
+          <td>{{ interface.speed|placeholder }}</td>
+          <td>{{ interface.get_fec_display|placeholder }}</td>
+          <td>
+            {% for logical in interface.logicalinterface.all %}<a href="{{ logical.get_absolute_url }}">{{ logical.name }}</a>{% if not forloop.last %}, {% endif %}{% empty %}{{ ""|placeholder }}{% endfor %}
+          </td>
+          <td>{{ interface.description|placeholder }}</td>
+          <td class="text-end">
+            {% if perms.netbox_cmdb.change_deviceinterface %}
+            <a href="{% url 'plugins:netbox_cmdb:deviceinterface_edit' pk=interface.pk %}?return_url={{ object.get_absolute_url }}"
+               class="btn btn-sm btn-warning">
+              <i class="mdi mdi-pencil" aria-hidden="true"></i>
+            </a>
+            {% endif %}
+          </td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+    {% else %}
+    <span class="text-muted">None</span>
+    {% endif %}
+  </div>
+</div>
+
+<div class="card">
+  <h5 class="card-header d-flex justify-content-between align-items-center">
+    CMDB Links <span class="badge bg-secondary">{{ cmdb_links|length }}</span>
+  </h5>
+  <div class="card-body table-responsive">
+    {% if cmdb_links %}
+    <table class="table table-hover">
+      <thead>
+        <tr>
+          <th>Device A</th>
+          <th>Interface A</th>
+          <th>Device B</th>
+          <th>Interface B</th>
+          <th>State</th>
+          <th>Monitoring state</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for link in cmdb_links %}
+        <tr>
+          <td>{{ link.interface_a.device|linkify }}</td>
+          <td><a href="{{ link.get_absolute_url }}">{{ link.interface_a.name }}</a></td>
+          <td>{{ link.interface_b.device|linkify }}</td>
+          <td><a href="{{ link.get_absolute_url }}">{{ link.interface_b.name }}</a></td>
+          <td>{% badge link.get_state_display bg_color=link.get_state_color %}</td>
+          <td>{% badge link.get_monitoring_state_display bg_color=link.get_monitoring_state_color %}</td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+    {% else %}
+    <span class="text-muted">None</span>
+    {% endif %}
+  </div>
+</div>
