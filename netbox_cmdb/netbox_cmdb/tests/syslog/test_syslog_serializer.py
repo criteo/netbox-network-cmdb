@@ -59,3 +59,92 @@ class SyslogSerializerCreate(BaseTestCase):
         assert syslog_obj2.device == self.device2
         assert syslog_obj2.server_list.count() == 1
         assert syslog_obj2.server_list.first() == server1
+
+    def test_upsert_without_server_list_preserves_the_servers(self):
+        """A POST acts as an upsert: omitting server_list must not wipe an existing one."""
+
+        server = SyslogServer.objects.create(server_address="10.10.10.10")
+        created = SyslogSerializer(
+            data={"device": {"id": self.device1.pk}, "server_list": [server.pk]}
+        )
+        assert created.is_valid() is True
+        created.save()
+
+        # Same device, no server_list: this goes through create() thanks to get_or_create().
+        upserted = SyslogSerializer(data={"device": {"id": self.device1.pk}})
+        assert upserted.is_valid() is True
+        syslog = upserted.save()
+
+        assert list(syslog.server_list.all()) == [server]
+
+    def test_upsert_with_a_server_list_replaces_the_servers(self):
+        """When server_list is provided, it stays authoritative."""
+
+        first = SyslogServer.objects.create(server_address="10.10.10.10")
+        second = SyslogServer.objects.create(server_address="10.10.10.11")
+        Syslog.objects.create(device=self.device1).server_list.set([first])
+
+        upserted = SyslogSerializer(
+            data={"device": {"id": self.device1.pk}, "server_list": [second.pk]}
+        )
+        assert upserted.is_valid() is True
+        syslog = upserted.save()
+
+        assert list(syslog.server_list.all()) == [second]
+
+    def test_update_without_server_list_preserves_the_servers(self):
+        """The PATCH path keeps the same rule as the POST one."""
+
+        server = SyslogServer.objects.create(server_address="10.10.10.10")
+        syslog = Syslog.objects.create(device=self.device1)
+        syslog.server_list.set([server])
+
+        updated = SyslogSerializer(
+            instance=syslog, data={"device": {"id": self.device1.pk}}, partial=True
+        )
+        assert updated.is_valid() is True
+        updated.save()
+        syslog.refresh_from_db()
+
+        assert list(syslog.server_list.all()) == [server]
+
+    def test_dropping_a_server_from_a_list_keeps_the_server(self):
+        """server_list only holds references: replacing it must not delete any server."""
+
+        first = SyslogServer.objects.create(server_address="10.10.10.10")
+        second = SyslogServer.objects.create(server_address="10.10.10.11")
+        syslog = Syslog.objects.create(device=self.device1)
+        syslog.server_list.set([first, second])
+
+        updated = SyslogSerializer(
+            instance=syslog,
+            data={"device": {"id": self.device1.pk}, "server_list": [second.pk]},
+        )
+        assert updated.is_valid() is True
+        updated.save()
+
+        assert list(syslog.server_list.all()) == [second]
+        assert SyslogServer.objects.filter(pk=first.pk).exists() is True
+
+    def test_duplicate_server_addresses_are_rejected(self):
+        """SONiC keys SYSLOG_SERVER by address, it cannot be stored twice."""
+
+        SyslogServer.objects.create(server_address="10.10.10.1")
+        serializer = SyslogServerSerializer(data={"server_address": "10.10.10.1"})
+        assert serializer.is_valid() is False
+        assert "server_address" in serializer.errors
+
+    def test_a_server_can_be_shared_by_several_devices(self):
+        """The unique address is a global constraint, not a per-device one."""
+
+        server = SyslogServer.objects.create(server_address="10.10.10.1")
+
+        for device in (self.device1, self.device2):
+            serializer = SyslogSerializer(
+                data={"device": {"id": device.pk}, "server_list": [server.pk]}
+            )
+            assert serializer.is_valid() is True
+            serializer.save()
+
+        assert Syslog.objects.get(device=self.device1).server_list.first() == server
+        assert Syslog.objects.get(device=self.device2).server_list.first() == server

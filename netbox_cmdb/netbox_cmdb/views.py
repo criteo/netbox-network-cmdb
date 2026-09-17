@@ -451,7 +451,6 @@ class SyslogDeleteView(ObjectDeleteView):
 
 class SyslogServerListView(ObjectListView):
     queryset = SyslogServer.objects.all()
-    filterset = SyslogFilterSet
     table = SyslogServerTable
 
 

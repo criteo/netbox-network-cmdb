@@ -46,7 +46,9 @@ class SyslogSerializer(ModelSerializer):
         fields = "__all__"
 
     def create(self, validated_data):
-        servers = validated_data.pop("server_list", [])
+        # None and not [], as a POST acts as an upsert: an omitted server_list must leave the
+        # servers of an existing configuration untouched, the way update() does.
+        servers = validated_data.pop("server_list", None)
         device_data = validated_data.pop("device")
 
         # If Device is already an object, use it
@@ -63,8 +65,11 @@ class SyslogSerializer(ModelSerializer):
         else:
             raise serializers.ValidationError("Invalid device data")
 
-        syslog, created = Syslog.objects.get_or_create(device=device)
-        syslog.server_list.set(servers)
+        # A POST on a device that already holds a configuration updates it, one per device.
+        syslog, _ = Syslog.objects.get_or_create(device=device)
+
+        if servers is not None:
+            syslog.server_list.set(servers)
         return syslog
 
     def update(self, instance, validated_data):
@@ -83,7 +88,10 @@ class SyslogSerializer(ModelSerializer):
                     raise serializers.ValidationError("Device must have 'id' or 'name'.")
             else:
                 raise serializers.ValidationError("Invalid device data")
-            instance.save()
+
+        # Unconditional, as Tacacs does: it refreshes last_updated even when only the
+        # server list changed, keeping the change log honest.
+        instance.save()
 
         if servers is not None:
             instance.server_list.set(servers)

@@ -121,12 +121,27 @@ class SNMPCommunityTable(NetBoxTable):
 class SyslogTable(NetBoxTable):
     device = tables.LinkColumn()
 
+    servers = tables.Column(
+        accessor="server_list",
+        verbose_name="Syslog Servers",
+    )
+
     class Meta(NetBoxTable.Meta):
         model = Syslog
         fields = (
             "device",
-            "server_address",
+            "servers",
         )
+
+    def render_servers(self, value):
+        """
+        Render Syslog servers as:
+        1.1.1.1, 2.2.2.2
+        """
+        if not value.exists():
+            return "—"
+
+        return ", ".join(s.server_address for s in value.all())
 
 
 class SyslogServerTable(NetBoxTable):

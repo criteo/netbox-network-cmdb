@@ -7,7 +7,8 @@ from netbox_cmdb import protect
 class SyslogServer(ChangeLoggedModel):
     """A Syslog server."""
 
-    server_address = models.GenericIPAddressField(blank=False, null=False)
+    # SONiC keys its SYSLOG_SERVER table by address, so an address can only appear once.
+    server_address = models.GenericIPAddressField(blank=False, null=False, unique=True)
 
     class Meta:
         verbose_name_plural = "Syslog Servers"
