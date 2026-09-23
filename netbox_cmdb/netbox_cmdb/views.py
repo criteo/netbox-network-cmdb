@@ -503,6 +503,12 @@ class LogicalInterfaceDeleteView(ObjectDeleteView):
     queryset = LogicalInterface.objects.all()
 
 
+class LogicalInterfaceBulkDeleteView(BulkDeleteView):
+    queryset = LogicalInterface.objects.all()
+    filterset = LogicalInterfaceFilterSet
+    table = LogicalInterfaceTable
+
+
 ## Link views
 class LinkListView(ObjectListView):
     queryset = Link.objects.select_related("interface_a__device", "interface_b__device").all()
