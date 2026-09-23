@@ -1,3 +1,4 @@
+from netbox_cmdb import filtersets
 from netbox_cmdb.api.interface.serializers import (
     DeviceInterfaceSerializer,
     LinkSerializer,
@@ -27,7 +28,7 @@ class DeviceInterfaceViewSet(CustomNetBoxModelViewSet):
         "autonegotiation",
         "speed",
         "fec",
-    ]
+    ] + filtersets.device_location_filterset
 
 
 class LogicalInterfaceViewSet(CustomNetBoxModelViewSet):
@@ -51,7 +52,7 @@ class LogicalInterfaceViewSet(CustomNetBoxModelViewSet):
         "mode",
         "untagged_vlan__id",
         "native_vlan__id",
-    ]
+    ] + filtersets.parent_interface_device_location_filterset
 
 
 class LinkViewSet(CustomNetBoxModelViewSet):
