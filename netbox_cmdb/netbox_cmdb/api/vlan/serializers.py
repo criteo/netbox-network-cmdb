@@ -23,3 +23,8 @@ class NestedVLANSerializer(WritableNestedSerializer):
         model = VLAN
         fields = ["id", "vid", "name", "description", "tenant"]
         ref_name = "NetboxCMDB_NestedVLANSerializer"
+        # Disable the (vid, name) UniqueTogetherValidator: nested references are
+        # resolved to VLAN instances by WritableNestedSerializer, which the
+        # validator cannot handle (TypeError) - and validating uniqueness makes
+        # no sense when referencing an existing object anyway.
+        validators = []

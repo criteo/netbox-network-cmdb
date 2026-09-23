@@ -36,6 +36,7 @@ from netbox_cmdb.views import (
     LinkEditView,
     LinkListView,
     LinkView,
+    LogicalInterfaceBulkDeleteView,
     LogicalInterfaceDeleteView,
     LogicalInterfaceEditView,
     LogicalInterfaceListView,
@@ -297,6 +298,11 @@ urlpatterns = [
         "logical-interface/add/",
         LogicalInterfaceEditView.as_view(),
         name="logicalinterface_add",
+    ),
+    path(
+        "logical-interface/delete/",
+        LogicalInterfaceBulkDeleteView.as_view(),
+        name="logicalinterface_bulk_delete",
     ),
     path(
         "logical-interface/<int:pk>/",

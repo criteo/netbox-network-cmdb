@@ -21,6 +21,12 @@ device_location_filterset = [
     "device__device_type_id",
 ]
 
+# Same filters for models attached to a device through their parent interface
+# (e.g. logical interfaces).
+parent_interface_device_location_filterset = [
+    f"parent_interface__{field}" for field in device_location_filterset
+]
+
 
 class ASNFilterSet(ChangeLoggedModelFilterSet):
     """AS number filterset."""

@@ -3,6 +3,7 @@ from dcim.api.nested_serializers import (
     NestedDeviceTypeSerializer,
 )
 from ipam.api.nested_serializers import NestedIPAddressSerializer
+from netbox.api.fields import SerializedPKRelatedField
 from netbox.api.serializers import WritableNestedSerializer
 from rest_framework.serializers import ModelSerializer, SerializerMethodField
 
@@ -15,6 +16,7 @@ from netbox_cmdb.models.interface import (
     LogicalInterface,
     PortLayout,
 )
+from netbox_cmdb.models.vlan import VLAN
 
 
 class NestedDeviceInterfaceSerializer(WritableNestedSerializer):
@@ -43,7 +45,15 @@ class LogicalInterfaceSerializer(ModelSerializer):
     ipv4_address = NestedIPAddressSerializer(required=False, allow_null=True)
     ipv6_address = NestedIPAddressSerializer(required=False, allow_null=True)
     untagged_vlan = NestedVLANSerializer(required=False, allow_null=True)
-    tagged_vlans = NestedVLANSerializer(required=False, many=True)
+    # M2M: a writable nested serializer is not supported by DRF's default
+    # create/update, use a PK-based field like NetBox core does for
+    # dcim.Interface.tagged_vlans.
+    tagged_vlans = SerializedPKRelatedField(
+        queryset=VLAN.objects.all(),
+        serializer=NestedVLANSerializer,
+        required=False,
+        many=True,
+    )
     native_vlan = NestedVLANSerializer(required=False, allow_null=True)
 
     display = SerializerMethodField(read_only=True)

@@ -172,7 +172,9 @@ class LogicalInterface(ChangeLoggedModel):
 
     def clean(self):
         # List of checks to perform
-        if self.untagged_vlan and (self.tagged_vlans.exists() or self.native_vlan):
+        # The M2M can only be inspected once the instance has a PK (on creation,
+        # tagged VLANs are assigned after the initial save anyway).
+        if self.untagged_vlan and (self.native_vlan or (self.pk and self.tagged_vlans.exists())):
             raise ValidationError(
                 "Untagged VLAN cannot be combined with tagged VLANs or native VLAN."
             )
