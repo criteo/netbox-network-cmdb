@@ -3,6 +3,7 @@ from django.db.models import Q
 
 from netbox_cmdb.models.bgp import BGPPeerGroup, BGPSession, DeviceBGPSession
 from netbox_cmdb.models.bgp_community_list import BGPCommunityList
+from netbox_cmdb.models.ntp import NTP
 from netbox_cmdb.models.prefix_list import PrefixList
 from netbox_cmdb.models.route_policy import RoutePolicy
 from netbox_cmdb.models.snmp import SNMP
@@ -21,6 +22,7 @@ def clean_cmdb_for_devices(device_ids: list[int]):
         "snmp": [],
         "syslog": [],
         "tacacs": [],
+        "ntp": [],
     }
 
     bgp_sessions = BGPSession.objects.filter(
@@ -34,6 +36,7 @@ def clean_cmdb_for_devices(device_ids: list[int]):
     snmp = SNMP.objects.filter(device__id__in=device_ids)
     syslog = Syslog.objects.filter(device__id__in=device_ids)
     tacacs = Tacacs.objects.filter(device__id__in=device_ids)
+    ntp = NTP.objects.filter(device__id__in=device_ids)
 
     deleted_objects["bgp_sessions"] = [str(val) for val in list(bgp_sessions)]
     deleted_objects["device_bgp_sessions"] = [str(val) for val in list(device_bgp_sessions)]
@@ -44,6 +47,7 @@ def clean_cmdb_for_devices(device_ids: list[int]):
     deleted_objects["snmp"] = [str(val) for val in list(snmp)]
     deleted_objects["syslog"] = [str(val) for val in list(syslog)]
     deleted_objects["tacacs"] = [str(val) for val in list(tacacs)]
+    deleted_objects["ntp"] = [str(val) for val in list(ntp)]
 
     bgp_sessions.delete()
     device_bgp_sessions.delete()
@@ -54,6 +58,7 @@ def clean_cmdb_for_devices(device_ids: list[int]):
     snmp.delete()
     syslog.delete()
     tacacs.delete()
+    ntp.delete()
 
     return deleted_objects
 
