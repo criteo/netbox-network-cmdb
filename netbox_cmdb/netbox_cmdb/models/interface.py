@@ -9,6 +9,7 @@ from netbox_cmdb.choices import AssetMonitoringStateChoices, AssetStateChoices
 
 FEC_CHOICES = [
     (None, "None"),
+    ("auto", "Auto"),
     ("rs", "Reed Solomon"),
     ("fc", "FireCode"),
 ]
