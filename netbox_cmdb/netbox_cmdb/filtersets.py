@@ -277,6 +277,7 @@ class LogicalInterfaceFilterSet(ChangeLoggedModelFilterSet):
             "mode",
             "state",
             "monitoring_state",
+            "use_ipv6_link_local_only",
         ]
 
     def search(self, queryset, name, value):
