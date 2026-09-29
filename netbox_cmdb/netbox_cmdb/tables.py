@@ -205,6 +205,7 @@ class LogicalInterfaceTable(NetBoxTable):
     vrf = tables.Column(verbose_name="VRF")
     ipv4_address = tables.Column(verbose_name="IPv4 address", linkify=True)
     ipv6_address = tables.Column(verbose_name="IPv6 address", linkify=True)
+    use_ipv6_link_local_only = columns.BooleanColumn(verbose_name="IPv6 link-local only")
     state = columns.ChoiceFieldColumn()
     monitoring_state = columns.ChoiceFieldColumn()
 
@@ -221,6 +222,7 @@ class LogicalInterfaceTable(NetBoxTable):
             "vrf",
             "ipv4_address",
             "ipv6_address",
+            "use_ipv6_link_local_only",
             "state",
             "monitoring_state",
             "description",

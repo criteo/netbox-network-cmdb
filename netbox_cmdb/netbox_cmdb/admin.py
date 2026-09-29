@@ -258,6 +258,7 @@ class LogicalInterfaceInline(StackedInline):
         "vrf",
         "ipv4_address",
         "ipv6_address",
+        "use_ipv6_link_local_only",
         "mode",
         "untagged_vlan",
         "native_vlan",
@@ -312,8 +313,16 @@ class LogicalInterfaceAdmin(BaseAdmin):
         "vrf",
         "ipv4_address",
         "ipv6_address",
+        "use_ipv6_link_local_only",
     )
-    list_filter = ("enabled", "state", "monitoring_state", "type", "mode")
+    list_filter = (
+        "enabled",
+        "state",
+        "monitoring_state",
+        "type",
+        "mode",
+        "use_ipv6_link_local_only",
+    )
     filter_horizontal = ("tagged_vlans",)
 
 
