@@ -5,7 +5,11 @@ from dcim.api.nested_serializers import (
 from ipam.api.nested_serializers import NestedIPAddressSerializer
 from netbox.api.fields import SerializedPKRelatedField
 from netbox.api.serializers import WritableNestedSerializer
-from rest_framework.serializers import ModelSerializer, SerializerMethodField
+from rest_framework.serializers import (
+    ModelSerializer,
+    SerializerMethodField,
+    ValidationError,
+)
 
 from netbox_cmdb.api.common_serializers import CommonDeviceSerializer
 from netbox_cmdb.api.vlan.serializers import NestedVLANSerializer
@@ -15,6 +19,7 @@ from netbox_cmdb.models.interface import (
     Link,
     LogicalInterface,
     PortLayout,
+    port_layout_lane_errors,
 )
 from netbox_cmdb.models.vlan import VLAN
 
@@ -116,3 +121,21 @@ class PortLayoutSerializer(ModelSerializer):
 
     def get_display(self, obj):
         return str(obj)
+
+    def validate(self, attrs):
+        # A PATCH only carries the changed fields, the others come from the stored port.
+        def current(field):
+            if field in attrs:
+                return attrs[field]
+            return getattr(self.instance, field, None)
+
+        errors = port_layout_lane_errors(
+            current("device_type"),
+            current("network_role"),
+            current("name"),
+            current("lanes"),
+            exclude_pk=getattr(self.instance, "pk", None),
+        )
+        if errors:
+            raise ValidationError({"lanes": errors})
+        return attrs

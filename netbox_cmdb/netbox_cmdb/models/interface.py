@@ -1,3 +1,7 @@
+import re
+from collections import Counter
+
+from django.contrib.postgres.fields import ArrayField
 from django.core.exceptions import ValidationError
 from django.db import models
 from django.urls import reverse
@@ -24,6 +28,64 @@ LOGICAL_INTERFACE_MODE_CHOICES = [
     ("access", "Access"),
     ("tagged", "Tagged"),
 ]
+
+# Lanes a single port can own: a breakout never splits a port into uneven parts.
+PORT_LAYOUT_LANE_COUNTS = (1, 2, 4, 8)
+# A breakout child is its parent port name followed by a single letter: etp3a is a child of etp3.
+BREAKOUT_CHILD_NAME = re.compile(r"^(?P<parent>.*\d)[a-z]$", re.IGNORECASE)
+
+
+def breakout_parent_name(name):
+    """Return the lowercased parent port name of a breakout child, None if `name` is not one."""
+    match = BREAKOUT_CHILD_NAME.match(name or "")
+    return match.group("parent").lower() if match else None
+
+
+def port_layout_lane_errors(device_type, network_role, name, lanes, exclude_pk=None):
+    """Return the reasons why `lanes` cannot be assigned to a port of a given layout.
+
+    A layout describes a single ASIC (a device type used in a network role), so its ports can't
+    share a lane. The lanes of a port must be contiguous, they are kept in the provided order, and
+    an empty list is accepted for the ports whose lanes are not documented.
+    """
+    if not lanes:
+        return []
+
+    errors = []
+    duplicates = sorted(lane for lane, count in Counter(lanes).items() if count > 1)
+    if duplicates:
+        errors.append(f"Lanes used more than once: {duplicates}.")
+    elif max(lanes) - min(lanes) + 1 != len(lanes):
+        errors.append(f"Lanes must be contiguous, got {sorted(lanes)}.")
+    if len(lanes) not in PORT_LAYOUT_LANE_COUNTS:
+        *counts, last_count = PORT_LAYOUT_LANE_COUNTS
+        errors.append(
+            f"A port must use {', '.join(map(str, counts))} or {last_count} lanes, "
+            f"got {len(lanes)}."
+        )
+
+    if device_type is None or network_role is None:
+        return errors
+
+    others = (
+        PortLayout.objects.filter(device_type=device_type, network_role=network_role)
+        .exclude(pk=exclude_pk)
+        .exclude(lanes=[])
+    )
+    for other in others.filter(lanes__overlap=lanes).order_by("name"):
+        shared = sorted(set(lanes) & set(other.lanes))
+        errors.append(f"Lanes {shared} are already used by {other.name}.")
+
+    parent = breakout_parent_name(name)
+    if parent:
+        for sibling in others.filter(name__istartswith=parent).order_by("name"):
+            if breakout_parent_name(sibling.name) == parent and len(sibling.lanes) != len(lanes):
+                errors.append(
+                    f"Breakout ports of {parent} must use the same number of lanes: "
+                    f"{sibling.name} uses {len(sibling.lanes)}, got {len(lanes)}."
+                )
+
+    return errors
 
 
 @protect.from_device_name_change("device")
@@ -260,9 +322,20 @@ class PortLayout(ChangeLoggedModel):
     vendor_long_name = models.CharField(
         max_length=64, help_text="The long vendor-specific name of the interface."
     )
+    lanes = ArrayField(
+        base_field=models.PositiveSmallIntegerField(),
+        blank=True,
+        default=list,
+        help_text="The ASIC lanes used by the interface, in hardware order (e.g. 0,1,2,3).",
+    )
 
     def __str__(self):
         return f"{self.device_type}--{self.network_role}--{self.name}"
+
+    @property
+    def lanes_display(self):
+        """Lanes as a comma-separated string, e.g. `0,1,2,3`."""
+        return ",".join(str(lane) for lane in self.lanes)
 
     @property
     def natural_name(self):
@@ -275,3 +348,20 @@ class PortLayout(ChangeLoggedModel):
 
     def get_absolute_url(self):
         return reverse("plugins:netbox_cmdb:portlayout", args=[self.pk])
+
+    def clean(self):
+        """Validate the lanes for every ModelForm based surface (plugin UI and Django admin).
+
+        DRF does not call full_clean(), the API enforces the same rules in
+        PortLayoutSerializer.validate().
+        """
+        super().clean()
+        errors = port_layout_lane_errors(
+            self.device_type if self.device_type_id else None,
+            self.network_role if self.network_role_id else None,
+            self.name,
+            self.lanes,
+            exclude_pk=self.pk,
+        )
+        if errors:
+            raise ValidationError({"lanes": errors})
