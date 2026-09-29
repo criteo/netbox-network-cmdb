@@ -327,6 +327,7 @@ class PortLayoutForm(NetBoxModelForm):
             "vendor_name",
             "vendor_short_name",
             "vendor_long_name",
+            "lanes",
         ]
 
 

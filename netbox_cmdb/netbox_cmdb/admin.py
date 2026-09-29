@@ -356,6 +356,7 @@ class PortLayoutAdmin(BaseAdmin):
         "label_name",
         "logical_name",
         "vendor_name",
+        "lanes_display",
     )
     list_filter = ("device_type", "network_role")
 

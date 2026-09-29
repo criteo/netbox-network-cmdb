@@ -1,12 +1,13 @@
 from dcim.models import DeviceRole, DeviceType, Manufacturer
 from django.core.exceptions import ValidationError
-from django.test import TestCase
+from django.test import Client, TestCase
 from django.urls import reverse
 from rest_framework import status
 from rest_framework.test import APIRequestFactory
 from utilities.testing import APITestCase
 
 from netbox_cmdb.api.interface.serializers import PortLayoutSerializer
+from netbox_cmdb.forms import PortLayoutForm
 from netbox_cmdb.models.interface import PortLayout
 
 
@@ -190,7 +191,7 @@ class PortLayoutLanesTestCase(TestCase):
 
 
 class PortLayoutLanesSurfacesTestCase(TestCase):
-    """The API enforces the same lane rules as the model."""
+    """The API and the UI form enforce the same lane rules as the model."""
 
     def setUp(self):
         manufacturer = Manufacturer.objects.create(name="Vendor", slug="vendor")
@@ -256,6 +257,20 @@ class PortLayoutLanesSurfacesTestCase(TestCase):
         self.assertFalse(serializer.is_valid())
         self.assertIn("lanes", serializer.errors)
 
+    def test_form(self):
+        data = {
+            **self.data(lanes="4,5,6,7"),
+            "device_type": self.device_type.pk,
+            "network_role": self.tor.pk,
+        }
+        form = PortLayoutForm(data=data)
+        self.assertTrue(form.is_valid(), form.errors)
+        self.assertEqual(form.save().lanes, [4, 5, 6, 7])
+
+        form = PortLayoutForm(data={**data, "name": "etp3", "lanes": "2,3"})
+        self.assertFalse(form.is_valid())
+        self.assertEqual(form.errors["lanes"], ["Lanes [2, 3] are already used by etp1."])
+
 
 class PortLayoutLanesAPITestCase(APITestCase):
     user_permissions = (
@@ -295,3 +310,29 @@ class PortLayoutLanesAPITestCase(APITestCase):
         response = self.post("etp2", [3, 4, 5, 6])
         self.assertHttpStatus(response, status.HTTP_400_BAD_REQUEST)
         self.assertEqual(response.data["lanes"], ["Lanes [3] are already used by etp1."])
+
+    def test_ui_renders_lanes(self):
+        port = PortLayout.objects.create(
+            device_type=self.device_type,
+            network_role=self.tor,
+            name="etp1",
+            label_name="1",
+            logical_name="to_leaf_01",
+            vendor_name="1",
+            vendor_short_name="etp1",
+            vendor_long_name="Ethernet0",
+            lanes=[0, 1, 2, 3],
+        )
+        client = Client()
+        client.force_login(self.user)
+        for url in (
+            port.get_absolute_url(),
+            reverse(
+                "plugins:netbox_cmdb:portlayout_group",
+                kwargs={"device_type_id": self.device_type.pk, "network_role_id": self.tor.pk},
+            ),
+        ):
+            with self.subTest(url=url):
+                response = client.get(url)
+                self.assertHttpStatus(response, status.HTTP_200_OK)
+                self.assertContains(response, "0,1,2,3")
