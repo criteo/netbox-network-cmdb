@@ -5,8 +5,10 @@ from netbox.tables import NetBoxTable, columns
 
 from netbox_cmdb.models.bgp import ASN, BGPPeerGroup, BGPSession, DeviceBGPSession
 from netbox_cmdb.models.interface import Link, LogicalInterface, PortLayout
+from netbox_cmdb.models.ntp import NTP, NTPServer
 from netbox_cmdb.models.route_policy import RoutePolicy
 from netbox_cmdb.models.snmp import SNMP, SNMPCommunity
+from netbox_cmdb.models.sonic_role_mapping import SonicRoleMapping
 from netbox_cmdb.models.syslog import Syslog, SyslogServer
 from netbox_cmdb.models.tacacs import Tacacs, TacacsServer
 
@@ -116,6 +118,39 @@ class SNMPCommunityTable(NetBoxTable):
     class Meta(NetBoxTable.Meta):
         model = SNMPCommunity
         fields = ("name", "community", "type")
+
+
+class NTPTable(NetBoxTable):
+    device = tables.LinkColumn()
+
+    servers = tables.Column(
+        accessor="server_list",
+        verbose_name="NTP Servers",
+    )
+
+    class Meta(NetBoxTable.Meta):
+        model = NTP
+        fields = (
+            "device",
+            "servers",
+        )
+
+    def render_servers(self, value):
+        """
+        Render NTP servers as:
+        ntp1 (1.1.1.1), 2.2.2.2
+        """
+        if not value.exists():
+            return "—"
+
+        return ", ".join(str(s) for s in value.all())
+
+
+class NTPServerTable(NetBoxTable):
+
+    class Meta(NetBoxTable.Meta):
+        model = NTPServer
+        fields = ("name", "server_address")
 
 
 class SyslogTable(NetBoxTable):
@@ -314,4 +349,15 @@ class TacacsServerTable(NetBoxTable):
             "server_address",
             "priority",
             "tcp_port",
+        )
+
+
+class SonicRoleMappingTable(NetBoxTable):
+    device_role = tables.Column(linkify=True)
+
+    class Meta(NetBoxTable.Meta):
+        model = SonicRoleMapping
+        fields = (
+            "device_role",
+            "sonic_type",
         )

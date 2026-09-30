@@ -5,6 +5,8 @@ from netbox.views.generic import ObjectChangeLogView, ObjectJournalView
 
 from netbox_cmdb.models.bgp import ASN, BGPSession, DeviceBGPSession, BGPPeerGroup
 from netbox_cmdb.models.interface import DeviceInterface, Link, LogicalInterface, PortLayout
+from netbox_cmdb.models.sonic_role_mapping import SonicRoleMapping
+from netbox_cmdb.models.ntp import NTP, NTPServer
 from netbox_cmdb.models.route_policy import RoutePolicy
 from netbox_cmdb.models.snmp import SNMP, SNMPCommunity
 from netbox_cmdb.models.syslog import Syslog, SyslogServer
@@ -57,6 +59,15 @@ from netbox_cmdb.views import (
     SNMPDeleteView,
     SNMPEditView,
     SNMPListView,
+    NTPListView,
+    NTPEditView,
+    NTPDeleteView,
+    NTPServerListView,
+    NTPServerEditView,
+    NTPServerDeleteView,
+    SonicRoleMappingListView,
+    SonicRoleMappingEditView,
+    SonicRoleMappingDeleteView,
     SyslogListView,
     SyslogEditView,
     SyslogDeleteView,
@@ -437,5 +448,66 @@ urlpatterns = [
         ObjectChangeLogView.as_view(),
         name="tacacsserver_changelog",
         kwargs={"model": TacacsServer},
+    ),
+    # NTP
+    path("ntp/", NTPListView.as_view(), name="ntp_list"),
+    path("ntp/add/", NTPEditView.as_view(), name="ntp_add"),
+    path(
+        "ntp/<int:pk>/edit/",
+        NTPEditView.as_view(),
+        name="ntp_edit",
+    ),
+    path(
+        "ntp/<int:pk>/delete/",
+        NTPDeleteView.as_view(),
+        name="ntp_delete",
+    ),
+    path(
+        "ntp/<int:pk>/changelog/",
+        ObjectChangeLogView.as_view(),
+        name="ntp_changelog",
+        kwargs={"model": NTP},
+    ),
+    # NTP SERVERS
+    path("ntp-server/", NTPServerListView.as_view(), name="ntpserver_list"),
+    path("ntp-server/add/", NTPServerEditView.as_view(), name="ntpserver_add"),
+    path(
+        "ntp-server/<int:pk>/edit/",
+        NTPServerEditView.as_view(),
+        name="ntpserver_edit",
+    ),
+    path(
+        "ntp-server/<int:pk>/delete/",
+        NTPServerDeleteView.as_view(),
+        name="ntpserver_delete",
+    ),
+    path(
+        "ntp-server/<int:pk>/changelog/",
+        ObjectChangeLogView.as_view(),
+        name="ntpserver_changelog",
+        kwargs={"model": NTPServer},
+    ),
+    # SONIC ROLE MAPPINGS
+    path("sonic-role-mapping/", SonicRoleMappingListView.as_view(), name="sonicrolemapping_list"),
+    path(
+        "sonic-role-mapping/add/",
+        SonicRoleMappingEditView.as_view(),
+        name="sonicrolemapping_add",
+    ),
+    path(
+        "sonic-role-mapping/<int:pk>/edit/",
+        SonicRoleMappingEditView.as_view(),
+        name="sonicrolemapping_edit",
+    ),
+    path(
+        "sonic-role-mapping/<int:pk>/delete/",
+        SonicRoleMappingDeleteView.as_view(),
+        name="sonicrolemapping_delete",
+    ),
+    path(
+        "sonic-role-mapping/<int:pk>/changelog/",
+        ObjectChangeLogView.as_view(),
+        name="sonicrolemapping_changelog",
+        kwargs={"model": SonicRoleMapping},
     ),
 ]

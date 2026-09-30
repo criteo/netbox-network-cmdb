@@ -6,8 +6,10 @@ from utilities.filters import MultiValueCharFilter
 
 from netbox_cmdb.models.bgp import ASN, BGPPeerGroup, BGPSession, DeviceBGPSession
 from netbox_cmdb.models.interface import Link, LogicalInterface
+from netbox_cmdb.models.ntp import NTP
 from netbox_cmdb.models.route_policy import RoutePolicy
 from netbox_cmdb.models.snmp import SNMP
+from netbox_cmdb.models.sonic_role_mapping import SonicRoleMapping
 from netbox_cmdb.models.syslog import Syslog
 from netbox_cmdb.models.tacacs import Tacacs
 
@@ -308,6 +310,24 @@ class SNMPFilterSet(ChangeLoggedModelFilterSet):
         return queryset.filter(Q(device__name__icontains=value)).distinct()
 
 
+class NTPFilterSet(ChangeLoggedModelFilterSet):
+    """NTP filterset."""
+
+    q = django_filters.CharFilter(
+        method="search",
+        label="Search",
+    )
+
+    class Meta:
+        model = NTP
+        fields = ["device"]
+
+    def search(self, queryset, name, value):
+        if not value.strip():
+            return queryset
+        return queryset.filter(Q(device__name__icontains=value)).distinct()
+
+
 class SyslogFilterSet(ChangeLoggedModelFilterSet):
     """Syslog filterset."""
 
@@ -342,3 +362,21 @@ class TacacsFilterSet(ChangeLoggedModelFilterSet):
         if not value.strip():
             return queryset
         return queryset.filter(Q(device__name__icontains=value)).distinct()
+
+
+class SonicRoleMappingFilterSet(ChangeLoggedModelFilterSet):
+    """SONiC Role Mapping filterset."""
+
+    q = django_filters.CharFilter(
+        method="search",
+        label="Search",
+    )
+
+    class Meta:
+        model = SonicRoleMapping
+        fields = ["device_role", "sonic_type"]
+
+    def search(self, queryset, name, value):
+        if not value.strip():
+            return queryset
+        return queryset.filter(Q(device_role__name__icontains=value)).distinct()
