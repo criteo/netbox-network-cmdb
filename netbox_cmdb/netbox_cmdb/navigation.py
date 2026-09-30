@@ -184,4 +184,16 @@ menu_items = (
             ),
         ),
     ),
+    PluginMenuItem(
+        link="plugins:netbox_cmdb:sonicrolemapping_list",
+        link_text="SONiC Role Mapping",
+        buttons=(
+            PluginMenuButton(
+                link="plugins:netbox_cmdb:sonicrolemapping_add",
+                title="SONiC Role Mapping",
+                icon_class="mdi mdi-plus-thick",
+                color=ButtonColorChoices.GREEN,
+            ),
+        ),
+    ),
 )

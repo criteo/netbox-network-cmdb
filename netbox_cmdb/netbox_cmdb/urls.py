@@ -5,6 +5,7 @@ from netbox.views.generic import ObjectChangeLogView, ObjectJournalView
 
 from netbox_cmdb.models.bgp import ASN, BGPSession, DeviceBGPSession, BGPPeerGroup
 from netbox_cmdb.models.interface import DeviceInterface, Link, LogicalInterface, PortLayout
+from netbox_cmdb.models.sonic_role_mapping import SonicRoleMapping
 from netbox_cmdb.models.ntp import NTP, NTPServer
 from netbox_cmdb.models.route_policy import RoutePolicy
 from netbox_cmdb.models.snmp import SNMP, SNMPCommunity
@@ -64,6 +65,9 @@ from netbox_cmdb.views import (
     NTPServerListView,
     NTPServerEditView,
     NTPServerDeleteView,
+    SonicRoleMappingListView,
+    SonicRoleMappingEditView,
+    SonicRoleMappingDeleteView,
     SyslogListView,
     SyslogEditView,
     SyslogDeleteView,
@@ -482,5 +486,28 @@ urlpatterns = [
         ObjectChangeLogView.as_view(),
         name="ntpserver_changelog",
         kwargs={"model": NTPServer},
+    ),
+    # SONIC ROLE MAPPINGS
+    path("sonic-role-mapping/", SonicRoleMappingListView.as_view(), name="sonicrolemapping_list"),
+    path(
+        "sonic-role-mapping/add/",
+        SonicRoleMappingEditView.as_view(),
+        name="sonicrolemapping_add",
+    ),
+    path(
+        "sonic-role-mapping/<int:pk>/edit/",
+        SonicRoleMappingEditView.as_view(),
+        name="sonicrolemapping_edit",
+    ),
+    path(
+        "sonic-role-mapping/<int:pk>/delete/",
+        SonicRoleMappingDeleteView.as_view(),
+        name="sonicrolemapping_delete",
+    ),
+    path(
+        "sonic-role-mapping/<int:pk>/changelog/",
+        ObjectChangeLogView.as_view(),
+        name="sonicrolemapping_changelog",
+        kwargs={"model": SonicRoleMapping},
     ),
 ]

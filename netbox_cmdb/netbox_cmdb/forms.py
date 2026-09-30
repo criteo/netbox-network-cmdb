@@ -23,6 +23,7 @@ from netbox_cmdb.models.interface import (
 from netbox_cmdb.models.ntp import NTP, NTPServer
 from netbox_cmdb.models.route_policy import RoutePolicy
 from netbox_cmdb.models.snmp import SNMP, SNMPCommunity
+from netbox_cmdb.models.sonic_role_mapping import SonicRoleMapping
 from netbox_cmdb.models.syslog import Syslog, SyslogServer
 from netbox_cmdb.models.tacacs import Tacacs, TacacsServer, duplicate_priorities
 from netbox_cmdb.models.vlan import VLAN
@@ -399,3 +400,11 @@ class TacacsServerForm(NetBoxModelForm):
             "priority",
             "tcp_port",
         ]
+
+
+class SonicRoleMappingForm(NetBoxModelForm):
+    device_role = DynamicModelChoiceField(queryset=DeviceRole.objects.all())
+
+    class Meta:
+        model = SonicRoleMapping
+        fields = ["device_role", "sonic_type"]

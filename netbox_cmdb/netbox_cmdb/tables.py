@@ -8,6 +8,7 @@ from netbox_cmdb.models.interface import Link, LogicalInterface, PortLayout
 from netbox_cmdb.models.ntp import NTP, NTPServer
 from netbox_cmdb.models.route_policy import RoutePolicy
 from netbox_cmdb.models.snmp import SNMP, SNMPCommunity
+from netbox_cmdb.models.sonic_role_mapping import SonicRoleMapping
 from netbox_cmdb.models.syslog import Syslog, SyslogServer
 from netbox_cmdb.models.tacacs import Tacacs, TacacsServer
 
@@ -348,4 +349,15 @@ class TacacsServerTable(NetBoxTable):
             "server_address",
             "priority",
             "tcp_port",
+        )
+
+
+class SonicRoleMappingTable(NetBoxTable):
+    device_role = tables.Column(linkify=True)
+
+    class Meta(NetBoxTable.Meta):
+        model = SonicRoleMapping
+        fields = (
+            "device_role",
+            "sonic_type",
         )
