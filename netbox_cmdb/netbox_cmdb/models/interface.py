@@ -187,6 +187,10 @@ class LogicalInterface(ChangeLoggedModel):
         blank=True,
         null=True,
     )
+    use_ipv6_link_local_only = models.BooleanField(
+        default=False,
+        help_text="Use only the IPv6 link-local address, without a global IPv6 address.",
+    )
     mode = models.CharField(
         choices=LOGICAL_INTERFACE_MODE_CHOICES,
         blank=True,

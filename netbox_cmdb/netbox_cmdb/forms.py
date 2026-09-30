@@ -279,6 +279,7 @@ class LogicalInterfaceForm(NetBoxModelForm):
             "vrf",
             "ipv4_address",
             "ipv6_address",
+            "use_ipv6_link_local_only",
             "untagged_vlan",
             "tagged_vlans",
             "native_vlan",

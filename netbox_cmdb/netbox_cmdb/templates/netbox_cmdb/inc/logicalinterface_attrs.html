@@ -41,6 +41,10 @@
     <td>{{ logical.ipv6_address|placeholder|linkify }}</td>
   </tr>
   <tr>
+    <th>IPv6 link-local only</th>
+    <td>{% checkmark logical.use_ipv6_link_local_only %}</td>
+  </tr>
+  <tr>
     <th>Untagged VLAN</th>
     <td>{{ logical.untagged_vlan|placeholder }}</td>
   </tr>
