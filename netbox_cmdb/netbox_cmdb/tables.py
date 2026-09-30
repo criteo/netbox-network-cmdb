@@ -247,6 +247,7 @@ class PortLayoutTable(NetBoxTable):
     name = tables.Column(linkify=True, order_by=("natural_name",))
     device_type = tables.Column(linkify=True)
     network_role = tables.Column(linkify=True)
+    lanes = tables.Column(accessor="lanes_display", orderable=False)
 
     class Meta(NetBoxTable.Meta):
         model = PortLayout
@@ -261,6 +262,7 @@ class PortLayoutTable(NetBoxTable):
             "vendor_name",
             "vendor_short_name",
             "vendor_long_name",
+            "lanes",
         )
         default_columns = (
             "name",
@@ -269,6 +271,7 @@ class PortLayoutTable(NetBoxTable):
             "vendor_name",
             "vendor_short_name",
             "vendor_long_name",
+            "lanes",
         )
 
 
