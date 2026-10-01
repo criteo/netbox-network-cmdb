@@ -409,6 +409,7 @@ class NTPAdmin(BaseAdmin):
     )
 
     search_fields = ("device__name", "server_list__name", "server_list__server_address")
+    autocomplete_fields = ("device",)
 
     def get_servers(self, obj):
         """
