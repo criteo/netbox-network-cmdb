@@ -28,6 +28,7 @@ from netbox_cmdb.filtersets import (
     DeviceBGPSessionFilterSet,
     LinkFilterSet,
     LogicalInterfaceFilterSet,
+    NTPFilterSet,
     RoutePolicyFilterSet,
     SNMPFilterSet,
     SyslogFilterSet,
@@ -42,6 +43,8 @@ from netbox_cmdb.forms import (
     DeviceInterfaceForm,
     LinkForm,
     LogicalInterfaceForm,
+    NTPForm,
+    NTPServerForm,
     PortLayoutForm,
     RoutePolicyFilterSetForm,
     RoutePolicyForm,
@@ -66,6 +69,7 @@ from netbox_cmdb.models.interface import (
     LogicalInterface,
     PortLayout,
 )
+from netbox_cmdb.models.ntp import NTP, NTPServer
 from netbox_cmdb.models.route_policy import RoutePolicy
 from netbox_cmdb.models.snmp import SNMP, SNMPCommunity
 from netbox_cmdb.models.syslog import Syslog, SyslogServer
@@ -77,6 +81,8 @@ from netbox_cmdb.tables import (
     DeviceBGPSessionTable,
     LinkTable,
     LogicalInterfaceTable,
+    NTPServerTable,
+    NTPTable,
     PortLayoutTable,
     RoutePolicyTable,
     SNMPCommunityTable,
@@ -432,6 +438,35 @@ class SNMPCommunityEditView(ObjectEditView):
 
 class SNMPCommunityDeleteView(ObjectDeleteView):
     queryset = SNMPCommunity.objects.all()
+
+
+class NTPListView(ObjectListView):
+    queryset = NTP.objects.all()
+    filterset = NTPFilterSet
+    table = NTPTable
+
+
+class NTPEditView(ObjectEditView):
+    queryset = NTP.objects.all()
+    form = NTPForm
+
+
+class NTPDeleteView(ObjectDeleteView):
+    queryset = NTP.objects.all()
+
+
+class NTPServerListView(ObjectListView):
+    queryset = NTPServer.objects.all()
+    table = NTPServerTable
+
+
+class NTPServerEditView(ObjectEditView):
+    queryset = NTPServer.objects.all()
+    form = NTPServerForm
+
+
+class NTPServerDeleteView(ObjectDeleteView):
+    queryset = NTPServer.objects.all()
 
 
 class SyslogListView(ObjectListView):

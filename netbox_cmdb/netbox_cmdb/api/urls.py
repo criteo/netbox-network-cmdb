@@ -21,6 +21,7 @@ from netbox_cmdb.api.interface.views import (
     LogicalInterfaceViewSet,
     PortLayoutViewSet,
 )
+from netbox_cmdb.api.ntp.views import NTPServerViewSet, NTPViewSet
 from netbox_cmdb.api.prefix_list.views import PrefixListViewSet
 from netbox_cmdb.api.route_policy.views import RoutePolicyViewSet
 from netbox_cmdb.api.snmp.views import SNMPCommunityViewSet, SNMPViewSet
@@ -47,6 +48,8 @@ router.register("snmp", SNMPViewSet)
 router.register("snmp-community", SNMPCommunityViewSet)
 router.register("vlans", VLANViewSet)
 router.register("vrfs", VRFViewSet)
+router.register("ntp", NTPViewSet)
+router.register("ntp-server", NTPServerViewSet)
 router.register("syslog", SyslogViewSet)
 router.register("syslog-server", SyslogServerViewSet)
 router.register("tacacs", TacacsViewSet)

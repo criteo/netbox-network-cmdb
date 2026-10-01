@@ -26,6 +26,7 @@ from netbox_cmdb.models.interface import (
     LogicalInterface,
     PortLayout,
 )
+from netbox_cmdb.models.ntp import NTP, NTPServer
 from netbox_cmdb.models.prefix_list import PrefixList, PrefixListTerm
 from netbox_cmdb.models.route_policy import RoutePolicy, RoutePolicyTerm
 from netbox_cmdb.models.snmp import SNMP, SNMPCommunity
@@ -396,6 +397,36 @@ class VLANAdmin(BaseAdmin):
         "description",
     )
     list_filter = ("tenant",)
+
+
+@admin.register(NTP)
+class NTPAdmin(BaseAdmin):
+    """Admin class to manage NTP configuration objects."""
+
+    list_display = (
+        "device",
+        "get_servers",
+    )
+
+    search_fields = ("device__name", "server_list__name", "server_list__server_address")
+    autocomplete_fields = ("device",)
+
+    def get_servers(self, obj):
+        """
+        Return a comma-separated list of NTP servers bound to this device.
+        """
+        return ", ".join(str(s) for s in obj.server_list.all())
+
+    get_servers.short_description = "NTP Servers"
+
+
+@admin.register(NTPServer)
+class NTPServerAdmin(BaseAdmin):
+    """Admin class to manage NTP Server objects."""
+
+    list_display = ("name", "server_address")
+
+    search_fields = ("name", "server_address")
 
 
 @admin.register(Syslog)
