@@ -30,6 +30,7 @@ from netbox_cmdb.models.ntp import NTP, NTPServer
 from netbox_cmdb.models.prefix_list import PrefixList, PrefixListTerm
 from netbox_cmdb.models.route_policy import RoutePolicy, RoutePolicyTerm
 from netbox_cmdb.models.snmp import SNMP, SNMPCommunity
+from netbox_cmdb.models.sonic_role_mapping import SonicRoleMapping
 from netbox_cmdb.models.syslog import Syslog, SyslogServer
 from netbox_cmdb.models.tacacs import Tacacs, TacacsServer
 from netbox_cmdb.models.vlan import VLAN
@@ -497,6 +498,19 @@ class TacacsServerAdmin(BaseAdmin):
     )
 
     search_fields = ("server_address",)
+
+
+@admin.register(SonicRoleMapping)
+class SonicRoleMappingAdmin(BaseAdmin):
+    """Admin class to manage SONiC Role Mapping objects."""
+
+    list_display = (
+        "device_role",
+        "sonic_type",
+    )
+
+    search_fields = ("device_role__name",)
+    list_filter = ("sonic_type",)
 
 
 # We need to register Netbox core models to the Admin page or we won't be able to lookup
