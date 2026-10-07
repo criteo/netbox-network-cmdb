@@ -28,6 +28,7 @@ from netbox_cmdb.filtersets import (
     DeviceBGPSessionFilterSet,
     LinkFilterSet,
     LogicalInterfaceFilterSet,
+    ManagementRouteFilterSet,
     NTPFilterSet,
     RoutePolicyFilterSet,
     SNMPFilterSet,
@@ -44,6 +45,7 @@ from netbox_cmdb.forms import (
     DeviceInterfaceForm,
     LinkForm,
     LogicalInterfaceForm,
+    ManagementRouteForm,
     NTPForm,
     NTPServerForm,
     PortLayoutForm,
@@ -71,6 +73,7 @@ from netbox_cmdb.models.interface import (
     LogicalInterface,
     PortLayout,
 )
+from netbox_cmdb.models.management_route import ManagementRoute
 from netbox_cmdb.models.ntp import NTP, NTPServer
 from netbox_cmdb.models.route_policy import RoutePolicy
 from netbox_cmdb.models.snmp import SNMP, SNMPCommunity
@@ -84,6 +87,7 @@ from netbox_cmdb.tables import (
     DeviceBGPSessionTable,
     LinkTable,
     LogicalInterfaceTable,
+    ManagementRouteTable,
     NTPServerTable,
     NTPTable,
     PortLayoutTable,
@@ -529,7 +533,7 @@ class LogicalInterfaceListView(ObjectListView):
 class LogicalInterfaceView(ObjectView):
     queryset = LogicalInterface.objects.select_related(
         "parent_interface__device", "vrf", "ipv4_address", "ipv6_address"
-    ).prefetch_related("tagged_vlans")
+    ).prefetch_related("tagged_vlans", "managementroute")
     template_name = "netbox_cmdb/logicalinterface.html"
 
 
@@ -546,6 +550,37 @@ class LogicalInterfaceBulkDeleteView(BulkDeleteView):
     queryset = LogicalInterface.objects.all()
     filterset = LogicalInterfaceFilterSet
     table = LogicalInterfaceTable
+
+
+## Management route views
+class ManagementRouteListView(ObjectListView):
+    queryset = ManagementRoute.objects.select_related(
+        "logical_interface__parent_interface__device"
+    ).all()
+    filterset = ManagementRouteFilterSet
+    table = ManagementRouteTable
+
+
+class ManagementRouteView(ObjectView):
+    queryset = ManagementRoute.objects.select_related(
+        "logical_interface__parent_interface__device", "logical_interface__ipv4_address"
+    )
+    template_name = "netbox_cmdb/managementroute.html"
+
+
+class ManagementRouteEditView(ObjectEditView):
+    queryset = ManagementRoute.objects.all()
+    form = ManagementRouteForm
+
+
+class ManagementRouteDeleteView(ObjectDeleteView):
+    queryset = ManagementRoute.objects.all()
+
+
+class ManagementRouteBulkDeleteView(BulkDeleteView):
+    queryset = ManagementRoute.objects.all()
+    filterset = ManagementRouteFilterSet
+    table = ManagementRouteTable
 
 
 ## Link views

@@ -1,0 +1,50 @@
+{% extends 'generic/object.html' %} {% load helpers %}
+{% block title %}{{ object.device }} ({{ object.logical_interface.name }}) {{ object.get_kind_display|lower }} route {{ object.prefix }}{% endblock %}
+{% block breadcrumbs %}
+  {{ block.super }}
+  <li class="breadcrumb-item">{{ object.device|linkify }}</li>
+  <li class="breadcrumb-item">
+    <a href="{{ object.logical_interface.get_absolute_url }}">{{ object.logical_interface.name }}</a>
+  </li>
+{% endblock %}
+{% block content %}
+<div class="row">
+  <div class="col col-12 col-xl-6">
+    <div class="card">
+      <h5 class="card-header">Management Route</h5>
+      <div class="card-body">
+        <table class="table table-hover attr-table">
+          <tr>
+            <th>Device</th>
+            <td>{{ object.device|linkify }}</td>
+          </tr>
+          <tr>
+            <th>Logical interface</th>
+            <td><a href="{{ object.logical_interface.get_absolute_url }}">{{ object.logical_interface.name }}</a></td>
+          </tr>
+          <tr>
+            <th>Interface IPv4 address</th>
+            <td>{{ object.logical_interface.ipv4_address|linkify|placeholder }}</td>
+          </tr>
+          <tr>
+            <th>Kind</th>
+            <td>{% badge object.get_kind_display bg_color=object.get_kind_color %}</td>
+          </tr>
+          <tr>
+            <th>Prefix</th>
+            <td>{{ object.prefix }}</td>
+          </tr>
+          <tr>
+            <th>Next-hop</th>
+            <td>{{ object.next_hop|placeholder }}</td>
+          </tr>
+          <tr>
+            <th>Description</th>
+            <td>{{ object.description|placeholder }}</td>
+          </tr>
+        </table>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

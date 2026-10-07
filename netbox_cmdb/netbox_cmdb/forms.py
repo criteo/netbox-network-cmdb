@@ -20,6 +20,7 @@ from netbox_cmdb.models.interface import (
     LogicalInterface,
     PortLayout,
 )
+from netbox_cmdb.models.management_route import ManagementRoute
 from netbox_cmdb.models.ntp import NTP, NTPServer
 from netbox_cmdb.models.route_policy import RoutePolicy
 from netbox_cmdb.models.snmp import SNMP, SNMPCommunity
@@ -300,6 +301,23 @@ class LogicalInterfaceForm(NetBoxModelForm):
             "untagged_vlan",
             "tagged_vlans",
             "native_vlan",
+            "description",
+        ]
+
+
+class ManagementRouteForm(NetBoxModelForm):
+    logical_interface = DynamicModelChoiceField(
+        queryset=LogicalInterface.objects.all(),
+        label=_("Logical interface"),
+    )
+
+    class Meta:
+        model = ManagementRoute
+        fields = [
+            "logical_interface",
+            "kind",
+            "prefix",
+            "next_hop",
             "description",
         ]
 
