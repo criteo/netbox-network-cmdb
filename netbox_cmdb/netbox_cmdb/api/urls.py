@@ -21,6 +21,7 @@ from netbox_cmdb.api.interface.views import (
     LogicalInterfaceViewSet,
     PortLayoutViewSet,
 )
+from netbox_cmdb.api.management_route.views import ManagementRouteViewSet
 from netbox_cmdb.api.ntp.views import NTPServerViewSet, NTPViewSet
 from netbox_cmdb.api.prefix_list.views import PrefixListViewSet
 from netbox_cmdb.api.route_policy.views import RoutePolicyViewSet
@@ -41,6 +42,7 @@ router.register("bgp-community-lists", BGPCommunityListViewSet)
 router.register("device-interfaces", DeviceInterfaceViewSet)
 router.register("logical-interfaces", LogicalInterfaceViewSet)
 router.register("links", LinkViewSet)
+router.register("management-routes", ManagementRouteViewSet)
 router.register("peer-groups", BGPPeerGroupViewSet)
 router.register("port-layouts", PortLayoutViewSet)
 router.register("prefix-lists", PrefixListViewSet)
