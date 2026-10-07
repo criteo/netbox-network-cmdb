@@ -5,6 +5,7 @@ from netbox.tables import NetBoxTable, columns
 
 from netbox_cmdb.models.bgp import ASN, BGPPeerGroup, BGPSession, DeviceBGPSession
 from netbox_cmdb.models.interface import Link, LogicalInterface, PortLayout
+from netbox_cmdb.models.management_route import ManagementRoute
 from netbox_cmdb.models.ntp import NTP, NTPServer
 from netbox_cmdb.models.route_policy import RoutePolicy
 from netbox_cmdb.models.snmp import SNMP, SNMPCommunity
@@ -275,6 +276,43 @@ class LogicalInterfaceTable(NetBoxTable):
         )
 
     def render_parent_interface(self, value):
+        return value.name
+
+
+class ManagementRouteTable(NetBoxTable):
+    id = tables.Column(linkify=True)
+    logical_interface__parent_interface__device = tables.Column(verbose_name="Device", linkify=True)
+    # `name` is a model property of the logical interface, order by the underlying fields.
+    logical_interface = tables.Column(
+        verbose_name="Logical interface",
+        order_by=("logical_interface__parent_interface__name", "logical_interface__index"),
+        linkify=True,
+    )
+    kind = columns.ChoiceFieldColumn()
+    prefix = tables.Column(linkify=lambda record: record.get_absolute_url())
+    next_hop = tables.Column(verbose_name="Next-hop")
+
+    class Meta(NetBoxTable.Meta):
+        model = ManagementRoute
+        fields = (
+            "pk",
+            "id",
+            "logical_interface__parent_interface__device",
+            "logical_interface",
+            "kind",
+            "prefix",
+            "next_hop",
+            "description",
+        )
+        default_columns = (
+            "logical_interface__parent_interface__device",
+            "logical_interface",
+            "kind",
+            "prefix",
+            "next_hop",
+        )
+
+    def render_logical_interface(self, value):
         return value.name
 
 

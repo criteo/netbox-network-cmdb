@@ -31,5 +31,41 @@
       </div>
     </div>
   </div>
+  <div class="col col-12 col-xl-6">
+    <div class="card">
+      <h5 class="card-header">Management Routes</h5>
+      <div class="card-body">
+        {% with routes=object.managementroute.all %}
+        {% if routes %}
+        <table class="table table-hover">
+          <thead>
+            <tr>
+              <th>Kind</th>
+              <th>Prefix</th>
+              <th>Next-hop</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for route in routes %}
+            <tr>
+              <td>{% badge route.get_kind_display bg_color=route.get_kind_color %}</td>
+              <td><a href="{{ route.get_absolute_url }}">{{ route.prefix }}</a></td>
+              <td>{{ route.next_hop|placeholder }}</td>
+            </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+        {% else %}
+        <span class="text-muted">None</span>
+        {% endif %}
+        {% endwith %}
+      </div>
+      <div class="card-footer text-end noprint">
+        <a href="{% url 'plugins:netbox_cmdb:managementroute_add' %}?logical_interface={{ object.pk }}&return_url={{ object.get_absolute_url }}" class="btn btn-sm btn-primary">
+          <i class="mdi mdi-plus-thick" aria-hidden="true"></i> Add a management route
+        </a>
+      </div>
+    </div>
+  </div>
 </div>
 {% endblock %}

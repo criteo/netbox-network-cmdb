@@ -77,6 +77,18 @@ menu_items = (
         ),
     ),
     PluginMenuItem(
+        link="plugins:netbox_cmdb:managementroute_list",
+        link_text="Management Routes",
+        buttons=(
+            PluginMenuButton(
+                link="plugins:netbox_cmdb:managementroute_add",
+                title="Management Routes",
+                icon_class="mdi mdi-plus-thick",
+                color=ButtonColorChoices.GREEN,
+            ),
+        ),
+    ),
+    PluginMenuItem(
         link="plugins:netbox_cmdb:portlayout_list",
         link_text="Port Layouts",
         buttons=(

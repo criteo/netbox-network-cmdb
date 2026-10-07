@@ -26,6 +26,7 @@ from netbox_cmdb.models.interface import (
     LogicalInterface,
     PortLayout,
 )
+from netbox_cmdb.models.management_route import ManagementRoute
 from netbox_cmdb.models.ntp import NTP, NTPServer
 from netbox_cmdb.models.prefix_list import PrefixList, PrefixListTerm
 from netbox_cmdb.models.route_policy import RoutePolicy, RoutePolicyTerm
@@ -370,6 +371,21 @@ class PortLayoutAdmin(BaseAdmin):
         "lanes_display",
     )
     list_filter = ("device_type", "network_role")
+
+
+@admin.register(ManagementRoute)
+class ManagementRouteAdmin(BaseAdmin):
+    """Admin class to manage ManagementRoute objects."""
+
+    search_fields = (
+        "logical_interface__parent_interface__device__name",
+        "logical_interface__parent_interface__name",
+        "prefix",
+        "next_hop",
+    )
+    list_display = ("device", "logical_interface", "kind", "prefix", "next_hop")
+    list_filter = ("kind",)
+    autocomplete_fields = ("logical_interface",)
 
 
 @admin.register(VRF)

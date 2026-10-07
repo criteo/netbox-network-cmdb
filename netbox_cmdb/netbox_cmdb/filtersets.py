@@ -1,11 +1,13 @@
 import django_filters
 from django.db.models import Q
+from netaddr import AddrFormatError, IPNetwork
 from netbox.filtersets import ChangeLoggedModelFilterSet
 from tenancy.filtersets import TenancyFilterSet
 from utilities.filters import MultiValueCharFilter
 
 from netbox_cmdb.models.bgp import ASN, BGPPeerGroup, BGPSession, DeviceBGPSession
 from netbox_cmdb.models.interface import Link, LogicalInterface
+from netbox_cmdb.models.management_route import ManagementRoute
 from netbox_cmdb.models.ntp import NTP
 from netbox_cmdb.models.route_policy import RoutePolicy
 from netbox_cmdb.models.snmp import SNMP
@@ -27,6 +29,12 @@ device_location_filterset = [
 # (e.g. logical interfaces).
 parent_interface_device_location_filterset = [
     f"parent_interface__{field}" for field in device_location_filterset
+]
+
+# Same filters for models attached to a device through a logical interface
+# (e.g. management routes).
+logical_interface_device_location_filterset = [
+    f"logical_interface__parent_interface__{field}" for field in device_location_filterset
 ]
 
 
@@ -290,6 +298,39 @@ class LogicalInterfaceFilterSet(ChangeLoggedModelFilterSet):
             | Q(parent_interface__device__name__icontains=value)
             | Q(description__icontains=value)
         ).distinct()
+
+
+class ManagementRouteFilterSet(ChangeLoggedModelFilterSet):
+    """Management route filterset."""
+
+    q = django_filters.CharFilter(
+        method="search",
+        label="Search",
+    )
+
+    class Meta:
+        model = ManagementRoute
+        fields = [
+            "id",
+            "logical_interface__parent_interface__device__name",
+            "logical_interface__parent_interface__name",
+            "kind",
+        ]
+
+    def search(self, queryset, name, value):
+        if not value.strip():
+            return queryset
+        query = (
+            Q(logical_interface__parent_interface__name__icontains=value)
+            | Q(logical_interface__parent_interface__device__name__icontains=value)
+            | Q(description__icontains=value)
+        )
+        try:
+            # a prefix or an address: the routes whose prefix contains it
+            query |= Q(prefix__net_contains_or_equals=str(IPNetwork(value.strip())))
+        except (AddrFormatError, ValueError):
+            pass
+        return queryset.filter(query).distinct()
 
 
 class SNMPFilterSet(ChangeLoggedModelFilterSet):

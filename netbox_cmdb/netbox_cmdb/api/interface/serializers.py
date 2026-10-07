@@ -6,6 +6,7 @@ from ipam.api.nested_serializers import NestedIPAddressSerializer
 from netbox.api.fields import SerializedPKRelatedField
 from netbox.api.serializers import WritableNestedSerializer
 from rest_framework.serializers import (
+    CharField,
     ModelSerializer,
     SerializerMethodField,
     ValidationError,
@@ -42,6 +43,21 @@ class DeviceInterfaceSerializer(ModelSerializer):
 
     def get_display(self, obj):
         return str(obj)
+
+
+class NestedLogicalInterfaceSerializer(WritableNestedSerializer):
+    """A logical interface as referenced by other objects (e.g. management routes).
+
+    On write, a PK or a dictionary of attributes identifying the logical interface
+    (e.g. parent_interface__device__name + parent_interface__name + index).
+    """
+
+    parent_interface = NestedDeviceInterfaceSerializer(read_only=True)
+    name = CharField(read_only=True)
+
+    class Meta:
+        model = LogicalInterface
+        fields = ["id", "index", "name", "parent_interface"]
 
 
 class LogicalInterfaceSerializer(ModelSerializer):

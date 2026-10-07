@@ -5,6 +5,7 @@ from netbox.views.generic import ObjectChangeLogView, ObjectJournalView
 
 from netbox_cmdb.models.bgp import ASN, BGPSession, DeviceBGPSession, BGPPeerGroup
 from netbox_cmdb.models.interface import DeviceInterface, Link, LogicalInterface, PortLayout
+from netbox_cmdb.models.management_route import ManagementRoute
 from netbox_cmdb.models.sonic_role_mapping import SonicRoleMapping
 from netbox_cmdb.models.ntp import NTP, NTPServer
 from netbox_cmdb.models.route_policy import RoutePolicy
@@ -43,6 +44,11 @@ from netbox_cmdb.views import (
     LogicalInterfaceEditView,
     LogicalInterfaceListView,
     LogicalInterfaceView,
+    ManagementRouteBulkDeleteView,
+    ManagementRouteDeleteView,
+    ManagementRouteEditView,
+    ManagementRouteListView,
+    ManagementRouteView,
     PortLayoutDeleteView,
     PortLayoutEditView,
     PortLayoutGroupListView,
@@ -341,6 +347,41 @@ urlpatterns = [
         ObjectJournalView.as_view(),
         name="logicalinterface_journal",
         kwargs={"model": LogicalInterface},
+    ),
+    # MANAGEMENT ROUTES
+    path("management-route/", ManagementRouteListView.as_view(), name="managementroute_list"),
+    path(
+        "management-route/add/",
+        ManagementRouteEditView.as_view(),
+        name="managementroute_add",
+    ),
+    path(
+        "management-route/delete/",
+        ManagementRouteBulkDeleteView.as_view(),
+        name="managementroute_bulk_delete",
+    ),
+    path("management-route/<int:pk>/", ManagementRouteView.as_view(), name="managementroute"),
+    path(
+        "management-route/<int:pk>/edit/",
+        ManagementRouteEditView.as_view(),
+        name="managementroute_edit",
+    ),
+    path(
+        "management-route/<int:pk>/delete/",
+        ManagementRouteDeleteView.as_view(),
+        name="managementroute_delete",
+    ),
+    path(
+        "management-route/<int:pk>/changelog/",
+        ObjectChangeLogView.as_view(),
+        name="managementroute_changelog",
+        kwargs={"model": ManagementRoute},
+    ),
+    path(
+        "management-route/<int:pk>/journal/",
+        ObjectJournalView.as_view(),
+        name="managementroute_journal",
+        kwargs={"model": ManagementRoute},
     ),
     # LINKS
     path("link/", LinkListView.as_view(), name="link_list"),
