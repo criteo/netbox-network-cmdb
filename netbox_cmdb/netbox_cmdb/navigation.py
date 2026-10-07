@@ -160,4 +160,28 @@ menu_items = (
             ),
         ),
     ),
+    PluginMenuItem(
+        link="plugins:netbox_cmdb:ntp_list",
+        link_text="NTP",
+        buttons=(
+            PluginMenuButton(
+                link="plugins:netbox_cmdb:ntp_add",
+                title="NTP",
+                icon_class="mdi mdi-plus-thick",
+                color=ButtonColorChoices.GREEN,
+            ),
+        ),
+    ),
+    PluginMenuItem(
+        link="plugins:netbox_cmdb:ntpserver_list",
+        link_text="NTP Server",
+        buttons=(
+            PluginMenuButton(
+                link="plugins:netbox_cmdb:ntpserver_add",
+                title="NTP Server",
+                icon_class="mdi mdi-plus-thick",
+                color=ButtonColorChoices.GREEN,
+            ),
+        ),
+    ),
 )
