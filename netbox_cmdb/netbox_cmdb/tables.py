@@ -9,6 +9,7 @@ from netbox_cmdb.models.management_route import ManagementRoute
 from netbox_cmdb.models.ntp import NTP, NTPServer
 from netbox_cmdb.models.route_policy import RoutePolicy
 from netbox_cmdb.models.snmp import SNMP, SNMPCommunity
+from netbox_cmdb.models.sonic_hwsku_mapping import SonicHwskuMapping
 from netbox_cmdb.models.sonic_role_mapping import SonicRoleMapping
 from netbox_cmdb.models.syslog import Syslog, SyslogServer
 from netbox_cmdb.models.tacacs import Tacacs, TacacsServer
@@ -398,4 +399,15 @@ class SonicRoleMappingTable(NetBoxTable):
         fields = (
             "device_role",
             "sonic_type",
+        )
+
+
+class SonicHwskuMappingTable(NetBoxTable):
+    device_type = tables.Column(linkify=True)
+
+    class Meta(NetBoxTable.Meta):
+        model = SonicHwskuMapping
+        fields = (
+            "device_type",
+            "hwsku",
         )

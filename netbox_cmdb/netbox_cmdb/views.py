@@ -32,6 +32,7 @@ from netbox_cmdb.filtersets import (
     NTPFilterSet,
     RoutePolicyFilterSet,
     SNMPFilterSet,
+    SonicHwskuMappingFilterSet,
     SonicRoleMappingFilterSet,
     SyslogFilterSet,
     TacacsFilterSet,
@@ -53,6 +54,7 @@ from netbox_cmdb.forms import (
     RoutePolicyForm,
     SNMPCommunityGroupForm,
     SNMPGroupForm,
+    SonicHwskuMappingForm,
     SonicRoleMappingForm,
     SyslogForm,
     SyslogServerForm,
@@ -77,6 +79,7 @@ from netbox_cmdb.models.management_route import ManagementRoute
 from netbox_cmdb.models.ntp import NTP, NTPServer
 from netbox_cmdb.models.route_policy import RoutePolicy
 from netbox_cmdb.models.snmp import SNMP, SNMPCommunity
+from netbox_cmdb.models.sonic_hwsku_mapping import SonicHwskuMapping
 from netbox_cmdb.models.sonic_role_mapping import SonicRoleMapping
 from netbox_cmdb.models.syslog import Syslog, SyslogServer
 from netbox_cmdb.models.tacacs import Tacacs, TacacsServer
@@ -94,6 +97,7 @@ from netbox_cmdb.tables import (
     RoutePolicyTable,
     SNMPCommunityTable,
     SNMPTable,
+    SonicHwskuMappingTable,
     SonicRoleMappingTable,
     SyslogServerTable,
     SyslogTable,
@@ -754,3 +758,18 @@ class SonicRoleMappingEditView(ObjectEditView):
 
 class SonicRoleMappingDeleteView(ObjectDeleteView):
     queryset = SonicRoleMapping.objects.all()
+
+
+class SonicHwskuMappingListView(ObjectListView):
+    queryset = SonicHwskuMapping.objects.select_related("device_type")
+    filterset = SonicHwskuMappingFilterSet
+    table = SonicHwskuMappingTable
+
+
+class SonicHwskuMappingEditView(ObjectEditView):
+    queryset = SonicHwskuMapping.objects.all()
+    form = SonicHwskuMappingForm
+
+
+class SonicHwskuMappingDeleteView(ObjectDeleteView):
+    queryset = SonicHwskuMapping.objects.all()

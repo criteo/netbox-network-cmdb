@@ -208,4 +208,16 @@ menu_items = (
             ),
         ),
     ),
+    PluginMenuItem(
+        link="plugins:netbox_cmdb:sonichwskumapping_list",
+        link_text="SONiC HwSKU Mapping",
+        buttons=(
+            PluginMenuButton(
+                link="plugins:netbox_cmdb:sonichwskumapping_add",
+                title="SONiC HwSKU Mapping",
+                icon_class="mdi mdi-plus-thick",
+                color=ButtonColorChoices.GREEN,
+            ),
+        ),
+    ),
 )

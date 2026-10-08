@@ -11,6 +11,7 @@ from netbox_cmdb.models.management_route import ManagementRoute
 from netbox_cmdb.models.ntp import NTP
 from netbox_cmdb.models.route_policy import RoutePolicy
 from netbox_cmdb.models.snmp import SNMP
+from netbox_cmdb.models.sonic_hwsku_mapping import SonicHwskuMapping
 from netbox_cmdb.models.sonic_role_mapping import SonicRoleMapping
 from netbox_cmdb.models.syslog import Syslog
 from netbox_cmdb.models.tacacs import Tacacs
@@ -421,3 +422,23 @@ class SonicRoleMappingFilterSet(ChangeLoggedModelFilterSet):
         if not value.strip():
             return queryset
         return queryset.filter(Q(device_role__name__icontains=value)).distinct()
+
+
+class SonicHwskuMappingFilterSet(ChangeLoggedModelFilterSet):
+    """SONiC HwSKU Mapping filterset."""
+
+    q = django_filters.CharFilter(
+        method="search",
+        label="Search",
+    )
+
+    class Meta:
+        model = SonicHwskuMapping
+        fields = ["device_type", "hwsku"]
+
+    def search(self, queryset, name, value):
+        if not value.strip():
+            return queryset
+        return queryset.filter(
+            Q(device_type__model__icontains=value) | Q(hwsku__icontains=value)
+        ).distinct()
