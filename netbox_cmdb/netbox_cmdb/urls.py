@@ -7,6 +7,7 @@ from netbox_cmdb.models.bgp import ASN, BGPSession, DeviceBGPSession, BGPPeerGro
 from netbox_cmdb.models.interface import DeviceInterface, Link, LogicalInterface, PortLayout
 from netbox_cmdb.models.management_route import ManagementRoute
 from netbox_cmdb.models.sonic_role_mapping import SonicRoleMapping
+from netbox_cmdb.models.sonic_hwsku_mapping import SonicHwskuMapping
 from netbox_cmdb.models.ntp import NTP, NTPServer
 from netbox_cmdb.models.route_policy import RoutePolicy
 from netbox_cmdb.models.snmp import SNMP, SNMPCommunity
@@ -74,6 +75,9 @@ from netbox_cmdb.views import (
     SonicRoleMappingListView,
     SonicRoleMappingEditView,
     SonicRoleMappingDeleteView,
+    SonicHwskuMappingListView,
+    SonicHwskuMappingEditView,
+    SonicHwskuMappingDeleteView,
     SyslogListView,
     SyslogEditView,
     SyslogDeleteView,
@@ -550,5 +554,30 @@ urlpatterns = [
         ObjectChangeLogView.as_view(),
         name="sonicrolemapping_changelog",
         kwargs={"model": SonicRoleMapping},
+    ),
+    # SONIC HWSKU MAPPINGS
+    path(
+        "sonic-hwsku-mapping/", SonicHwskuMappingListView.as_view(), name="sonichwskumapping_list"
+    ),
+    path(
+        "sonic-hwsku-mapping/add/",
+        SonicHwskuMappingEditView.as_view(),
+        name="sonichwskumapping_add",
+    ),
+    path(
+        "sonic-hwsku-mapping/<int:pk>/edit/",
+        SonicHwskuMappingEditView.as_view(),
+        name="sonichwskumapping_edit",
+    ),
+    path(
+        "sonic-hwsku-mapping/<int:pk>/delete/",
+        SonicHwskuMappingDeleteView.as_view(),
+        name="sonichwskumapping_delete",
+    ),
+    path(
+        "sonic-hwsku-mapping/<int:pk>/changelog/",
+        ObjectChangeLogView.as_view(),
+        name="sonichwskumapping_changelog",
+        kwargs={"model": SonicHwskuMapping},
     ),
 ]
