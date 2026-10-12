@@ -484,7 +484,6 @@ class TacacsAdmin(BaseAdmin):
 
     list_display = (
         "device",
-        "passkey",
         "get_servers",
     )
 

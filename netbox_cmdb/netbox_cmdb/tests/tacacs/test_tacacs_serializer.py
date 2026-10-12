@@ -22,11 +22,13 @@ class TacacsSerializerCreate(BaseTestCase):
             "server_address": "10.20.20.1",
             "priority": 1,
             "tcp_port": 49,
+            "passkey": "secret-server1",
         }
         server_serializer1 = TacacsServerSerializer(data=server_data1)
         assert server_serializer1.is_valid() is True
         server_serializer1.save()
         server1 = TacacsServer.objects.get(server_address="10.20.20.1")
+        assert server1.passkey == "secret-server1"
 
         # --- Create TacacsServer 2 ---
         server_data2 = {
@@ -42,7 +44,6 @@ class TacacsSerializerCreate(BaseTestCase):
         # --- Create Tacacs for device1 using device ID ---
         tacacs_data1 = {
             "device": {"id": self.device1.pk},
-            "passkey": "secret-device1",
             "server_list": [server1.pk],
         }
         tacacs_serializer1 = TacacsSerializer(data=tacacs_data1)
@@ -51,14 +52,12 @@ class TacacsSerializerCreate(BaseTestCase):
         tacacs_obj1 = Tacacs.objects.get(device=self.device1)
 
         assert tacacs_obj1.device == self.device1
-        assert tacacs_obj1.passkey == "secret-device1"
         assert tacacs_obj1.server_list.count() == 1
         assert tacacs_obj1.server_list.first() == server1
 
         # --- Create Tacacs for device2 using device ID with 2 servers ---
         tacacs_data2 = {
             "device": {"id": self.device2.pk},
-            "passkey": "secret-device2",
             "server_list": [server1.pk, server2.pk],
         }
         tacacs_serializer2 = TacacsSerializer(data=tacacs_data2)
@@ -73,7 +72,6 @@ class TacacsSerializerCreate(BaseTestCase):
         # --- Update existing Tacacs for device2 using device name ---
         tacacs_data_update = {
             "device": {"name": "router-test2"},
-            "passkey": "secret-updated",
             "server_list": [server1.pk],
         }
 
@@ -88,16 +86,15 @@ class TacacsSerializerCreate(BaseTestCase):
         tacacs_obj2.refresh_from_db()
 
         assert tacacs_obj2.device == self.device2
-        assert tacacs_obj2.passkey == "secret-updated"
         assert tacacs_obj2.server_list.count() == 1
         assert tacacs_obj2.server_list.first() == server1
 
     def test_passkey_too_short_is_rejected_by_the_api(self):
         """A passkey shorter than MIN_TACACS_PASSKEY_LENGTH must be refused."""
 
-        serializer = TacacsSerializer(
+        serializer = TacacsServerSerializer(
             data={
-                "device": {"id": self.device1.pk},
+                "server_address": "10.20.20.1",
                 "passkey": "short",
             }
         )
@@ -107,16 +104,23 @@ class TacacsSerializerCreate(BaseTestCase):
     def test_passkey_can_be_omitted(self):
         """passkey is optional: omitting it must not trigger the length check."""
 
-        serializer = TacacsSerializer(data={"device": {"id": self.device1.pk}})
+        serializer = TacacsServerSerializer(data={"server_address": "10.20.20.1"})
         assert serializer.is_valid() is True
 
     def test_passkey_too_short_is_rejected_by_the_model(self):
-        """Tacacs.clean() enforces the same rule for the plugin UI and the Django admin."""
+        """TacacsServer.clean() enforces the same rule for the plugin UI and the Django admin."""
 
-        tacacs = Tacacs(device=self.device1, passkey="short")
+        server = TacacsServer(server_address="10.20.20.1", passkey="short")
         with self.assertRaises(DjangoValidationError) as ctx:
-            tacacs.full_clean()
+            server.full_clean()
         assert "passkey" in ctx.exception.error_dict
+
+    def test_passkey_is_kept_out_of_the_change_log(self):
+        """The passkey is a secret: the change log never records it."""
+
+        server = TacacsServer.objects.create(server_address="10.20.20.1", passkey="Passkey1")
+        assert "passkey" not in server.serialize_object()
+        assert server.serialize_object()["server_address"] == "10.20.20.1"
 
     def test_upsert_without_server_list_preserves_the_servers(self):
         """A POST acts as an upsert: omitting server_list must not wipe an existing one."""
@@ -125,19 +129,17 @@ class TacacsSerializerCreate(BaseTestCase):
         created = TacacsSerializer(
             data={
                 "device": {"id": self.device1.pk},
-                "passkey": "Passkey1",
                 "server_list": [server.pk],
             }
         )
         assert created.is_valid() is True
         created.save()
 
-        # Same device, passkey only: this goes through create() thanks to get_or_create().
-        upserted = TacacsSerializer(data={"device": {"id": self.device1.pk}, "passkey": "Passkey2"})
+        # Same device, no server_list: this goes through create() thanks to get_or_create().
+        upserted = TacacsSerializer(data={"device": {"id": self.device1.pk}})
         assert upserted.is_valid() is True
         tacacs = upserted.save()
 
-        assert tacacs.passkey == "Passkey2"
         assert list(tacacs.server_list.all()) == [server]
 
     def test_upsert_with_a_server_list_replaces_the_servers(self):

@@ -395,11 +395,8 @@ class TacacsForm(TacacsServerListCleanMixin, NetBoxModelForm):
         model = Tacacs
         fields = [
             "device",
-            "passkey",
             "server_list",
         ]
-
-    # passkey length is validated by Tacacs.clean()
 
 
 class TacacsAdminForm(TacacsServerListCleanMixin, forms.ModelForm):
@@ -418,7 +415,10 @@ class TacacsServerForm(NetBoxModelForm):
             "server_address",
             "priority",
             "tcp_port",
+            "passkey",
         ]
+
+    # passkey length is validated by TacacsServer.clean()
 
 
 class SonicRoleMappingForm(NetBoxModelForm):
