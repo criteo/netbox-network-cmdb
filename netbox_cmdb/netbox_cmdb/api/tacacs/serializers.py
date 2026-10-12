@@ -18,6 +18,13 @@ class TacacsServerSerializer(ModelSerializer):
         model = TacacsServer
         fields = "__all__"
 
+    def validate_passkey(self, value):
+        if value and len(value) < MIN_TACACS_PASSKEY_LENGTH:
+            raise serializers.ValidationError(
+                f"passkey should contain at least {MIN_TACACS_PASSKEY_LENGTH} characters."
+            )
+        return value
+
 
 class TacacsServerReadSerializer(ModelSerializer):
     """
@@ -47,13 +54,6 @@ class TacacsSerializer(ModelSerializer):
     class Meta:
         model = Tacacs
         fields = "__all__"
-
-    def validate_passkey(self, value):
-        if value and len(value) < MIN_TACACS_PASSKEY_LENGTH:
-            raise serializers.ValidationError(
-                f"passkey should contain at least {MIN_TACACS_PASSKEY_LENGTH} characters."
-            )
-        return value
 
     def validate_server_list(self, value):
         duplicates = duplicate_priorities(value)
@@ -85,17 +85,7 @@ class TacacsSerializer(ModelSerializer):
             raise serializers.ValidationError("Invalid device data")
 
         # A POST on a device that already holds a configuration updates it, one per device.
-        tacacs, _ = Tacacs.objects.get_or_create(
-            device=device,
-            defaults={
-                "passkey": validated_data.get("passkey"),
-            },
-        )
-
-        # Update passkey if provided
-        if "passkey" in validated_data:
-            tacacs.passkey = validated_data["passkey"]
-            tacacs.save()
+        tacacs, _ = Tacacs.objects.get_or_create(device=device)
 
         if servers is not None:
             tacacs.server_list.set(servers)
@@ -117,10 +107,6 @@ class TacacsSerializer(ModelSerializer):
                     raise serializers.ValidationError("Device must have 'id' or 'name'.")
             else:
                 raise serializers.ValidationError("Invalid device data")
-
-        # Update passkey if provided
-        if "passkey" in validated_data:
-            instance.passkey = validated_data["passkey"]
 
         instance.save()
 

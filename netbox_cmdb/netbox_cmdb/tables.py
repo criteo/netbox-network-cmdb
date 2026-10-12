@@ -363,7 +363,6 @@ class TacacsTable(NetBoxTable):
         model = Tacacs
         fields = (
             "device",
-            "passkey",
             "servers",
         )
 
