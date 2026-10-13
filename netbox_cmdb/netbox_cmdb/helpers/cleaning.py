@@ -3,6 +3,7 @@ from django.db.models import Q
 
 from netbox_cmdb.models.bgp import BGPPeerGroup, BGPSession, DeviceBGPSession
 from netbox_cmdb.models.bgp_community_list import BGPCommunityList
+from netbox_cmdb.models.dhcp import DhcpRelayInterface
 from netbox_cmdb.models.ntp import NTP
 from netbox_cmdb.models.prefix_list import PrefixList
 from netbox_cmdb.models.route_policy import RoutePolicy
@@ -20,6 +21,7 @@ def clean_cmdb_for_devices(device_ids: list[int]):
         "prefix_lists": [],
         "bgp_community_lists": [],
         "snmp": [],
+        "dhcp_relay_interfaces": [],
         "syslog": [],
         "tacacs": [],
         "ntp": [],
@@ -34,6 +36,9 @@ def clean_cmdb_for_devices(device_ids: list[int]):
     prefix_lists = PrefixList.objects.filter(device__id__in=device_ids)
     bgp_community_lists = BGPCommunityList.objects.filter(device__id__in=device_ids)
     snmp = SNMP.objects.filter(device__id__in=device_ids)
+    dhcp_relay_interfaces = DhcpRelayInterface.objects.filter(
+        logical_interface__parent_interface__device__id__in=device_ids
+    )
     syslog = Syslog.objects.filter(device__id__in=device_ids)
     tacacs = Tacacs.objects.filter(device__id__in=device_ids)
     ntp = NTP.objects.filter(device__id__in=device_ids)
@@ -45,6 +50,7 @@ def clean_cmdb_for_devices(device_ids: list[int]):
     deleted_objects["prefix_lists"] = [str(val) for val in list(prefix_lists)]
     deleted_objects["bgp_community_lists"] = [str(val) for val in list(bgp_community_lists)]
     deleted_objects["snmp"] = [str(val) for val in list(snmp)]
+    deleted_objects["dhcp_relay_interfaces"] = [str(val) for val in list(dhcp_relay_interfaces)]
     deleted_objects["syslog"] = [str(val) for val in list(syslog)]
     deleted_objects["tacacs"] = [str(val) for val in list(tacacs)]
     deleted_objects["ntp"] = [str(val) for val in list(ntp)]
@@ -56,6 +62,7 @@ def clean_cmdb_for_devices(device_ids: list[int]):
     prefix_lists.delete()
     bgp_community_lists.delete()
     snmp.delete()
+    dhcp_relay_interfaces.delete()
     syslog.delete()
     tacacs.delete()
     ntp.delete()
