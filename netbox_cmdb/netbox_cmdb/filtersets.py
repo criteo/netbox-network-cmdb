@@ -6,6 +6,7 @@ from tenancy.filtersets import TenancyFilterSet
 from utilities.filters import MultiValueCharFilter
 
 from netbox_cmdb.models.bgp import ASN, BGPPeerGroup, BGPSession, DeviceBGPSession
+from netbox_cmdb.models.dhcp import DhcpRelayInterface
 from netbox_cmdb.models.interface import Link, LogicalInterface
 from netbox_cmdb.models.management_route import ManagementRoute
 from netbox_cmdb.models.ntp import NTP
@@ -298,6 +299,32 @@ class LogicalInterfaceFilterSet(ChangeLoggedModelFilterSet):
             Q(parent_interface__name__icontains=value)
             | Q(parent_interface__device__name__icontains=value)
             | Q(description__icontains=value)
+        ).distinct()
+
+
+class DhcpRelayInterfaceFilterSet(ChangeLoggedModelFilterSet):
+    """DHCP relay interface filterset."""
+
+    q = django_filters.CharFilter(
+        method="search",
+        label="Search",
+    )
+
+    class Meta:
+        model = DhcpRelayInterface
+        fields = [
+            "id",
+            "logical_interface__parent_interface__device__name",
+            "logical_interface__parent_interface__name",
+        ]
+
+    def search(self, queryset, name, value):
+        if not value.strip():
+            return queryset
+        return queryset.filter(
+            Q(logical_interface__parent_interface__name__icontains=value)
+            | Q(logical_interface__parent_interface__device__name__icontains=value)
+            | Q(server_list__server_address__icontains=value)
         ).distinct()
 
 

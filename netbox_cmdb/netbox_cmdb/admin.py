@@ -20,6 +20,7 @@ from netbox_cmdb.models.bgp import (
     RedistributedNetwork,
 )
 from netbox_cmdb.models.bgp_community_list import BGPCommunityList, BGPCommunityListTerm
+from netbox_cmdb.models.dhcp import DhcpRelayInterface, DhcpServer
 from netbox_cmdb.models.interface import (
     DeviceInterface,
     Link,
@@ -445,6 +446,38 @@ class NTPServerAdmin(BaseAdmin):
     list_display = ("name", "server_address")
 
     search_fields = ("name", "server_address")
+
+
+@admin.register(DhcpRelayInterface)
+class DhcpRelayInterfaceAdmin(BaseAdmin):
+    """Admin class to manage DHCP relay configuration objects."""
+
+    list_display = ("device", "logical_interface", "get_servers")
+
+    search_fields = (
+        "logical_interface__parent_interface__device__name",
+        "logical_interface__parent_interface__name",
+        "server_list__server_address",
+    )
+
+    autocomplete_fields = ("logical_interface",)
+
+    def get_servers(self, obj):
+        """
+        Return a comma-separated list of DHCP servers bound to this interface.
+        """
+        return ", ".join(s.server_address for s in obj.server_list.all())
+
+    get_servers.short_description = "Dhcp Servers"
+
+
+@admin.register(DhcpServer)
+class DhcpServerAdmin(BaseAdmin):
+    """Admin class to manage DHCP Server objects."""
+
+    list_display = ("server_address",)
+
+    search_fields = ("server_address",)
 
 
 @admin.register(Syslog)

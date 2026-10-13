@@ -26,6 +26,7 @@ from netbox_cmdb.filtersets import (
     BGPPeerGroupFilterSet,
     BGPSessionFilterSet,
     DeviceBGPSessionFilterSet,
+    DhcpRelayInterfaceFilterSet,
     LinkFilterSet,
     LogicalInterfaceFilterSet,
     ManagementRouteFilterSet,
@@ -44,6 +45,8 @@ from netbox_cmdb.forms import (
     BGPSessionForm,
     DeviceBGPSessionForm,
     DeviceInterfaceForm,
+    DhcpRelayInterfaceForm,
+    DhcpServerForm,
     LinkForm,
     LogicalInterfaceForm,
     ManagementRouteForm,
@@ -69,6 +72,7 @@ from netbox_cmdb.models.bgp import (
     BGPSession,
     DeviceBGPSession,
 )
+from netbox_cmdb.models.dhcp import DhcpRelayInterface, DhcpServer
 from netbox_cmdb.models.interface import (
     DeviceInterface,
     Link,
@@ -88,6 +92,8 @@ from netbox_cmdb.tables import (
     BGPPeerGroupTable,
     BGPSessionTable,
     DeviceBGPSessionTable,
+    DhcpRelayInterfaceTable,
+    DhcpServerTable,
     LinkTable,
     LogicalInterfaceTable,
     ManagementRouteTable,
@@ -554,6 +560,38 @@ class LogicalInterfaceBulkDeleteView(BulkDeleteView):
     queryset = LogicalInterface.objects.all()
     filterset = LogicalInterfaceFilterSet
     table = LogicalInterfaceTable
+
+
+## DHCP relay views
+class DhcpRelayInterfaceListView(ObjectListView):
+    queryset = DhcpRelayInterface.objects.select_related(
+        "logical_interface__parent_interface__device"
+    ).prefetch_related("server_list")
+    filterset = DhcpRelayInterfaceFilterSet
+    table = DhcpRelayInterfaceTable
+
+
+class DhcpRelayInterfaceEditView(ObjectEditView):
+    queryset = DhcpRelayInterface.objects.all()
+    form = DhcpRelayInterfaceForm
+
+
+class DhcpRelayInterfaceDeleteView(ObjectDeleteView):
+    queryset = DhcpRelayInterface.objects.all()
+
+
+class DhcpServerListView(ObjectListView):
+    queryset = DhcpServer.objects.all()
+    table = DhcpServerTable
+
+
+class DhcpServerEditView(ObjectEditView):
+    queryset = DhcpServer.objects.all()
+    form = DhcpServerForm
+
+
+class DhcpServerDeleteView(ObjectDeleteView):
+    queryset = DhcpServer.objects.all()
 
 
 ## Management route views

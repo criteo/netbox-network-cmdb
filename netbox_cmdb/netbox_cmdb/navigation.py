@@ -125,6 +125,30 @@ menu_items = (
         ),
     ),
     PluginMenuItem(
+        link="plugins:netbox_cmdb:dhcprelayinterface_list",
+        link_text="Dhcp Relay Interface",
+        buttons=(
+            PluginMenuButton(
+                link="plugins:netbox_cmdb:dhcprelayinterface_add",
+                title="Dhcp Relay Interface",
+                icon_class="mdi mdi-plus-thick",
+                color=ButtonColorChoices.GREEN,
+            ),
+        ),
+    ),
+    PluginMenuItem(
+        link="plugins:netbox_cmdb:dhcpserver_list",
+        link_text="Dhcp Server",
+        buttons=(
+            PluginMenuButton(
+                link="plugins:netbox_cmdb:dhcpserver_add",
+                title="Dhcp Server",
+                icon_class="mdi mdi-plus-thick",
+                color=ButtonColorChoices.GREEN,
+            ),
+        ),
+    ),
+    PluginMenuItem(
         link="plugins:netbox_cmdb:syslog_list",
         link_text="Syslog",
         buttons=(
