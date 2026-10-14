@@ -28,6 +28,7 @@ setup(
     package_data={
         "netbox_cmdb.templates.netbox_cmdb": ["*.html"],
         "netbox_cmdb.templates.netbox_cmdb.decommissioning": ["*.html"],
+        "netbox_cmdb.templates.netbox_cmdb.inc": ["*.html"],
     },
     zip_safe=False,
 )
