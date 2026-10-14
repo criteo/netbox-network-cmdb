@@ -15,6 +15,7 @@ from netbox_cmdb.api.cmdb.views import (
     DeviceDecommissioningAPIView,
     SiteDecommissioningAPIView,
 )
+from netbox_cmdb.api.dhcp.views import DhcpRelayInterfaceViewSet, DhcpServerViewSet
 from netbox_cmdb.api.interface.views import (
     DeviceInterfaceViewSet,
     LinkViewSet,
@@ -42,6 +43,8 @@ router.register("device-bgp-sessions", DeviceBGPSessionsViewSet)
 router.register("bgp-community-lists", BGPCommunityListViewSet)
 router.register("device-interfaces", DeviceInterfaceViewSet)
 router.register("logical-interfaces", LogicalInterfaceViewSet)
+router.register("dhcp-relay-interface", DhcpRelayInterfaceViewSet)
+router.register("dhcp-server", DhcpServerViewSet)
 router.register("links", LinkViewSet)
 router.register("management-routes", ManagementRouteViewSet)
 router.register("peer-groups", BGPPeerGroupViewSet)

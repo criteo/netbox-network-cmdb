@@ -5,6 +5,7 @@ from netbox.views.generic import ObjectChangeLogView, ObjectJournalView
 
 from netbox_cmdb.models.bgp import ASN, BGPSession, DeviceBGPSession, BGPPeerGroup
 from netbox_cmdb.models.interface import DeviceInterface, Link, LogicalInterface, PortLayout
+from netbox_cmdb.models.dhcp import DhcpRelayInterface, DhcpServer
 from netbox_cmdb.models.management_route import ManagementRoute
 from netbox_cmdb.models.sonic_role_mapping import SonicRoleMapping
 from netbox_cmdb.models.sonic_hwsku_mapping import SonicHwskuMapping
@@ -45,6 +46,12 @@ from netbox_cmdb.views import (
     LogicalInterfaceEditView,
     LogicalInterfaceListView,
     LogicalInterfaceView,
+    DhcpRelayInterfaceDeleteView,
+    DhcpRelayInterfaceEditView,
+    DhcpRelayInterfaceListView,
+    DhcpServerDeleteView,
+    DhcpServerEditView,
+    DhcpServerListView,
     ManagementRouteBulkDeleteView,
     ManagementRouteDeleteView,
     ManagementRouteEditView,
@@ -258,6 +265,33 @@ urlpatterns = [
         name="snmpcommunity_changelog",
         kwargs={"model": SNMPCommunity},
     ),
+    # DHCP RELAY INTERFACES
+    path(
+        "dhcp-relay-interface/",
+        DhcpRelayInterfaceListView.as_view(),
+        name="dhcprelayinterface_list",
+    ),
+    path(
+        "dhcp-relay-interface/add/",
+        DhcpRelayInterfaceEditView.as_view(),
+        name="dhcprelayinterface_add",
+    ),
+    path(
+        "dhcp-relay-interface/<int:pk>/edit/",
+        DhcpRelayInterfaceEditView.as_view(),
+        name="dhcprelayinterface_edit",
+    ),
+    path(
+        "dhcp-relay-interface/<int:pk>/delete/",
+        DhcpRelayInterfaceDeleteView.as_view(),
+        name="dhcprelayinterface_delete",
+    ),
+    path(
+        "dhcp-relay-interface/<int:pk>/changelog/",
+        ObjectChangeLogView.as_view(),
+        name="dhcprelayinterface_changelog",
+        kwargs={"model": DhcpRelayInterface},
+    ),
     # SYSLOG
     path("syslog/", SyslogListView.as_view(), name="syslog_list"),
     path("syslog/add/", SyslogEditView.as_view(), name="syslog_add"),
@@ -436,6 +470,25 @@ urlpatterns = [
         ObjectJournalView.as_view(),
         name="portlayout_journal",
         kwargs={"model": PortLayout},
+    ),
+    # DHCP SERVERS
+    path("dhcp-server/", DhcpServerListView.as_view(), name="dhcpserver_list"),
+    path("dhcp-server/add/", DhcpServerEditView.as_view(), name="dhcpserver_add"),
+    path(
+        "dhcp-server/<int:pk>/edit/",
+        DhcpServerEditView.as_view(),
+        name="dhcpserver_edit",
+    ),
+    path(
+        "dhcp-server/<int:pk>/delete/",
+        DhcpServerDeleteView.as_view(),
+        name="dhcpserver_delete",
+    ),
+    path(
+        "dhcp-server/<int:pk>/changelog/",
+        ObjectChangeLogView.as_view(),
+        name="dhcpserver_changelog",
+        kwargs={"model": DhcpServer},
     ),
     # SYSLOG SERVERS
     path("syslog-server/", SyslogServerListView.as_view(), name="syslogserver_list"),

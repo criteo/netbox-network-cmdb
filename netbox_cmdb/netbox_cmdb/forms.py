@@ -14,6 +14,7 @@ from utilities.forms.fields import DynamicModelChoiceField, MultipleChoiceField
 from netbox_cmdb.choices import AssetMonitoringStateChoices, AssetStateChoices
 from netbox_cmdb.constants import MAX_COMMUNITY_PER_DEVICE
 from netbox_cmdb.models.bgp import ASN, BGPPeerGroup, BGPSession, DeviceBGPSession
+from netbox_cmdb.models.dhcp import DhcpRelayInterface, DhcpServer
 from netbox_cmdb.models.interface import (
     DeviceInterface,
     Link,
@@ -304,6 +305,24 @@ class LogicalInterfaceForm(NetBoxModelForm):
             "native_vlan",
             "description",
         ]
+
+
+class DhcpServerForm(NetBoxModelForm):
+
+    class Meta:
+        model = DhcpServer
+        fields = ["server_address"]
+
+
+class DhcpRelayInterfaceForm(NetBoxModelForm):
+    logical_interface = DynamicModelChoiceField(
+        queryset=LogicalInterface.objects.filter(type="l3"),
+        label=_("Logical interface"),
+    )
+
+    class Meta:
+        model = DhcpRelayInterface
+        fields = ["logical_interface", "server_list"]
 
 
 class ManagementRouteForm(NetBoxModelForm):

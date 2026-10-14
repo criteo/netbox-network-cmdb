@@ -4,6 +4,7 @@ import django_tables2 as tables
 from netbox.tables import NetBoxTable, columns
 
 from netbox_cmdb.models.bgp import ASN, BGPPeerGroup, BGPSession, DeviceBGPSession
+from netbox_cmdb.models.dhcp import DhcpRelayInterface, DhcpServer
 from netbox_cmdb.models.interface import Link, LogicalInterface, PortLayout
 from netbox_cmdb.models.management_route import ManagementRoute
 from netbox_cmdb.models.ntp import NTP, NTPServer
@@ -278,6 +279,45 @@ class LogicalInterfaceTable(NetBoxTable):
 
     def render_parent_interface(self, value):
         return value.name
+
+
+class DhcpServerTable(NetBoxTable):
+
+    class Meta(NetBoxTable.Meta):
+        model = DhcpServer
+        fields = ("server_address",)
+
+
+class DhcpRelayInterfaceTable(NetBoxTable):
+    logical_interface__parent_interface__device = tables.Column(verbose_name="Device", linkify=True)
+    # `name` is a model property of the logical interface, order by the underlying fields.
+    logical_interface = tables.Column(
+        verbose_name="Logical interface",
+        order_by=("logical_interface__parent_interface__name", "logical_interface__index"),
+        linkify=True,
+    )
+    servers = tables.Column(
+        accessor="server_list",
+        verbose_name="Dhcp Servers",
+    )
+
+    class Meta(NetBoxTable.Meta):
+        model = DhcpRelayInterface
+        fields = (
+            "logical_interface__parent_interface__device",
+            "logical_interface",
+            "servers",
+        )
+
+    def render_servers(self, value):
+        """
+        Render DHCP servers as:
+        1.1.1.1, 2.2.2.2
+        """
+        if not value.exists():
+            return "—"
+
+        return ", ".join(s.server_address for s in value.all())
 
 
 class ManagementRouteTable(NetBoxTable):

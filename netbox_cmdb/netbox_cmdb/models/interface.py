@@ -246,6 +246,10 @@ class LogicalInterface(ChangeLoggedModel):
                 "Untagged VLAN cannot be combined with tagged VLANs or native VLAN."
             )
 
+        # A DHCP relay only exists on a routed interface, keep it so (reverse OneToOne).
+        if self.type != "l3" and hasattr(self, "dhcprelayinterface"):
+            raise ValidationError("A DHCP relay is set on this interface: its type must stay l3.")
+
         super(LogicalInterface, self).clean()
 
     def save(self, *args, **kwargs):
