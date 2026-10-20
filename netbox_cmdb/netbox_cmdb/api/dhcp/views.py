@@ -33,16 +33,7 @@ class DhcpRelayInterfaceViewSet(CustomNetBoxModelViewSet):
     ).prefetch_related("server_list")
     serializer_class = DhcpRelayInterfaceSerializer
 
-    filterset_fields = [
-        "id",
-        "server_list",
-        "logical_interface__id",
-        "logical_interface__index",
-        "logical_interface__parent_interface__id",
-        "logical_interface__parent_interface__name",
-        "logical_interface__parent_interface__device__id",
-        "logical_interface__parent_interface__device__name",
-    ] + filtersets.logical_interface_device_location_filterset
+    filterset_class = filtersets.DhcpRelayInterfaceFilterSet
 
     def get_serializer_class(self):
         if self.action in ["list", "retrieve"]:

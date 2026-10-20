@@ -11,13 +11,4 @@ class ManagementRouteViewSet(CustomNetBoxModelViewSet):
         "logical_interface__parent_interface__device", "logical_interface__ipv4_address"
     )
     serializer_class = ManagementRouteSerializer
-    filterset_fields = [
-        "id",
-        "logical_interface__id",
-        "logical_interface__index",
-        "logical_interface__parent_interface__id",
-        "logical_interface__parent_interface__name",
-        "logical_interface__parent_interface__device__id",
-        "logical_interface__parent_interface__device__name",
-        "kind",
-    ] + filtersets.logical_interface_device_location_filterset
+    filterset_class = filtersets.ManagementRouteFilterSet
