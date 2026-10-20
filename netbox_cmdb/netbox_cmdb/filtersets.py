@@ -379,7 +379,10 @@ class LogicalInterfaceFilterSet(
         ).distinct()
 
 
-class DhcpRelayInterfaceFilterSet(ChangeLoggedModelFilterSet):
+class DhcpRelayInterfaceFilterSet(
+    ChangeLoggedModelFilterSet,
+    device_location_filters("logical_interface__parent_interface__device"),
+):
     """DHCP relay interface filterset."""
 
     q = django_filters.CharFilter(
@@ -391,9 +394,14 @@ class DhcpRelayInterfaceFilterSet(ChangeLoggedModelFilterSet):
         model = DhcpRelayInterface
         fields = [
             "id",
-            "logical_interface__parent_interface__device__name",
+            "server_list",
+            "logical_interface__id",
+            "logical_interface__index",
+            "logical_interface__parent_interface__id",
             "logical_interface__parent_interface__name",
-        ]
+            "logical_interface__parent_interface__device__id",
+            "logical_interface__parent_interface__device__name",
+        ] + logical_interface_device_location_filterset
 
     def search(self, queryset, name, value):
         if not value.strip():
