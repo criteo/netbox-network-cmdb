@@ -34,41 +34,13 @@ class DeviceInterfaceViewSet(CustomNetBoxModelViewSet):
 class LogicalInterfaceViewSet(CustomNetBoxModelViewSet):
     queryset = LogicalInterface.objects.all()
     serializer_class = LogicalInterfaceSerializer
-    filterset_fields = [
-        "id",
-        "index",
-        "parent_interface__id",
-        "parent_interface__name",
-        "parent_interface__device__name",
-        "enabled",
-        "state",
-        "monitoring_state",
-        "mtu",
-        "type",
-        "vrf__id",
-        "vrf__name",
-        "ipv4_address__id",
-        "ipv6_address__id",
-        "mode",
-        "untagged_vlan__id",
-        "native_vlan__id",
-    ] + filtersets.parent_interface_device_location_filterset
+    filterset_class = filtersets.LogicalInterfaceFilterSet
 
 
 class LinkViewSet(CustomNetBoxModelViewSet):
     queryset = Link.objects.all()
     serializer_class = LinkSerializer
-    filterset_fields = [
-        "id",
-        "interface_a__id",
-        "interface_a__name",
-        "interface_a__device__name",
-        "interface_b__id",
-        "interface_b__name",
-        "interface_b__device__name",
-        "state",
-        "monitoring_state",
-    ]
+    filterset_class = filtersets.LinkFilterSet
 
 
 class PortLayoutViewSet(CustomNetBoxModelViewSet):

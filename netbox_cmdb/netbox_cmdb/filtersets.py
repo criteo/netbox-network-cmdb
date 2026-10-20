@@ -40,6 +40,23 @@ logical_interface_device_location_filterset = [
 ]
 
 
+def device_location_filters(device_path):
+    """Return the device location filters, under their usual names (e.g. device__site__name),
+    for models attached to a device through device_path (e.g. parent_interface__device).
+
+    It lets clients filter every model by location the same way, whatever the path to the
+    device is (e.g. logical interfaces with device__site__name instead of
+    parent_interface__device__site__name).
+    """
+    filters = {
+        field: MultiValueCharFilter(
+            field_name=f"{device_path}{field.removeprefix('device')}", label=field
+        )
+        for field in device_location_filterset
+    }
+    return type("DeviceLocationFilterSet", (django_filters.FilterSet,), filters)
+
+
 class ASNFilterSet(ChangeLoggedModelFilterSet):
     """AS number filterset."""
 
@@ -243,22 +260,70 @@ class BGPPeerGroupFilterSet(ChangeLoggedModelFilterSet):
 
 
 class LinkFilterSet(ChangeLoggedModelFilterSet):
-    """Link filterset."""
+    """Link filterset.
+
+    The device location filters (e.g. device__site__name) match the links with at least one
+    end on a device of the location.
+    """
 
     q = django_filters.CharFilter(
         method="search",
         label="Search",
     )
 
+    device__location__name = MultiValueCharFilter(
+        method="filter_device_location",
+        label="device__location__name",
+    )
+
+    device__site__name = MultiValueCharFilter(
+        method="filter_device_location",
+        label="device__site__name",
+    )
+
+    device__site__group__name = MultiValueCharFilter(
+        method="filter_device_location",
+        label="device__site__group__name",
+    )
+
+    device__site__region__name = MultiValueCharFilter(
+        method="filter_device_location",
+        label="device__site__region__name",
+    )
+
+    device__rack__name = MultiValueCharFilter(
+        method="filter_device_location",
+        label="device__rack__name",
+    )
+
+    device__site__group_id = MultiValueCharFilter(
+        method="filter_device_location",
+        label="device__site__group",
+    )
+
+    device__device_type_id = MultiValueCharFilter(
+        method="filter_device_location",
+        label="device__device_type",
+    )
+
     class Meta:
         model = Link
         fields = [
             "id",
+            "interface_a__id",
+            "interface_a__name",
             "interface_a__device__name",
+            "interface_b__id",
+            "interface_b__name",
             "interface_b__device__name",
             "state",
             "monitoring_state",
         ]
+
+    def filter_device_location(self, queryset, name, value):
+        return queryset.filter(
+            Q(**{f"interface_a__{name}__in": value}) | Q(**{f"interface_b__{name}__in": value})
+        ).distinct()
 
     def search(self, queryset, name, value):
         if not value.strip():
@@ -271,7 +336,9 @@ class LinkFilterSet(ChangeLoggedModelFilterSet):
         ).distinct()
 
 
-class LogicalInterfaceFilterSet(ChangeLoggedModelFilterSet):
+class LogicalInterfaceFilterSet(
+    ChangeLoggedModelFilterSet, device_location_filters("parent_interface__device")
+):
     """Logical interface filterset."""
 
     q = django_filters.CharFilter(
@@ -283,14 +350,24 @@ class LogicalInterfaceFilterSet(ChangeLoggedModelFilterSet):
         model = LogicalInterface
         fields = [
             "id",
-            "parent_interface__device__name",
+            "index",
+            "parent_interface__id",
             "parent_interface__name",
-            "type",
-            "mode",
+            "parent_interface__device__name",
+            "enabled",
             "state",
             "monitoring_state",
+            "mtu",
+            "type",
+            "vrf__id",
+            "vrf__name",
+            "ipv4_address__id",
+            "ipv6_address__id",
+            "mode",
+            "untagged_vlan__id",
+            "native_vlan__id",
             "use_ipv6_link_local_only",
-        ]
+        ] + parent_interface_device_location_filterset
 
     def search(self, queryset, name, value):
         if not value.strip():
@@ -328,7 +405,10 @@ class DhcpRelayInterfaceFilterSet(ChangeLoggedModelFilterSet):
         ).distinct()
 
 
-class ManagementRouteFilterSet(ChangeLoggedModelFilterSet):
+class ManagementRouteFilterSet(
+    ChangeLoggedModelFilterSet,
+    device_location_filters("logical_interface__parent_interface__device"),
+):
     """Management route filterset."""
 
     q = django_filters.CharFilter(
@@ -340,10 +420,14 @@ class ManagementRouteFilterSet(ChangeLoggedModelFilterSet):
         model = ManagementRoute
         fields = [
             "id",
-            "logical_interface__parent_interface__device__name",
+            "logical_interface__id",
+            "logical_interface__index",
+            "logical_interface__parent_interface__id",
             "logical_interface__parent_interface__name",
+            "logical_interface__parent_interface__device__id",
+            "logical_interface__parent_interface__device__name",
             "kind",
-        ]
+        ] + logical_interface_device_location_filterset
 
     def search(self, queryset, name, value):
         if not value.strip():
