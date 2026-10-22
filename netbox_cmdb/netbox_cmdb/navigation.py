@@ -221,6 +221,30 @@ menu_items = (
         ),
     ),
     PluginMenuItem(
+        link="plugins:netbox_cmdb:dns_list",
+        link_text="DNS",
+        buttons=(
+            PluginMenuButton(
+                link="plugins:netbox_cmdb:dns_add",
+                title="DNS",
+                icon_class="mdi mdi-plus-thick",
+                color=ButtonColorChoices.GREEN,
+            ),
+        ),
+    ),
+    PluginMenuItem(
+        link="plugins:netbox_cmdb:dnsserver_list",
+        link_text="DNS Server",
+        buttons=(
+            PluginMenuButton(
+                link="plugins:netbox_cmdb:dnsserver_add",
+                title="DNS Server",
+                icon_class="mdi mdi-plus-thick",
+                color=ButtonColorChoices.GREEN,
+            ),
+        ),
+    ),
+    PluginMenuItem(
         link="plugins:netbox_cmdb:sonicrolemapping_list",
         link_text="SONiC Role Mapping",
         buttons=(

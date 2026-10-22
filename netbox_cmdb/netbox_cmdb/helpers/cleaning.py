@@ -4,6 +4,7 @@ from django.db.models import Q
 from netbox_cmdb.models.bgp import BGPPeerGroup, BGPSession, DeviceBGPSession
 from netbox_cmdb.models.bgp_community_list import BGPCommunityList
 from netbox_cmdb.models.dhcp import DhcpRelayInterface
+from netbox_cmdb.models.dns import DNS
 from netbox_cmdb.models.ntp import NTP
 from netbox_cmdb.models.prefix_list import PrefixList
 from netbox_cmdb.models.route_policy import RoutePolicy
@@ -25,6 +26,7 @@ def clean_cmdb_for_devices(device_ids: list[int]):
         "syslog": [],
         "tacacs": [],
         "ntp": [],
+        "dns": [],
     }
 
     bgp_sessions = BGPSession.objects.filter(
@@ -42,6 +44,7 @@ def clean_cmdb_for_devices(device_ids: list[int]):
     syslog = Syslog.objects.filter(device__id__in=device_ids)
     tacacs = Tacacs.objects.filter(device__id__in=device_ids)
     ntp = NTP.objects.filter(device__id__in=device_ids)
+    dns = DNS.objects.filter(device__id__in=device_ids)
 
     deleted_objects["bgp_sessions"] = [str(val) for val in list(bgp_sessions)]
     deleted_objects["device_bgp_sessions"] = [str(val) for val in list(device_bgp_sessions)]
@@ -54,6 +57,7 @@ def clean_cmdb_for_devices(device_ids: list[int]):
     deleted_objects["syslog"] = [str(val) for val in list(syslog)]
     deleted_objects["tacacs"] = [str(val) for val in list(tacacs)]
     deleted_objects["ntp"] = [str(val) for val in list(ntp)]
+    deleted_objects["dns"] = [str(val) for val in list(dns)]
 
     bgp_sessions.delete()
     device_bgp_sessions.delete()
@@ -66,6 +70,7 @@ def clean_cmdb_for_devices(device_ids: list[int]):
     syslog.delete()
     tacacs.delete()
     ntp.delete()
+    dns.delete()
 
     return deleted_objects
 

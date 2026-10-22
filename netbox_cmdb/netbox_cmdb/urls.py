@@ -10,6 +10,7 @@ from netbox_cmdb.models.management_route import ManagementRoute
 from netbox_cmdb.models.sonic_role_mapping import SonicRoleMapping
 from netbox_cmdb.models.sonic_hwsku_mapping import SonicHwskuMapping
 from netbox_cmdb.models.ntp import NTP, NTPServer
+from netbox_cmdb.models.dns import DNS, DNSServer
 from netbox_cmdb.models.route_policy import RoutePolicy
 from netbox_cmdb.models.snmp import SNMP, SNMPCommunity
 from netbox_cmdb.models.syslog import Syslog, SyslogServer
@@ -79,6 +80,12 @@ from netbox_cmdb.views import (
     NTPServerListView,
     NTPServerEditView,
     NTPServerDeleteView,
+    DNSListView,
+    DNSEditView,
+    DNSDeleteView,
+    DNSServerListView,
+    DNSServerEditView,
+    DNSServerDeleteView,
     SonicRoleMappingListView,
     SonicRoleMappingEditView,
     SonicRoleMappingDeleteView,
@@ -584,6 +591,44 @@ urlpatterns = [
         ObjectChangeLogView.as_view(),
         name="ntpserver_changelog",
         kwargs={"model": NTPServer},
+    ),
+    # DNS
+    path("dns/", DNSListView.as_view(), name="dns_list"),
+    path("dns/add/", DNSEditView.as_view(), name="dns_add"),
+    path(
+        "dns/<int:pk>/edit/",
+        DNSEditView.as_view(),
+        name="dns_edit",
+    ),
+    path(
+        "dns/<int:pk>/delete/",
+        DNSDeleteView.as_view(),
+        name="dns_delete",
+    ),
+    path(
+        "dns/<int:pk>/changelog/",
+        ObjectChangeLogView.as_view(),
+        name="dns_changelog",
+        kwargs={"model": DNS},
+    ),
+    # DNS SERVERS
+    path("dns-server/", DNSServerListView.as_view(), name="dnsserver_list"),
+    path("dns-server/add/", DNSServerEditView.as_view(), name="dnsserver_add"),
+    path(
+        "dns-server/<int:pk>/edit/",
+        DNSServerEditView.as_view(),
+        name="dnsserver_edit",
+    ),
+    path(
+        "dns-server/<int:pk>/delete/",
+        DNSServerDeleteView.as_view(),
+        name="dnsserver_delete",
+    ),
+    path(
+        "dns-server/<int:pk>/changelog/",
+        ObjectChangeLogView.as_view(),
+        name="dnsserver_changelog",
+        kwargs={"model": DNSServer},
     ),
     # SONIC ROLE MAPPINGS
     path("sonic-role-mapping/", SonicRoleMappingListView.as_view(), name="sonicrolemapping_list"),
