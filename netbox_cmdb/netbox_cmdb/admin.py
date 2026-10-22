@@ -21,6 +21,7 @@ from netbox_cmdb.models.bgp import (
 )
 from netbox_cmdb.models.bgp_community_list import BGPCommunityList, BGPCommunityListTerm
 from netbox_cmdb.models.dhcp import DhcpRelayInterface, DhcpServer
+from netbox_cmdb.models.dns import DNS, DNSServer
 from netbox_cmdb.models.interface import (
     DeviceInterface,
     Link,
@@ -442,6 +443,36 @@ class NTPAdmin(BaseAdmin):
 @admin.register(NTPServer)
 class NTPServerAdmin(BaseAdmin):
     """Admin class to manage NTP Server objects."""
+
+    list_display = ("name", "server_address")
+
+    search_fields = ("name", "server_address")
+
+
+@admin.register(DNS)
+class DNSAdmin(BaseAdmin):
+    """Admin class to manage DNS configuration objects."""
+
+    list_display = (
+        "device",
+        "get_servers",
+    )
+
+    search_fields = ("device__name", "server_list__name", "server_list__server_address")
+    autocomplete_fields = ("device",)
+
+    def get_servers(self, obj):
+        """
+        Return a comma-separated list of DNS servers bound to this device.
+        """
+        return ", ".join(str(s) for s in obj.server_list.all())
+
+    get_servers.short_description = "DNS Servers"
+
+
+@admin.register(DNSServer)
+class DNSServerAdmin(BaseAdmin):
+    """Admin class to manage DNS Server objects."""
 
     list_display = ("name", "server_address")
 

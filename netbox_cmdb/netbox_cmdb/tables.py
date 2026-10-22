@@ -5,6 +5,7 @@ from netbox.tables import NetBoxTable, columns
 
 from netbox_cmdb.models.bgp import ASN, BGPPeerGroup, BGPSession, DeviceBGPSession
 from netbox_cmdb.models.dhcp import DhcpRelayInterface, DhcpServer
+from netbox_cmdb.models.dns import DNS, DNSServer
 from netbox_cmdb.models.interface import Link, LogicalInterface, PortLayout
 from netbox_cmdb.models.management_route import ManagementRoute
 from netbox_cmdb.models.ntp import NTP, NTPServer
@@ -153,6 +154,39 @@ class NTPServerTable(NetBoxTable):
 
     class Meta(NetBoxTable.Meta):
         model = NTPServer
+        fields = ("name", "server_address")
+
+
+class DNSTable(NetBoxTable):
+    device = tables.LinkColumn()
+
+    servers = tables.Column(
+        accessor="server_list",
+        verbose_name="DNS Servers",
+    )
+
+    class Meta(NetBoxTable.Meta):
+        model = DNS
+        fields = (
+            "device",
+            "servers",
+        )
+
+    def render_servers(self, value):
+        """
+        Render DNS servers as:
+        dns1 (1.1.1.1), 2.2.2.2
+        """
+        if not value.exists():
+            return "—"
+
+        return ", ".join(str(s) for s in value.all())
+
+
+class DNSServerTable(NetBoxTable):
+
+    class Meta(NetBoxTable.Meta):
+        model = DNSServer
         fields = ("name", "server_address")
 
 

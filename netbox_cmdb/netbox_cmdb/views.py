@@ -27,6 +27,7 @@ from netbox_cmdb.filtersets import (
     BGPSessionFilterSet,
     DeviceBGPSessionFilterSet,
     DhcpRelayInterfaceFilterSet,
+    DNSFilterSet,
     LinkFilterSet,
     LogicalInterfaceFilterSet,
     ManagementRouteFilterSet,
@@ -47,6 +48,8 @@ from netbox_cmdb.forms import (
     DeviceInterfaceForm,
     DhcpRelayInterfaceForm,
     DhcpServerForm,
+    DNSForm,
+    DNSServerForm,
     LinkForm,
     LogicalInterfaceForm,
     ManagementRouteForm,
@@ -73,6 +76,7 @@ from netbox_cmdb.models.bgp import (
     DeviceBGPSession,
 )
 from netbox_cmdb.models.dhcp import DhcpRelayInterface, DhcpServer
+from netbox_cmdb.models.dns import DNS, DNSServer
 from netbox_cmdb.models.interface import (
     DeviceInterface,
     Link,
@@ -94,6 +98,8 @@ from netbox_cmdb.tables import (
     DeviceBGPSessionTable,
     DhcpRelayInterfaceTable,
     DhcpServerTable,
+    DNSServerTable,
+    DNSTable,
     LinkTable,
     LogicalInterfaceTable,
     ManagementRouteTable,
@@ -456,6 +462,35 @@ class SNMPCommunityEditView(ObjectEditView):
 
 class SNMPCommunityDeleteView(ObjectDeleteView):
     queryset = SNMPCommunity.objects.all()
+
+
+class DNSListView(ObjectListView):
+    queryset = DNS.objects.all()
+    filterset = DNSFilterSet
+    table = DNSTable
+
+
+class DNSEditView(ObjectEditView):
+    queryset = DNS.objects.all()
+    form = DNSForm
+
+
+class DNSDeleteView(ObjectDeleteView):
+    queryset = DNS.objects.all()
+
+
+class DNSServerListView(ObjectListView):
+    queryset = DNSServer.objects.all()
+    table = DNSServerTable
+
+
+class DNSServerEditView(ObjectEditView):
+    queryset = DNSServer.objects.all()
+    form = DNSServerForm
+
+
+class DNSServerDeleteView(ObjectDeleteView):
+    queryset = DNSServer.objects.all()
 
 
 class NTPListView(ObjectListView):

@@ -12,9 +12,10 @@ from utilities.forms import DynamicModelMultipleChoiceField
 from utilities.forms.fields import DynamicModelChoiceField, MultipleChoiceField
 
 from netbox_cmdb.choices import AssetMonitoringStateChoices, AssetStateChoices
-from netbox_cmdb.constants import MAX_COMMUNITY_PER_DEVICE
+from netbox_cmdb.constants import MAX_COMMUNITY_PER_DEVICE, MAX_DNS_SERVERS_PER_DEVICE
 from netbox_cmdb.models.bgp import ASN, BGPPeerGroup, BGPSession, DeviceBGPSession
 from netbox_cmdb.models.dhcp import DhcpRelayInterface, DhcpServer
+from netbox_cmdb.models.dns import DNS, DNSServer
 from netbox_cmdb.models.interface import (
     DeviceInterface,
     Link,
@@ -210,6 +211,29 @@ class NTPServerForm(NetBoxModelForm):
 
     class Meta:
         model = NTPServer
+        fields = ["name", "server_address"]
+
+
+class DNSForm(NetBoxModelForm):
+    device = DynamicModelChoiceField(queryset=Device.objects.all())
+
+    class Meta:
+        model = DNS
+        fields = ["device", "server_list"]
+
+    def clean_server_list(self):
+        server_list = self.cleaned_data.get("server_list")
+        if len(server_list) > MAX_DNS_SERVERS_PER_DEVICE:
+            raise forms.ValidationError(
+                f"You cannot select more than {MAX_DNS_SERVERS_PER_DEVICE} DNS Servers."
+            )
+        return server_list
+
+
+class DNSServerForm(NetBoxModelForm):
+
+    class Meta:
+        model = DNSServer
         fields = ["name", "server_address"]
 
 

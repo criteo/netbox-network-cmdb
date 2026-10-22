@@ -16,6 +16,7 @@ from netbox_cmdb.api.cmdb.views import (
     SiteDecommissioningAPIView,
 )
 from netbox_cmdb.api.dhcp.views import DhcpRelayInterfaceViewSet, DhcpServerViewSet
+from netbox_cmdb.api.dns.views import DNSServerViewSet, DNSViewSet
 from netbox_cmdb.api.interface.views import (
     DeviceInterfaceViewSet,
     LinkViewSet,
@@ -59,6 +60,8 @@ router.register("sonic-role-mapping", SonicRoleMappingViewSet)
 router.register("sonic-hwsku-mapping", SonicHwskuMappingViewSet)
 router.register("ntp", NTPViewSet)
 router.register("ntp-server", NTPServerViewSet)
+router.register("dns", DNSViewSet)
+router.register("dns-server", DNSServerViewSet)
 router.register("syslog", SyslogViewSet)
 router.register("syslog-server", SyslogServerViewSet)
 router.register("tacacs", TacacsViewSet)
