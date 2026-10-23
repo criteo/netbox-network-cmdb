@@ -336,6 +336,12 @@ class PortLayout(ChangeLoggedModel):
         default=list,
         help_text="The ASIC lanes used by the interface, in hardware order (e.g. 0,1,2,3).",
     )
+    index = models.PositiveSmallIntegerField(
+        null=True,
+        blank=True,
+        help_text="The front-panel port index in the NOS (e.g. 0 for etp0). "
+        "Breakout ports share the index of their parent port.",
+    )
 
     def __str__(self):
         return f"{self.device_type}--{self.network_role}--{self.name}"

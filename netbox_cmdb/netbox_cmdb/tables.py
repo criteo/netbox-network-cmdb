@@ -413,6 +413,7 @@ class PortLayoutTable(NetBoxTable):
             "vendor_short_name",
             "vendor_long_name",
             "lanes",
+            "index",
         )
         default_columns = (
             "name",
@@ -422,6 +423,7 @@ class PortLayoutTable(NetBoxTable):
             "vendor_short_name",
             "vendor_long_name",
             "lanes",
+            "index",
         )
 
 
